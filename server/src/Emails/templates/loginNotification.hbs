@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Login Detected</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: #ffffff; padding: 30px 20px; text-align: center; }
+    .header h1 { margin: 0; font-size: 28px; }
+    .content { padding: 40px 30px; }
+    .info-box { background: #f8f9fa; border-left: 4px solid #28a745; padding: 20px; margin: 20px 0; }
+    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #dee2e6; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { font-weight: bold; color: #666; }
+    .info-value { color: #333; }
+    .alert-box { background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin: 20px 0; }
+    .button { display: inline-block; padding: 12px 30px; background: #dc3545; color: #ffffff !important; text-decoration: none; border-radius: 5px; margin: 10px 5px; }
+    .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔓 New Login Detected</h1>
+    </div>
+    
+    <div class="content">
+      <p>Hello <strong>{{name}}</strong>,</p>
+      
+      <p>We detected a new login to your PG Finder account. If this was you, you can safely ignore this email.</p>
+      
+      <div class="info-box">
+        <h3 style="margin-top: 0; color: #28a745;">Login Details:</h3>
+        
+        <div class="info-row">
+          <span class="info-label">🕒 Time:</span>
+          <span class="info-value">{{loginTime}}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">💻 Device:</span>
+          <span class="info-value">{{device}}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">📍 Location:</span>
+          <span class="info-value">{{location}}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">🌐 IP Address:</span>
+          <span class="info-value">{{ipAddress}}</span>
+        </div>
+      </div>
+      
+      <div class="alert-box">
+        <strong>⚠️ Didn't recognize this login?</strong><br>
+        If this wasn't you, your account may be compromised. Please take immediate action to secure your account.
+        
+        <div style="text-align: center; margin-top: 15px;">
+          <a href="#" class="button">Secure My Account</a>
+          <a href="#" class="button" style="background: #6c757d;">Change Password</a>
+        </div>
+      </div>
+      
+      <p><strong>Security Tips:</strong></p>
+      <ul>
+        <li>Never share your password with anyone</li>
+        <li>Use a strong, unique password</li>
+        <li>Enable two-factor authentication if available</li>
+        <li>Be cautious of phishing emails</li>
+      </ul>
+      
+      <p>If you have any questions or concerns, please contact our support team immediately.</p>
+      
+      <p>Stay safe,<br><strong>The PG Finder Security Team</strong></p>
+    </div>
+    
+    <div class="footer">
+      <p>© {{year}} PG Finder. All rights reserved.</p>
+      <p>This is a security notification email. Please do not reply.</p>
+      <p>📧 security@pgfinder.com</p>
+    </div>
+  </div>
+</body>
+</html>
