@@ -8,7 +8,6 @@ const Saved = () => {
     const { isAuthenticated } = useAuth();
     const [activeTab, setActiveTab] = useState('all');
 
-    // Mock saved properties data
     const savedProperties = [
         {
             id: 1,
@@ -149,14 +148,14 @@ const Saved = () => {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`relative px-5 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all ${activeTab === tab.id
-                                    ? 'text-primary-700'
-                                    : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
+                                ? 'text-primary-700'
+                                : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
                                 }`}
                         >
                             {tab.label}
                             <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${activeTab === tab.id
-                                    ? 'bg-primary-100 text-primary-700'
-                                    : 'bg-neutral-100 text-neutral-500'
+                                ? 'bg-primary-100 text-primary-700'
+                                : 'bg-neutral-100 text-neutral-500'
                                 }`}>
                                 {tab.count}
                             </span>
