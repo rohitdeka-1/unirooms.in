@@ -26,7 +26,7 @@ const Navbar = () => {
                             <div className="hidden md:flex items-center space-x-1">
                                 {[
                                     { path: '/', label: 'Home' },
-                                    { path: '/properties', label: 'Browse' },
+                                    { path: '/browse', label: 'Browse' },
                                     { path: '/about', label: 'About' },
                                 ].map((item) => (
                                     <Link
@@ -115,7 +115,7 @@ const Navbar = () => {
                         <div className="glass rounded-2xl shadow-soft p-4 space-y-2">
                             {[
                                 { path: '/', label: 'Home' },
-                                { path: '/properties', label: 'Browse' },
+                                { path: '/browse', label: 'Browse' },
                                 { path: '/about', label: 'About' },
                             ].map((item) => (
                                 <Link

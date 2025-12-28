@@ -5,11 +5,13 @@ import BottomNav from './components/BottomNav';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
+import Browse from './pages/Browse';
+import Saved from './pages/Saved';
+import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import PropertyDetail from './pages/PropertyDetail';
 
-// Layout component to conditionally show Navbar/Footer
 const Layout = ({ children }) => {
   const location = useLocation();
   const hideNavRoutes = ['/login', '/signup', '/forgot-password'];
@@ -33,6 +35,9 @@ function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/browse" element={<Browse />} />
+            <Route path="/saved" element={<Saved />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/property/:id" element={<PropertyDetail />} />

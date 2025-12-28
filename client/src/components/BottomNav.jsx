@@ -5,7 +5,7 @@ const BottomNav = () => {
 
     const navItems = [
         { name: 'Home', path: '/', icon: 'home' },
-        { name: 'Browse', path: '/properties', icon: 'search' },
+        { name: 'Browse', path: '/browse', icon: 'search' },
         { name: 'Saved', path: '/saved', icon: 'heart' },
         { name: 'Profile', path: '/profile', icon: 'user' },
     ];

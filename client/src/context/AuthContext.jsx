@@ -66,12 +66,32 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
     };
 
+    const googleLogin = async (credential) => {
+        const response = await authAPI.googleLogin(credential);
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+        setUser(response.data.user);
+        setIsAuthenticated(true);
+        return response;
+    };
+
+    const googleSignup = async (credential, role) => {
+        const response = await authAPI.googleSignup(credential, role);
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+        setUser(response.data.user);
+        setIsAuthenticated(true);
+        return response;
+    };
+
     const value = {
         user,
         isAuthenticated,
         loading,
         login,
         register,
+        googleLogin,
+        googleSignup,
         logout,
     };
 

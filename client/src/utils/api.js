@@ -41,6 +41,16 @@ export const authAPI = {
         body: JSON.stringify(userData),
     }),
 
+    googleLogin: (credential) => apiCall('/auth/google/login', {
+        method: 'POST',
+        body: JSON.stringify({ credential }),
+    }),
+
+    googleSignup: (credential, role) => apiCall('/auth/google/signup', {
+        method: 'POST',
+        body: JSON.stringify({ credential, role }),
+    }),
+
     getCurrentUser: () => apiCall('/auth/me'),
 
     logout: () => apiCall('/auth/logout', { method: 'POST' }),
