@@ -192,18 +192,23 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        // Calculate nearby colleges automatically
-        const nearbyColleges = calculateNearbyColleges(
-            req.body.location.coordinates[1], // latitude
-            req.body.location.coordinates[0]  // longitude
-        );
+        // Use nearbyColleges directly from frontend (landlord selects which campus the property is near)
+        const nearbyColleges = req.body.nearbyColleges || [];
+
+        // Validate that at least one college is selected
+        if (nearbyColleges.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Please select at least one nearby campus",
+            });
+        }
 
         // Create property
         const propertyData = {
             ...req.body,
             landlordId: req.user.id,
             paymentId,
-            nearbyColleges, // Add calculated nearby colleges
+            nearbyColleges, // Campuses selected by landlord
         };
 
         const property = await Property.create(propertyData);

@@ -30,6 +30,7 @@ const AddProperty = () => {
         },
         city: '',
         state: '',
+        phone: '',
         roomType: 'single',
         gender: 'any',
         totalRooms: '',
@@ -42,7 +43,7 @@ const AddProperty = () => {
     useEffect(() => {
         const fetchNearbyColleges = async () => {
             const [lon, lat] = formData.location.coordinates;
-            
+
             if (lat && lon && lat !== '' && lon !== '') {
                 try {
                     setLoadingColleges(true);
@@ -91,7 +92,7 @@ const AddProperty = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        
+
         if (name.includes('.')) {
             const [parent, child, index] = name.split('.');
             if (index !== undefined) {
@@ -128,7 +129,7 @@ const AddProperty = () => {
     const handlePaymentSuccess = async (pId) => {
         setPaymentId(pId);
         setShowPaymentModal(false);
-        
+
         // Now submit the property
         await handleSubmitProperty(pId);
     };
@@ -166,7 +167,7 @@ const AddProperty = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         // Validate form
         if (!formData.title || !formData.description || !formData.price) {
             alert('Please fill all required fields');
@@ -199,8 +200,16 @@ const AddProperty = () => {
                     className="card p-6 md:p-8 space-y-6"
                 >
                     {/* Basic Details */}
-                    <div>
-                        <h2 className="text-xl font-display font-bold text-neutral-800 mb-4">Basic Details</h2>
+                    <div className="bg-gradient-to-br from-neutral-50 to-white p-6 rounded-xl border border-neutral-100">
+                        <h2 className="text-xl font-display font-bold text-neutral-800 mb-1 flex items-center gap-2">
+                            <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                                <svg className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            Basic Information
+                        </h2>
+                        <p className="text-sm text-neutral-500 mb-6">Tell us about your property</p>
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-neutral-700 mb-2">Property Title *</label>
@@ -227,9 +236,15 @@ const AddProperty = () => {
                                     minLength={20}
                                     maxLength={1000}
                                     rows={4}
-                                    className="input"
-                                    placeholder="Describe your property, facilities, and nearby landmarks..."
+                                    className="input resize-none"
+                                    placeholder="Describe your property, facilities, nearby landmarks, and what makes it special..."
                                 />
+                                <div className="mt-1.5 flex items-center justify-between text-xs">
+                                    <span className="text-neutral-500">  Minimum 20 characters</span>
+                                    <span className={`font-medium ${formData.description.length >= 20 ? 'text-green-600' : 'text-amber-600'}`}>
+                                        {formData.description.length}/1000
+                                    </span>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -313,9 +328,18 @@ const AddProperty = () => {
                         </div>
                     </div>
 
-                    {/* Address */}
-                    <div>
-                        <h2 className="text-xl font-display font-bold text-neutral-800 mb-4">Address</h2>
+                    {/* Address & Location */}
+                    <div className="bg-gradient-to-br from-neutral-50 to-white p-6 rounded-xl border border-neutral-100">
+                        <h2 className="text-xl font-display font-bold text-neutral-800 mb-1 flex items-center gap-2">
+                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            Address & Location
+                        </h2>
+                        <p className="text-sm text-neutral-500 mb-6">Where is your property located?</p>
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-neutral-700 mb-2">Street Address *</label>
@@ -399,6 +423,54 @@ const AddProperty = () => {
                                 </div>
                             </div>
 
+                            {/* Contact Information */}
+                            <div className="mt-6">
+                                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                    <span className="flex items-center gap-2">
+                                        <svg className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        </svg>
+                                        Contact Phone Number *
+                                    </span>
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span className="text-neutral-500 font-medium">+91</span>
+                                    </div>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, ''); // Only numbers
+                                            if (value.length <= 10) {
+                                                handleChange({ target: { name: 'phone', value } });
+                                            }
+                                        }}
+                                        required
+                                        maxLength={10}
+                                        pattern="[0-9]{10}"
+                                        className="input pl-14 font-mono"
+                                        placeholder="9876543210"
+                                    />
+                                    {formData.phone.length === 10 && (
+                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                            <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    )}
+                                </div>
+                                <p className="mt-1.5 text-xs text-neutral-500 flex items-center gap-1">
+                                    <span className={formData.phone.length === 10 ? 'text-green-600 font-medium' : ''}>
+                                        {formData.phone.length}/10 digits
+                                    </span>
+                                    {formData.phone.length > 0 && formData.phone.length < 10 && (
+                                        <span className="text-amber-600">• {10 - formData.phone.length} more needed</span>
+                                    )}
+                                </p>
+                            </div>
+
                             <div>
                                 <label className="block text-sm font-medium text-neutral-700 mb-3">Property Location *</label>
                                 <LocationPicker
@@ -436,7 +508,7 @@ const AddProperty = () => {
                                         </svg>
                                         Nearby Colleges (within 10km)
                                     </h3>
-                                    
+
                                     {loadingColleges ? (
                                         <div className="p-4 bg-neutral-50 rounded-lg text-center text-sm text-neutral-500">
                                             <svg className="animate-spin h-5 w-5 mx-auto mb-2" fill="none" viewBox="0 0 24 24">

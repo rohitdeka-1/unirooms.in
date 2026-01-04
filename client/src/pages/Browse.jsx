@@ -9,8 +9,6 @@ const Browse = () => {
     const [searchParams] = useSearchParams();
     const initialSearch = searchParams.get('search') || '';
     const collegeParam = searchParams.get('college') || '';
-
-    // State
     const [searchQuery, setSearchQuery] = useState(initialSearch);
     const [collegeName, setCollegeName] = useState(collegeParam);
     const [selectedType, setSelectedType] = useState('all');
@@ -23,30 +21,28 @@ const Browse = () => {
     const [error, setError] = useState(null);
     const [collegeInfo, setCollegeInfo] = useState(null);
 
-    // Fetch properties based on college or general search
     useEffect(() => {
         const fetchProperties = async () => {
             setLoading(true);
             setError(null);
-            
+
             try {
                 console.log('Fetching properties...', { collegeName, selectedType, priceRange });
-                
+
                 if (collegeName) {
-                    // Fetch properties near the college
                     const params = {
                         collegeName: collegeName,
-                        maxDistance: 5, // 5km radius
+                        maxDistance: 5,
                     };
-                    
+
                     if (selectedType !== 'all') params.roomType = selectedType.toLowerCase().replace(' pg', '');
                     if (priceRange.min) params.minPrice = priceRange.min;
                     if (priceRange.max) params.maxPrice = priceRange.max;
-                    
+
                     console.log('Fetching properties near college:', params);
                     const response = await propertyAPI.getPropertiesNearCollege(params);
                     console.log('API Response:', response);
-                    
+
                     if (response.success) {
                         console.log('Properties found:', response.data.properties?.length || 0);
                         setProperties(response.data.properties || []);
@@ -57,17 +53,16 @@ const Browse = () => {
                         setCollegeInfo(null);
                     }
                 } else {
-                    // Fetch all properties from backend
                     const params = {};
                     if (searchQuery) params.search = searchQuery;
                     if (selectedType !== 'all') params.roomType = selectedType.toLowerCase().replace(' pg', '');
                     if (priceRange.min) params.minPrice = priceRange.min;
                     if (priceRange.max) params.maxPrice = priceRange.max;
-                    
+
                     console.log('Fetching all properties:', params);
                     const response = await propertyAPI.getAllProperties(params);
                     console.log('API Response:', response);
-                    
+
                     if (response.success) {
                         console.log('Properties found:', response.data.properties?.length || 0);
                         setProperties(response.data.properties || []);
@@ -91,13 +86,11 @@ const Browse = () => {
         fetchProperties();
     }, [collegeName, selectedType, priceRange, searchQuery]);
 
-    // Update college name when URL param changes
     useEffect(() => {
         const newCollegeName = searchParams.get('college') || '';
         setCollegeName(newCollegeName);
     }, [searchParams]);
 
-    // Property types for filter
     const propertyTypes = [
         { value: 'all', label: 'All Types' },
         { value: 'Boys PG', label: 'Boys PG' },
@@ -106,7 +99,6 @@ const Browse = () => {
         { value: 'Hostel', label: 'Hostel' },
     ];
 
-    // Sort options
     const sortOptions = collegeName ? [
         { value: 'distance', label: 'Nearest First' },
         { value: 'recommended', label: 'Recommended' },
@@ -120,11 +112,9 @@ const Browse = () => {
         { value: 'rating', label: 'Highest Rated' },
     ];
 
-    // Filter and sort properties (client-side filtering for remaining filters)
     const filteredProperties = useMemo(() => {
         let result = [...properties];
 
-        // Search filter (client-side for general search)
         if (searchQuery && !collegeName) {
             const query = searchQuery.toLowerCase();
             result = result.filter(
@@ -134,17 +124,13 @@ const Browse = () => {
             );
         }
 
-        // Type filter (additional client-side filtering)
         if (selectedType !== 'all' && !collegeName) {
             result = result.filter((p) => p.type === selectedType || p.roomType === selectedType.toLowerCase().replace(' pg', ''));
         }
-
-        // Rating filter (client-side only)
         if (minRating > 0) {
             result = result.filter((p) => (p.rating || 0) >= minRating);
         }
 
-        // Sorting
         switch (sortBy) {
             case 'price-low':
                 result.sort((a, b) => a.price - b.price);
@@ -161,7 +147,6 @@ const Browse = () => {
                 }
                 break;
             default:
-                // Keep recommended order
                 break;
         }
 
@@ -498,7 +483,7 @@ const Browse = () => {
                                     No Properties Found
                                 </h3>
                                 <p className="text-neutral-500 mb-6">
-                                    {collegeName 
+                                    {collegeName
                                         ? `No properties available near ${collegeName}. Try searching for a different college or check back later.`
                                         : 'Try adjusting your filters or search criteria'
                                     }

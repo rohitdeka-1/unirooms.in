@@ -1,6 +1,3 @@
-// Popular colleges in India with their coordinates
-// This is a starter list - can be expanded or moved to database seeding
-
 export const popularColleges = [
   // VIT Campuses
   {
@@ -8,7 +5,7 @@ export const popularColleges = [
     shortName: "VIT Vellore",
     location: {
       type: "Point",
-      coordinates: [79.1591, 12.9698], // [longitude, latitude]
+      coordinates: [79.1591, 12.9698],
     },
     address: {
       city: "Vellore",
@@ -346,7 +343,7 @@ export const searchColleges = (query) => {
   }
 
   const searchTerm = query.toLowerCase().trim();
-  
+
   return popularColleges.filter(
     (college) =>
       college.name.toLowerCase().includes(searchTerm) ||
@@ -358,7 +355,7 @@ export const searchColleges = (query) => {
 // Function to get college by exact name match
 export const getCollegeByName = (name) => {
   const searchTerm = name.toLowerCase().trim();
-  
+
   return popularColleges.find(
     (college) =>
       college.name.toLowerCase() === searchTerm ||

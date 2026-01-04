@@ -49,9 +49,9 @@ const propertySchema = new mongoose.Schema(
         required: true,
         validate: {
           validator: function (coords) {
-            return coords.length === 2 && 
-                   coords[0] >= -180 && coords[0] <= 180 && // longitude
-                   coords[1] >= -90 && coords[1] <= 90;     // latitude
+            return coords.length === 2 &&
+              coords[0] >= -180 && coords[0] <= 180 && // longitude
+              coords[1] >= -90 && coords[1] <= 90;     // latitude
           },
           message: "Invalid coordinates format",
         },
@@ -88,14 +88,15 @@ const propertySchema = new mongoose.Schema(
       required: [true, "State is required"],
       trim: true,
     },
+    phone: {
+      type: String,
+      required: [true, "Phone number is required"],
+      match: [/^[0-9]{10}$/, "Please provide a valid 10-digit phone number"],
+    },
     nearbyColleges: [
       {
         name: {
           type: String,
-          required: true,
-        },
-        distance: {
-          type: Number, // in kilometers
           required: true,
         },
       },
