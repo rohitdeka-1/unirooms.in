@@ -27,6 +27,15 @@ app.use(cookieParser());
 
 app.use("/api/v1", apiRoutes);
 
+// Health check endpoint for Render
+app.get('/api/v1/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'ok',
+        message: 'API is healthy',
+        timestamp: new Date().toISOString()
+    });
+});
+
 app.get('/', (req, res) => {
     res.json({ 
         message: "PG Finder API is up and running!",
@@ -38,7 +47,7 @@ app.get('/', (req, res) => {
             payments: "/api/v1/payments",
             reviews: "/api/v1/reviews",
             saved: "/api/v1/saved",
-            health: "/"
+            health: "/api/v1/health"
         }
     });
 })
