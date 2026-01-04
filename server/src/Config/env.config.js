@@ -19,7 +19,7 @@ const config = {
   
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   
-  FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
+  FRONTEND_URL: process.env.FRONTEND_URL || "https://unirooms-in.vercel.app",
   
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,

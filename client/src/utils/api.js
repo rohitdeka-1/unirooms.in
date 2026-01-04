@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://uniroomsin-production.up.railway.app/api/v1';
 
 const getAuthToken = () => {
     return localStorage.getItem('accessToken');
