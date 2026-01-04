@@ -15,17 +15,33 @@ const Signup = () => {
         role: 'student',
     });
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setSuccess('');
         setLoading(true);
 
         try {
-            await register(formData);
-            navigate('/');
+            const response = await register(formData);
+            
+            // Check if email verification is required
+            if (response.data.requiresEmailVerification) {
+                // Navigate to verification pending page with email
+                navigate('/verify-email-pending', { 
+                    state: { email: formData.email }
+                });
+            } else {
+                // Redirect based on user role
+                if (formData.role === 'landlord') {
+                    navigate('/landlord/dashboard');
+                } else {
+                    navigate('/');
+                }
+            }
         } catch (err) {
             setError(err.message || 'Registration failed. Please try again.');
         } finally {
@@ -38,8 +54,14 @@ const Signup = () => {
         setError('');
         try {
             // credentialResponse.credential is the ID token
-            await googleSignup(credentialResponse.credential, formData.role);
-            navigate('/');
+            const response = await googleSignup(credentialResponse.credential, formData.role);
+            
+            // Redirect based on user role
+            if (formData.role === 'landlord') {
+                navigate('/landlord/dashboard');
+            } else {
+                navigate('/');
+            }
         } catch (err) {
             // Check if user already exists
             if (err.message?.includes('already registered')) {
@@ -121,6 +143,29 @@ const Signup = () => {
                             className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm"
                         >
                             {error}
+                        </motion.div>
+                    )}
+
+                    {success && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm"
+                        >
+                            <div className="flex items-start space-x-3">
+                                <svg className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div>
+                                    <p className="font-semibold mb-1">Registration Successful!</p>
+                                    <p>{success}</p>
+                                    <p className="mt-2">
+                                        <Link to="/login" className="text-green-600 hover:text-green-700 font-semibold underline">
+                                            Go to Login
+                                        </Link>
+                                    </p>
+                                </div>
+                            </div>
                         </motion.div>
                     )}
 
@@ -221,12 +266,15 @@ const Signup = () => {
                             <input
                                 type="password"
                                 required
-                                minLength={6}
+                                minLength={4}
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 className="input-field"
                                 placeholder="••••••••"
                             />
+                            <p className="mt-1.5 text-xs text-neutral-500">
+                                Must be at least 4 characters with one uppercase, one lowercase, and one number
+                            </p>
                         </div>
 
                         <button

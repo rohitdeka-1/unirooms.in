@@ -111,7 +111,22 @@ const Profile = () => {
                         <div className="flex flex-col md:flex-row md:items-center gap-6">
                             {/* Avatar */}
                             <div className="flex-shrink-0">
-                                <div className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                {user?.profileImage ? (
+                                    <img
+                                        src={user.profileImage}
+                                        alt={user?.name || 'User'}
+                                        className="w-24 h-24 md:w-32 md:h-32 rounded-2xl object-cover shadow-lg"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.style.display = 'none';
+                                            e.target.nextElementSibling.style.display = 'flex';
+                                        }}
+                                    />
+                                ) : null}
+                                <div
+                                    className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-primary-400 to-primary-600 rounded-2xl flex items-center justify-center shadow-lg"
+                                    style={{ display: user?.profileImage ? 'none' : 'flex' }}
+                                >
                                     <span className="text-white font-display font-bold text-4xl md:text-5xl">
                                         {user?.name?.charAt(0).toUpperCase() || 'U'}
                                     </span>

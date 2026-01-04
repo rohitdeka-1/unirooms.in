@@ -7,6 +7,11 @@ const propertySchema = new mongoose.Schema(
       ref: "User",
       required: [true, "Landlord ID is required"],
     },
+    paymentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Payment",
+      required: [true, "Payment ID is required"],
+    },
     title: {
       type: String,
       required: [true, "Property title is required"],
@@ -221,11 +226,10 @@ propertySchema.methods.incrementContactRequests = async function () {
 };
 
 // Ensure availableRooms doesn't exceed totalRooms
-propertySchema.pre("save", function (next) {
+propertySchema.pre("save", async function () {
   if (this.availableRooms > this.totalRooms) {
     this.availableRooms = this.totalRooms;
   }
-  next();
 });
 
 const Property = mongoose.model("Property", propertySchema);

@@ -46,10 +46,21 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (userData) => {
         const response = await authAPI.register(userData);
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-        setUser(response.data.user);
-        setIsAuthenticated(true);
+        
+        // Check if email verification is required
+        if (response.data.requiresEmailVerification) {
+            // Don't set tokens or authenticate - user needs to verify email
+            return response;
+        }
+        
+        // For other cases (e.g., Google signup), set tokens
+        if (response.data.accessToken) {
+            localStorage.setItem('accessToken', response.data.accessToken);
+            localStorage.setItem('refreshToken', response.data.refreshToken);
+            setUser(response.data.user);
+            setIsAuthenticated(true);
+        }
+        
         return response;
     };
 

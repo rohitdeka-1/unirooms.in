@@ -18,8 +18,14 @@ const Login = () => {
         setLoading(true);
 
         try {
-            await login(formData);
-            navigate('/');
+            const response = await login(formData);
+            
+            // Redirect based on user role
+            if (response.data.user.role === 'landlord') {
+                navigate('/landlord/dashboard');
+            } else {
+                navigate('/');
+            }
         } catch (err) {
             setError(err.message || 'Login failed. Please check your credentials.');
         } finally {
@@ -32,8 +38,14 @@ const Login = () => {
         setError('');
         try {
             // credentialResponse.credential is the ID token
-            await googleLogin(credentialResponse.credential);
-            navigate('/');
+            const response = await googleLogin(credentialResponse.credential);
+            
+            // Redirect based on user role
+            if (response.data.user.role === 'landlord') {
+                navigate('/landlord/dashboard');
+            } else {
+                navigate('/');
+            }
         } catch (err) {
             setError(err.message || 'Google login failed. Please try again or sign up first.');
         } finally {

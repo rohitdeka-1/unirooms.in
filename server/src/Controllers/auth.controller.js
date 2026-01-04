@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import config from "../Config/env.config.js";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 import {
     sendWelcomeEmail,
@@ -75,6 +76,7 @@ export const registerStudent = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({
                 success: false,
+                message: "Validation failed",
                 errors: errors.array(),
             });
         }
@@ -86,14 +88,43 @@ export const registerStudent = async (req, res) => {
         });
 
         if (existingUser) {
+            // If user exists but is not verified, allow re-registration
+            if (!existingUser.isVerified && existingUser.email === email) {
+                console.log("Re-registering unverified user:", email);
+                
+                // Update the user details
+                existingUser.name = name;
+                existingUser.phone = phone;
+                existingUser.password = password;
+                
+                // Generate new verification token
+                const verificationToken = existingUser.generateEmailVerificationToken();
+                await existingUser.save();
+
+                sendVerificationEmail(email, name, verificationToken).catch((err) =>
+                    console.error("Failed to send verification email:", err)
+                );
+
+                return res.status(201).json({
+                    success: true,
+                    message: "Registration successful! A new verification email has been sent. Please check your email.",
+                    data: {
+                        email: existingUser.email,
+                        name: existingUser.name,
+                        requiresEmailVerification: true,
+                    }
+                });
+            }
+            
             return res.status(400).json({
                 success: false,
                 message:
                     existingUser.email === email
-                        ? "Email already registered"
-                        : "Phone number already registered",
+                        ? "Email already registered. Please login or use a different email."
+                        : "Phone number already registered. Please use a different phone number.",
             });
         }
+        
         const user = await User.create({
             name,
             email,
@@ -101,6 +132,8 @@ export const registerStudent = async (req, res) => {
             password,
             role: "student",
         });
+
+        console.log("Student registered:", email);
 
         // Generate and send verification email
         const verificationToken = user.generateEmailVerificationToken();
@@ -110,14 +143,31 @@ export const registerStudent = async (req, res) => {
             console.error("Failed to send verification email:", err)
         );
 
-        sendTokenResponse(user, 201, res, "Student registered successfully. Please verify your email to login.", {
-            requiresEmailVerification: true
+        // Don't send tokens - user must verify email first
+        res.status(201).json({
+            success: true,
+            message: "Registration successful! Please check your email to verify your account before logging in.",
+            data: {
+                email: user.email,
+                name: user.name,
+                requiresEmailVerification: true,
+            }
         });
     } catch (error) {
         console.error("Register Student Error:", error);
+        
+        // Handle duplicate key error
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern)[0];
+            return res.status(400).json({
+                success: false,
+                message: `This ${field} is already registered. Please use a different ${field}.`,
+            });
+        }
+        
         res.status(500).json({
             success: false,
-            message: "Error registering student",
+            message: "Error registering student. Please try again.",
             error: error.message,
         });
     }
@@ -132,6 +182,7 @@ export const registerLandlord = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({
                 success: false,
+                message: "Validation failed",
                 errors: errors.array(),
             });
         }
@@ -143,12 +194,44 @@ export const registerLandlord = async (req, res) => {
         });
 
         if (existingUser) {
+            // If user exists but is not verified, allow re-registration
+            if (!existingUser.isVerified && existingUser.email === email) {
+                console.log("Re-registering unverified landlord:", email);
+                
+                // Update the user details
+                existingUser.name = name;
+                existingUser.phone = phone;
+                existingUser.password = password;
+                existingUser.role = "landlord";
+                existingUser.subscriptionStatus = "none";
+                
+                // Generate new verification token
+                const verificationToken = existingUser.generateEmailVerificationToken();
+                await existingUser.save();
+
+                sendVerificationEmail(email, name, verificationToken).catch((err) =>
+                    console.error("Failed to send verification email:", err)
+                );
+
+                return res.status(201).json({
+                    success: true,
+                    message: "Registration successful! A new verification email has been sent. Please check your email.",
+                    data: {
+                        email: existingUser.email,
+                        name: existingUser.name,
+                        role: existingUser.role,
+                        requiresEmailVerification: true,
+                        requiresPayment: true,
+                    }
+                });
+            }
+            
             return res.status(400).json({
                 success: false,
                 message:
                     existingUser.email === email
-                        ? "Email already registered"
-                        : "Phone number already registered",
+                        ? "Email already registered. Please login or use a different email."
+                        : "Phone number already registered. Please use a different phone number.",
             });
         }
 
@@ -161,6 +244,8 @@ export const registerLandlord = async (req, res) => {
             subscriptionStatus: "none",
         });
 
+        console.log("Landlord registered:", email);
+
         // Generate and send verification email
         const verificationToken = user.generateEmailVerificationToken();
         await user.save();
@@ -169,21 +254,33 @@ export const registerLandlord = async (req, res) => {
             console.error("Failed to send verification email:", err)
         );
 
-        sendTokenResponse(
-            user,
-            201,
-            res,
-            "Landlord registered successfully. Please verify your email to login.",
-            {
+        // Don't send tokens - user must verify email first
+        res.status(201).json({
+            success: true,
+            message: "Registration successful! Please check your email to verify your account before logging in.",
+            data: {
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                requiresEmailVerification: true,
                 requiresPayment: true,
-                requiresEmailVerification: true
             }
-        );
+        });
     } catch (error) {
         console.error("Register Landlord Error:", error);
+        
+        // Handle duplicate key error
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern)[0];
+            return res.status(400).json({
+                success: false,
+                message: `This ${field} is already registered. Please use a different ${field}.`,
+            });
+        }
+        
         res.status(500).json({
             success: false,
-            message: "Error registering landlord",
+            message: "Error registering landlord. Please try again.",
             error: error.message,
         });
     }
@@ -301,16 +398,25 @@ export const googleSignup = async (req, res) => {
             });
         }
 
+        // Generate a valid 10-digit phone number placeholder for Google users
+        // Format: 9 followed by last 9 digits of googleId (ensures it passes validation)
+        const googlePhonePlaceholder = '9' + googleId.slice(-9).padStart(9, '0');
+        
         const user = await User.create({
             name,
             email,
-            phone: `GOOGLE_${googleId.slice(0, 10)}`,
+            phone: googlePhonePlaceholder,
             password: `GOOGLE_AUTH_${googleId}_${Date.now()}`,
             role,
             profileImage: picture || undefined,
             isVerified: true,
             subscriptionStatus: role === "landlord" ? "none" : undefined,
         });
+
+        // Send welcome email for Google signup
+        sendWelcomeEmail(user.email, user.name, user.role).catch((err) =>
+            console.error("Failed to send welcome email:", err)
+        );
 
         sendTokenResponse(
             user,
@@ -352,7 +458,7 @@ export const googleLogin = async (req, res) => {
         });
 
         const payload = ticket.getPayload();
-        const { email } = payload;
+        const { email, picture } = payload;
 
         const user = await User.findOne({ email });
 
@@ -370,6 +476,23 @@ export const googleLogin = async (req, res) => {
                 message: "Account is deactivated. Please contact support.",
             });
         }
+
+        // Update profile image if it has changed
+        if (picture && user.profileImage !== picture) {
+            user.profileImage = picture;
+            await user.save();
+        }
+
+        // Send login notification email for Google login
+        const loginInfo = {
+            device: req.headers["user-agent"] || "Unknown Device",
+            ip: req.ip || req.connection.remoteAddress || "Unknown IP",
+            location: "India",
+        };
+
+        sendLoginNotificationEmail(user.email, user.name, loginInfo).catch((err) =>
+            console.error("Failed to send login notification:", err)
+        );
 
         sendTokenResponse(user, 200, res, "Login successful");
     } catch (error) {
@@ -727,48 +850,76 @@ export const verifyEmail = async (req, res) => {
             });
         }
 
+        console.log("Verifying token:", token.substring(0, 10) + "...");
+
         // Hash the token to compare with stored hash
-        const crypto = await import("crypto");
-        const hashedToken = crypto.default
+        const hashedToken = crypto
             .createHash("sha256")
             .update(token)
             .digest("hex");
 
-        const user = await User.findOne({
+        console.log("Hashed token:", hashedToken.substring(0, 10) + "...");
+
+        // First check if user exists with this token (regardless of expiry)
+        const userWithToken = await User.findOne({
             emailVerificationToken: hashedToken,
-            emailVerificationExpire: { $gt: Date.now() },
         });
 
-        if (!user) {
+        if (!userWithToken) {
+            console.log("No user found with this token");
             return res.status(400).json({
                 success: false,
-                message: "Invalid or expired verification token. Please request a new verification email.",
+                message: "Invalid verification token. The link may be incorrect or the account may have been deleted.",
+            });
+        }
+
+        // Check if already verified
+        if (userWithToken.isVerified) {
+            console.log("User already verified:", userWithToken.email);
+            return res.status(200).json({
+                success: true,
+                message: "Email already verified! You can now login to your account.",
+                data: {
+                    isVerified: true,
+                    alreadyVerified: true,
+                },
+            });
+        }
+
+        // Check if token is expired
+        if (userWithToken.emailVerificationExpire && userWithToken.emailVerificationExpire < Date.now()) {
+            console.log("Token expired for:", userWithToken.email);
+            return res.status(400).json({
+                success: false,
+                message: "Verification token has expired. Please request a new verification email.",
+                data: {
+                    email: userWithToken.email,
+                    expired: true,
+                },
             });
         }
 
         // Mark user as verified
-        user.isVerified = true;
-        user.emailVerificationToken = undefined;
-        user.emailVerificationExpire = undefined;
-        await user.save();
+        userWithToken.isVerified = true;
+        userWithToken.emailVerificationToken = undefined;
+        userWithToken.emailVerificationExpire = undefined;
+        await userWithToken.save();
+
+        console.log("Email verified successfully for:", userWithToken.email);
 
         // Send welcome email now that user is verified
-        sendWelcomeEmail(user.email, user.name, user.role).catch((err) =>
+        sendWelcomeEmail(userWithToken.email, userWithToken.name, userWithToken.role).catch((err) =>
             console.error("Failed to send welcome email:", err)
         );
 
-        res.status(200).json({
-            success: true,
-            message: "Email verified successfully! You can now login to your account.",
-            data: {
-                isVerified: true,
-            },
-        });
+        // Auto-login: Generate and send tokens for first-time verification
+        userWithToken.password = undefined; // Remove password from response
+        sendTokenResponse(userWithToken, 200, res, "Email verified successfully! Welcome to Unirooms.");
     } catch (error) {
         console.error("Verify Email Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error verifying email",
+            message: "Error verifying email. Please try again or contact support.",
             error: error.message,
         });
     }

@@ -1,104 +1,101 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
 import PropertyCard from '../components/PropertyCard';
 import SearchBar from '../components/SearchBar';
+import { propertyAPI } from '../utils/api';
 
 const Browse = () => {
     const [searchParams] = useSearchParams();
     const initialSearch = searchParams.get('search') || '';
+    const collegeParam = searchParams.get('college') || '';
 
     // State
     const [searchQuery, setSearchQuery] = useState(initialSearch);
+    const [collegeName, setCollegeName] = useState(collegeParam);
     const [selectedType, setSelectedType] = useState('all');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     const [minRating, setMinRating] = useState(0);
     const [sortBy, setSortBy] = useState('recommended');
     const [showFilters, setShowFilters] = useState(false);
+    const [properties, setProperties] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [collegeInfo, setCollegeInfo] = useState(null);
 
-    // Mock properties data
-    const allProperties = [
-        {
-            id: 1,
-            name: 'Sunrise Boys PG',
-            location: 'Near IIT Delhi, Hauz Khas',
-            price: 8500,
-            rating: 4.8,
-            type: 'Boys PG',
-            image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400',
-            amenities: ['WiFi', 'AC', 'Food', 'Laundry'],
-        },
-        {
-            id: 2,
-            name: 'Elite Girls Hostel',
-            location: 'DU North Campus, Delhi',
-            price: 9500,
-            rating: 4.9,
-            type: 'Girls PG',
-            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400',
-            amenities: ['WiFi', 'AC', 'Food', 'Security'],
-        },
-        {
-            id: 3,
-            name: 'Urban Co-Living',
-            location: 'Near NIT, Kurukshetra',
-            price: 7500,
-            rating: 4.6,
-            type: 'Co-Living',
-            image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400',
-            amenities: ['WiFi', 'Gym', 'Laundry'],
-        },
-        {
-            id: 4,
-            name: 'Royal PG for Boys',
-            location: 'VIT Bhopal, Madhya Pradesh',
-            price: 6500,
-            rating: 4.5,
-            type: 'Boys PG',
-            image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400',
-            amenities: ['WiFi', 'Food', 'Parking'],
-        },
-        {
-            id: 5,
-            name: 'Comfort Stay Girls',
-            location: 'SRM University, Chennai',
-            price: 11000,
-            rating: 4.7,
-            type: 'Girls PG',
-            image: 'https://images.unsplash.com/photo-1628744448840-55bdb2497bd4?w=400',
-            amenities: ['WiFi', 'AC', 'Food', 'Security', 'Gym'],
-        },
-        {
-            id: 6,
-            name: 'Student Nest Hostel',
-            location: 'VIT Vellore, Tamil Nadu',
-            price: 8000,
-            rating: 4.4,
-            type: 'Hostel',
-            image: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400',
-            amenities: ['WiFi', 'Food', 'Laundry'],
-        },
-        {
-            id: 7,
-            name: 'Premium Boys Lodge',
-            location: 'Near BITS Pilani, Rajasthan',
-            price: 12500,
-            rating: 4.9,
-            type: 'Boys PG',
-            image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400',
-            amenities: ['WiFi', 'AC', 'Food', 'Gym', 'Parking'],
-        },
-        {
-            id: 8,
-            name: 'City View Co-Living',
-            location: 'Manipal University, Karnataka',
-            price: 9000,
-            rating: 4.6,
-            type: 'Co-Living',
-            image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400',
-            amenities: ['WiFi', 'AC', 'Laundry', 'Gym'],
-        },
-    ];
+    // Fetch properties based on college or general search
+    useEffect(() => {
+        const fetchProperties = async () => {
+            setLoading(true);
+            setError(null);
+            
+            try {
+                console.log('Fetching properties...', { collegeName, selectedType, priceRange });
+                
+                if (collegeName) {
+                    // Fetch properties near the college
+                    const params = {
+                        collegeName: collegeName,
+                        maxDistance: 5, // 5km radius
+                    };
+                    
+                    if (selectedType !== 'all') params.roomType = selectedType.toLowerCase().replace(' pg', '');
+                    if (priceRange.min) params.minPrice = priceRange.min;
+                    if (priceRange.max) params.maxPrice = priceRange.max;
+                    
+                    console.log('Fetching properties near college:', params);
+                    const response = await propertyAPI.getPropertiesNearCollege(params);
+                    console.log('API Response:', response);
+                    
+                    if (response.success) {
+                        console.log('Properties found:', response.data.properties?.length || 0);
+                        setProperties(response.data.properties || []);
+                        setCollegeInfo(response.data.college);
+                    } else {
+                        console.log('No success in response');
+                        setProperties([]);
+                        setCollegeInfo(null);
+                    }
+                } else {
+                    // Fetch all properties from backend
+                    const params = {};
+                    if (searchQuery) params.search = searchQuery;
+                    if (selectedType !== 'all') params.roomType = selectedType.toLowerCase().replace(' pg', '');
+                    if (priceRange.min) params.minPrice = priceRange.min;
+                    if (priceRange.max) params.maxPrice = priceRange.max;
+                    
+                    console.log('Fetching all properties:', params);
+                    const response = await propertyAPI.getAllProperties(params);
+                    console.log('API Response:', response);
+                    
+                    if (response.success) {
+                        console.log('Properties found:', response.data.properties?.length || 0);
+                        setProperties(response.data.properties || []);
+                        setCollegeInfo(null);
+                    } else {
+                        console.log('No success in response');
+                        setProperties([]);
+                        setCollegeInfo(null);
+                    }
+                }
+            } catch (err) {
+                console.error('Error fetching properties:', err);
+                setError(err.message || 'Failed to fetch properties');
+                setProperties([]);
+                setCollegeInfo(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProperties();
+    }, [collegeName, selectedType, priceRange, searchQuery]);
+
+    // Update college name when URL param changes
+    useEffect(() => {
+        const newCollegeName = searchParams.get('college') || '';
+        setCollegeName(newCollegeName);
+    }, [searchParams]);
 
     // Property types for filter
     const propertyTypes = [
@@ -110,43 +107,41 @@ const Browse = () => {
     ];
 
     // Sort options
-    const sortOptions = [
+    const sortOptions = collegeName ? [
+        { value: 'distance', label: 'Nearest First' },
+        { value: 'recommended', label: 'Recommended' },
+        { value: 'price-low', label: 'Price: Low to High' },
+        { value: 'price-high', label: 'Price: High to Low' },
+        { value: 'rating', label: 'Highest Rated' },
+    ] : [
         { value: 'recommended', label: 'Recommended' },
         { value: 'price-low', label: 'Price: Low to High' },
         { value: 'price-high', label: 'Price: High to Low' },
         { value: 'rating', label: 'Highest Rated' },
     ];
 
-    // Filter and sort properties
+    // Filter and sort properties (client-side filtering for remaining filters)
     const filteredProperties = useMemo(() => {
-        let result = [...allProperties];
+        let result = [...properties];
 
-        // Search filter
-        if (searchQuery) {
+        // Search filter (client-side for general search)
+        if (searchQuery && !collegeName) {
             const query = searchQuery.toLowerCase();
             result = result.filter(
                 (p) =>
-                    p.name.toLowerCase().includes(query) ||
-                    p.location.toLowerCase().includes(query)
+                    (p.name || p.title)?.toLowerCase().includes(query) ||
+                    (p.location || p.address?.locality)?.toLowerCase().includes(query)
             );
         }
 
-        // Type filter
-        if (selectedType !== 'all') {
-            result = result.filter((p) => p.type === selectedType);
+        // Type filter (additional client-side filtering)
+        if (selectedType !== 'all' && !collegeName) {
+            result = result.filter((p) => p.type === selectedType || p.roomType === selectedType.toLowerCase().replace(' pg', ''));
         }
 
-        // Price range filter
-        if (priceRange.min) {
-            result = result.filter((p) => p.price >= parseInt(priceRange.min));
-        }
-        if (priceRange.max) {
-            result = result.filter((p) => p.price <= parseInt(priceRange.max));
-        }
-
-        // Rating filter
+        // Rating filter (client-side only)
         if (minRating > 0) {
-            result = result.filter((p) => p.rating >= minRating);
+            result = result.filter((p) => (p.rating || 0) >= minRating);
         }
 
         // Sorting
@@ -158,7 +153,12 @@ const Browse = () => {
                 result.sort((a, b) => b.price - a.price);
                 break;
             case 'rating':
-                result.sort((a, b) => b.rating - a.rating);
+                result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                break;
+            case 'distance':
+                if (collegeName) {
+                    result.sort((a, b) => (a.distanceInKm || 0) - (b.distanceInKm || 0));
+                }
                 break;
             default:
                 // Keep recommended order
@@ -166,7 +166,7 @@ const Browse = () => {
         }
 
         return result;
-    }, [searchQuery, selectedType, priceRange, minRating, sortBy]);
+    }, [properties, searchQuery, selectedType, minRating, sortBy, collegeName]);
 
     const clearFilters = () => {
         setSelectedType('all');
@@ -174,6 +174,8 @@ const Browse = () => {
         setMinRating(0);
         setSortBy('recommended');
         setSearchQuery('');
+        setCollegeName('');
+        window.history.pushState({}, '', '/browse');
     };
 
     const hasActiveFilters =
@@ -181,7 +183,8 @@ const Browse = () => {
         priceRange.min ||
         priceRange.max ||
         minRating > 0 ||
-        searchQuery;
+        searchQuery ||
+        collegeName;
 
     return (
         <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
@@ -203,13 +206,43 @@ const Browse = () => {
                         <span className="text-neutral-700 font-medium">Browse PGs</span>
                     </div>
 
+                    {/* College Info Banner */}
+                    {collegeInfo && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mb-4 p-4 bg-gradient-to-r from-primary-50 to-accent-50 rounded-xl border border-primary-200"
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+                                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-neutral-600">Showing PGs near</p>
+                                        <h3 className="text-lg font-bold text-neutral-800">{collegeInfo.shortName || collegeInfo.name}</h3>
+                                        <p className="text-xs text-neutral-500">{collegeInfo.city}, {collegeInfo.state}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={clearFilters}
+                                    className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-white rounded-lg transition-colors"
+                                >
+                                    Clear
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div>
                             <h1 className="text-3xl md:text-4xl font-display font-bold text-neutral-800">
-                                Browse Properties
+                                {collegeName ? `PGs near ${collegeName}` : 'Browse Properties'}
                             </h1>
                             <p className="text-neutral-500 mt-1">
-                                {filteredProperties.length} properties available
+                                {loading ? 'Loading...' : `${filteredProperties.length} properties available`}
                             </p>
                         </div>
 
@@ -400,11 +433,48 @@ const Browse = () => {
                         </motion.div>
 
                         {/* Property Grid */}
-                        {filteredProperties.length > 0 ? (
+                        {loading ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {[1, 2, 3, 4, 5, 6].map((i) => (
+                                    <div key={i} className="card overflow-hidden animate-pulse">
+                                        <div className="h-48 bg-neutral-200"></div>
+                                        <div className="p-4">
+                                            <div className="h-4 bg-neutral-200 rounded mb-2"></div>
+                                            <div className="h-3 bg-neutral-200 rounded w-3/4 mb-4"></div>
+                                            <div className="h-3 bg-neutral-200 rounded w-1/2"></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : error ? (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="card p-12 text-center"
+                            >
+                                <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
+                                    <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-xl font-display font-bold text-neutral-800 mb-2">
+                                    Error Loading Properties
+                                </h3>
+                                <p className="text-neutral-500 mb-6">
+                                    {error}
+                                </p>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="btn-primary"
+                                >
+                                    Try Again
+                                </button>
+                            </motion.div>
+                        ) : filteredProperties.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                                 {filteredProperties.map((property, index) => (
                                     <motion.div
-                                        key={property.id}
+                                        key={property._id || property.id}
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: index * 0.05 }}
@@ -421,21 +491,26 @@ const Browse = () => {
                             >
                                 <div className="w-20 h-20 mx-auto mb-6 bg-neutral-100 rounded-full flex items-center justify-center">
                                     <svg className="w-10 h-10 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                     </svg>
                                 </div>
                                 <h3 className="text-xl font-display font-bold text-neutral-800 mb-2">
                                     No Properties Found
                                 </h3>
                                 <p className="text-neutral-500 mb-6">
-                                    Try adjusting your filters or search criteria
+                                    {collegeName 
+                                        ? `No properties available near ${collegeName}. Try searching for a different college or check back later.`
+                                        : 'Try adjusting your filters or search criteria'
+                                    }
                                 </p>
-                                <button
-                                    onClick={clearFilters}
-                                    className="btn-primary"
-                                >
-                                    Clear All Filters
-                                </button>
+                                {hasActiveFilters && (
+                                    <button
+                                        onClick={clearFilters}
+                                        className="btn-primary"
+                                    >
+                                        Clear All Filters
+                                    </button>
+                                )}
                             </motion.div>
                         )}
                     </div>

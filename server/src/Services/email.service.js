@@ -9,6 +9,11 @@ import chalk from "chalk";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Register Handlebars helpers
+handlebars.registerHelper('eq', function(a, b) {
+  return a === b;
+});
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {

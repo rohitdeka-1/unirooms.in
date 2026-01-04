@@ -109,3 +109,7 @@ export const checkSubscription = async (req, res, next) => {
         });
     }
 };
+
+// Alias exports for convenience
+export const protect = verifyToken;
+export const authorize = checkRole;

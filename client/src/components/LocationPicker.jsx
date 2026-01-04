@@ -1,0 +1,358 @@
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default marker icon in React-Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Component to handle map clicks
+function MapClickHandler({ onClick }) {
+    useMapEvents({
+        click: (e) => {
+            onClick(e.latlng);
+        },
+    });
+    return null;
+}
+
+// Component to update map view when center changes
+function MapViewController({ center, zoom }) {
+    const map = useMap();
+    useEffect(() => {
+        map.setView(center, zoom);
+    }, [center, zoom, map]);
+    return null;
+}
+
+const LocationPicker = ({ onLocationSelect, initialLocation }) => {
+    const [selectedLocation, setSelectedLocation] = useState(
+        initialLocation || { lat: 28.6139, lng: 77.2090 } // Default: New Delhi
+    );
+    const [mapCenter, setMapCenter] = useState([selectedLocation.lat, selectedLocation.lng]);
+    const [address, setAddress] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchMode, setSearchMode] = useState('college'); // 'college' or 'address'
+    const searchTimeoutRef = useRef(null);
+
+    const handleMapClick = useCallback(async (latlng) => {
+        const newLocation = { lat: latlng.lat, lng: latlng.lng };
+        setSelectedLocation(newLocation);
+        
+        // Reverse geocode using Nominatim
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`
+            );
+            const data = await response.json();
+            
+            if (data.display_name) {
+                setAddress(data.display_name);
+                setSearchQuery(data.display_name);
+                onLocationSelect({
+                    coordinates: [latlng.lng, latlng.lat],
+                    address: data.display_name,
+                    addressComponents: parseNominatimAddress(data.address),
+                });
+            }
+        } catch (error) {
+            console.error('Error reverse geocoding:', error);
+        }
+    }, [onLocationSelect]);
+
+    const parseNominatimAddress = (address) => {
+        return {
+            street: address.road || address.street || '',
+            locality: address.suburb || address.neighbourhood || address.locality || '',
+            city: address.city || address.town || address.village || '',
+            state: address.state || '',
+            pincode: address.postcode || '',
+            country: address.country || '',
+        };
+    };
+
+    const handleSearch = useCallback(async (query, mode = 'college') => {
+        if (!query || query.length < 2) {
+            setSearchResults([]);
+            return;
+        }
+
+        setIsSearching(true);
+        try {
+            // Build search query based on mode
+            let searchQuery = query;
+            if (mode === 'college') {
+                // Prioritize educational institutions
+                searchQuery = `${query} college university institute campus`;
+            }
+            
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=8&addressdetails=1`
+            );
+            const data = await response.json();
+            
+            // Filter and prioritize educational institutions when in college mode
+            let results = data;
+            if (mode === 'college') {
+                // Prioritize results with educational-related tags
+                results = data.sort((a, b) => {
+                    const aIsEducational = (
+                        a.type === 'university' || 
+                        a.type === 'college' ||
+                        a.class === 'amenity' ||
+                        a.display_name.toLowerCase().includes('university') ||
+                        a.display_name.toLowerCase().includes('college') ||
+                        a.display_name.toLowerCase().includes('institute') ||
+                        a.display_name.toLowerCase().includes('campus')
+                    );
+                    const bIsEducational = (
+                        b.type === 'university' || 
+                        b.type === 'college' ||
+                        b.class === 'amenity' ||
+                        b.display_name.toLowerCase().includes('university') ||
+                        b.display_name.toLowerCase().includes('college') ||
+                        b.display_name.toLowerCase().includes('institute') ||
+                        b.display_name.toLowerCase().includes('campus')
+                    );
+                    
+                    if (aIsEducational && !bIsEducational) return -1;
+                    if (!aIsEducational && bIsEducational) return 1;
+                    return 0;
+                });
+            }
+            
+            setSearchResults(results);
+        } catch (error) {
+            console.error('Error searching:', error);
+            setSearchResults([]);
+        } finally {
+            setIsSearching(false);
+        }
+    }, []);
+
+    const handleSearchInputChange = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+
+        // Debounce search
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        searchTimeoutRef.current = setTimeout(() => {
+            handleSearch(query, searchMode);
+        }, 500);
+    };
+
+    const handleSelectSearchResult = (result) => {
+        const lat = parseFloat(result.lat);
+        const lng = parseFloat(result.lon);
+        const newLocation = { lat, lng };
+        
+        setSelectedLocation(newLocation);
+        setMapCenter([lat, lng]);
+        setAddress(result.display_name);
+        setSearchQuery(result.display_name);
+        setSearchResults([]);
+        
+        onLocationSelect({
+            coordinates: [lng, lat],
+            address: result.display_name,
+            addressComponents: parseNominatimAddress(result.address || {}),
+        });
+    };
+
+    const handleUseCurrentLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const newLocation = { lat, lng };
+                    
+                    setSelectedLocation(newLocation);
+                    setMapCenter([lat, lng]);
+                    
+                    // Reverse geocode
+                    try {
+                        const response = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+                        );
+                        const data = await response.json();
+                        
+                        if (data.display_name) {
+                            setAddress(data.display_name);
+                            setSearchQuery(data.display_name);
+                            onLocationSelect({
+                                coordinates: [lng, lat],
+                                address: data.display_name,
+                                addressComponents: parseNominatimAddress(data.address),
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error reverse geocoding:', error);
+                    }
+                },
+                (error) => {
+                    console.error('Error getting location:', error);
+                    alert('Could not get your location. Please search or click on the map.');
+                }
+            );
+        } else {
+            alert('Geolocation is not supported by your browser');
+        }
+    };
+
+    return (
+        <div className="space-y-4">
+            <div className="space-y-3">
+                {/* Search Mode Toggle */}
+                <div className="flex gap-2 p-1 bg-neutral-100 rounded-lg w-fit">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setSearchMode('college');
+                            setSearchQuery('');
+                            setSearchResults([]);
+                        }}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                            searchMode === 'college'
+                                ? 'bg-white text-primary-600 shadow-sm'
+                                : 'text-neutral-600 hover:text-neutral-900'
+                        }`}
+                    >
+                        🎓 Search Colleges
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setSearchMode('address');
+                            setSearchQuery('');
+                            setSearchResults([]);
+                        }}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                            searchMode === 'address'
+                                ? 'bg-white text-primary-600 shadow-sm'
+                                : 'text-neutral-600 hover:text-neutral-900'
+                        }`}
+                    >
+                        📍 Search Address
+                    </button>
+                </div>
+
+                {/* Search Box */}
+                <div className="flex gap-2 relative">
+                    <div className="flex-1 relative">
+                        <input
+                            type="text"
+                            placeholder={
+                                searchMode === 'college'
+                                    ? 'Search for college, university, or campus...'
+                                    : 'Search for street address or locality...'
+                            }
+                            className="input w-full"
+                            value={searchQuery}
+                            onChange={handleSearchInputChange}
+                        />
+                        {isSearching && (
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                <div className="animate-spin h-5 w-5 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+                            </div>
+                        )}
+                        {searchResults.length > 0 && (
+                            <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                {searchResults.map((result, index) => {
+                                    const isEducational = (
+                                        result.type === 'university' || 
+                                        result.type === 'college' ||
+                                        result.display_name.toLowerCase().includes('university') ||
+                                        result.display_name.toLowerCase().includes('college') ||
+                                        result.display_name.toLowerCase().includes('institute')
+                                    );
+                                    
+                                    return (
+                                        <button
+                                            key={index}
+                                            type="button"
+                                            onClick={() => handleSelectSearchResult(result)}
+                                            className="w-full text-left px-4 py-3 hover:bg-neutral-50 border-b border-neutral-100 last:border-b-0 transition-colors"
+                                        >
+                                            <div className="flex items-start gap-2">
+                                                <span className="text-lg mt-0.5">
+                                                    {isEducational ? '🎓' : '📍'}
+                                                </span>
+                                                <p className="text-sm font-medium text-neutral-800 flex-1">
+                                                    {result.display_name}
+                                                </p>
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleUseCurrentLocation}
+                        className="btn-secondary whitespace-nowrap"
+                        title="Use my current location"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Helper Text */}
+                {searchMode === 'college' && (
+                    <p className="text-xs text-primary-600 bg-primary-50 border border-primary-200 rounded-lg px-3 py-2">
+                        💡 <strong>Pro tip:</strong> Search for your college/university name to find the exact campus location. PGs near campus are more popular!
+                    </p>
+                )}
+
+                {/* Map */}
+                <div className="border-2 border-neutral-200 rounded-xl overflow-hidden" style={{ height: '400px' }}>
+                    <MapContainer
+                        center={mapCenter}
+                        zoom={15}
+                        style={{ height: '100%', width: '100%' }}
+                        scrollWheelZoom={true}
+                    >
+                        <TileLayer
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        <Marker position={[selectedLocation.lat, selectedLocation.lng]} />
+                        <MapClickHandler onClick={handleMapClick} />
+                        <MapViewController center={mapCenter} zoom={15} />
+                    </MapContainer>
+                </div>
+
+                {/* Selected Location Info */}
+                {address && (
+                    <div className="p-4 bg-primary-50 border border-primary-200 rounded-xl">
+                        <p className="text-sm font-medium text-primary-900 mb-1">Selected Location:</p>
+                        <p className="text-sm text-primary-700">{address}</p>
+                        <p className="text-xs text-primary-600 mt-2">
+                            Lat: {selectedLocation.lat.toFixed(6)}, Lng: {selectedLocation.lng.toFixed(6)}
+                        </p>
+                    </div>
+                )}
+
+                <p className="text-sm text-neutral-500">
+                    💡 <strong>Tip:</strong> {searchMode === 'college' 
+                        ? 'Search for your college/campus, then click nearby on the map to pinpoint your PG location' 
+                        : 'Click on the map to pinpoint exact location, or search for an address above'}
+                </p>
+            </div>
+        </div>
+    );
+};
+export default LocationPicker;

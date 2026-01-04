@@ -30,7 +30,7 @@ const paymentSchema = new mongoose.Schema(
     },
     purpose: {
       type: String,
-      enum: ["registration", "subscription_renewal"],
+      enum: ["registration", "subscription_renewal", "property_listing"],
       required: [true, "Payment purpose is required"],
     },
     // Cashfree specific fields
@@ -85,7 +85,6 @@ const paymentSchema = new mongoose.Schema(
 
 // Indexes for queries
 paymentSchema.index({ userId: 1, status: 1 });
-paymentSchema.index({ cashfreeOrderId: 1 });
 paymentSchema.index({ status: 1, createdAt: -1 });
 
 // Method to mark payment as successful

@@ -10,12 +10,16 @@ import Saved from './pages/Saved';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import VerifyEmail from './pages/VerifyEmail';
+import VerifyEmailPending from './pages/VerifyEmailPending';
 import PropertyDetail from './pages/PropertyDetail';
+import LandlordDashboard from './pages/LandlordDashboard';
+import AddProperty from './pages/AddProperty';
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideNavRoutes = ['/login', '/signup', '/forgot-password'];
-  const shouldHideNav = hideNavRoutes.includes(location.pathname);
+  const hideNavRoutes = ['/login', '/signup', '/forgot-password', '/verify-email', '/verify-email-pending'];
+  const shouldHideNav = hideNavRoutes.includes(location.pathname) || location.pathname.startsWith('/verify-email/');
 
   return (
     <>
@@ -40,7 +44,12 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/verify-email/:token" element={<VerifyEmail />} />
+            <Route path="/verify-email-pending" element={<VerifyEmailPending />} />
             <Route path="/property/:id" element={<PropertyDetail />} />
+            <Route path="/landlord/dashboard" element={<LandlordDashboard />} />
+            <Route path="/landlord/add-property" element={<AddProperty />} />
+            <Route path="/landlord/edit-property/:id" element={<AddProperty />} />
           </Routes>
         </Layout>
       </AuthProvider>

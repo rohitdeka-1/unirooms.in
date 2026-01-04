@@ -2,18 +2,43 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const PropertyCard = ({ property }) => {
+    // Handle both backend (_id) and mock data (id) formats
+    const propertyId = property._id || property.id;
+    const propertyTitle = property.title || property.name;
+    const propertyImage = property.images?.[0] || property.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400';
+    const propertyLocation = property.address 
+        ? `${property.address.locality}, ${property.city}`
+        : property.location || 'Location not specified';
+    
+    // Format property type (e.g., "single" -> "Single Room", "Boys PG" -> "Boys PG")
+    const formatPropertyType = () => {
+        if (property.type) return property.type; // For mock data
+        if (property.roomType) {
+            const typeMap = {
+                'single': 'Single Room',
+                'double': 'Double Sharing',
+                'triple': 'Triple Sharing',
+                'shared': 'Shared Room'
+            };
+            const roomTypeLabel = typeMap[property.roomType] || property.roomType;
+            const genderLabel = property.gender === 'male' ? 'Boys' : property.gender === 'female' ? 'Girls' : '';
+            return genderLabel ? `${genderLabel} ${roomTypeLabel}` : roomTypeLabel;
+        }
+        return 'PG';
+    };
+
     return (
         <motion.div
             whileHover={{ y: -6 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             className="group card overflow-hidden w-full lg:max-w-xs"
         >
-            <Link to={`/property/${property.id}`}>
+            <Link to={`/property/${propertyId}`}>
                 {/* Image Container */}
                 <div className="relative h-52 overflow-hidden">
                     <img
-                        src={property.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400'}
-                        alt={property.name}
+                        src={propertyImage}
+                        alt={propertyTitle}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
 
@@ -30,7 +55,7 @@ const PropertyCard = ({ property }) => {
                     {/* Type Badge */}
                     <div className="absolute bottom-3 left-3">
                         <span className="px-2.5 py-1 bg-white/95 backdrop-blur-sm rounded-full text-xs font-semibold text-neutral-700 shadow-lg">
-                            {property.type || 'PG'}
+                            {formatPropertyType()}
                         </span>
                     </div>
                 </div>
@@ -39,7 +64,7 @@ const PropertyCard = ({ property }) => {
                 <div className="p-4">
                     {/* Title */}
                     <h3 className="font-display font-bold text-base text-neutral-800 mb-1 group-hover:text-primary-600 transition-colors truncate">
-                        {property.name}
+                        {propertyTitle}
                     </h3>
 
                     {/* Location */}
@@ -48,8 +73,20 @@ const PropertyCard = ({ property }) => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span className="truncate">{property.location}</span>
+                        <span className="truncate">{propertyLocation}</span>
                     </p>
+
+                    {/* Distance Badge (if available) */}
+                    {property.distanceInKm !== undefined && (
+                        <div className="mb-3">
+                            <span className="inline-flex items-center px-2.5 py-1 bg-green-50 text-green-700 rounded-full text-xs font-medium">
+                                <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                                {property.distanceInKm} km away
+                            </span>
+                        </div>
+                    )}
 
                     {/* Rating & Price */}
                     <div className="flex items-center justify-between">

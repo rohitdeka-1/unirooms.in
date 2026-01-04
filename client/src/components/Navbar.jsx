@@ -54,7 +54,22 @@ const Navbar = () => {
                                 {isAuthenticated ? (
                                     <div className="flex items-center space-x-4">
                                         <Link to="/profile" className="flex items-center space-x-3 px-3 py-2 rounded-xl hover:bg-neutral-100 transition-colors">
-                                            <div className="w-9 h-9 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center">
+                                            {user?.profileImage ? (
+                                                <img
+                                                    src={user.profileImage}
+                                                    alt={user?.name || 'User'}
+                                                    className="w-9 h-9 rounded-xl object-cover"
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.style.display = 'none';
+                                                        e.target.nextElementSibling.style.display = 'flex';
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <div
+                                                className="w-9 h-9 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center"
+                                                style={{ display: user?.profileImage ? 'none' : 'flex' }}
+                                            >
                                                 <span className="text-white font-semibold text-sm">
                                                     {user?.name?.charAt(0).toUpperCase() || 'U'}
                                                 </span>
