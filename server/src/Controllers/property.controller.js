@@ -13,6 +13,7 @@ export const getAllProperties = async (req, res) => {
             page = 1,
             limit = 10,
             city,
+            campusName,
             roomType,
             gender,
             minPrice,
@@ -26,6 +27,10 @@ export const getAllProperties = async (req, res) => {
         // Build filter object
         const filter = { isActive: true }; // Show all active properties (verified or not)
 
+        if (campusName) {
+            // Use regex for flexible campus name matching (supports both full name and shortName)
+            filter.campusName = { $regex: campusName, $options: "i" };
+        }
         if (city) filter.city = { $regex: city, $options: "i" };
         if (roomType) filter.roomType = roomType;
         if (gender) filter.gender = { $in: [gender, "any"] };
@@ -192,14 +197,11 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        // Use nearbyColleges directly from frontend (landlord selects which campus the property is near)
-        const nearbyColleges = req.body.nearbyColleges || [];
-
-        // Validate that at least one college is selected
-        if (nearbyColleges.length === 0) {
+        // Validate campus name is provided
+        if (!req.body.campusName) {
             return res.status(400).json({
                 success: false,
-                message: "Please select at least one nearby campus",
+                message: "Please select a campus for this property",
             });
         }
 
@@ -208,7 +210,6 @@ export const createProperty = async (req, res) => {
             ...req.body,
             landlordId: req.user.id,
             paymentId,
-            nearbyColleges, // Campuses selected by landlord
         };
 
         const property = await Property.create(propertyData);
@@ -216,7 +217,7 @@ export const createProperty = async (req, res) => {
         res.status(201).json({
             success: true,
             message: "Property created successfully",
-            data: { property, nearbyColleges },
+            data: { property },
         });
     } catch (error) {
         console.error("Create Property Error:", error);
@@ -228,57 +229,29 @@ export const createProperty = async (req, res) => {
     }
 };
 
-// Helper function to calculate nearby colleges within 10km
-function calculateNearbyColleges(lat, lon, maxDistance = 10) {
-    const nearby = popularColleges
-        .map((college) => {
-            const distance = calculateDistance(
-                lat,
-                lon,
-                college.location.coordinates[1],
-                college.location.coordinates[0]
-            );
-            return {
-                name: college.shortName || college.name,
-                distance: parseFloat(distance.toFixed(2)),
-            };
-        })
-        .filter((college) => college.distance <= maxDistance)
-        .sort((a, b) => a.distance - b.distance)
-        .slice(0, 5); // Top 5 nearest colleges
-
-    return nearby;
-}
-
-// @desc    Get nearby colleges for a location (preview)
-// @route   GET /api/properties/nearby-colleges?lat=<lat>&lon=<lon>
+// @desc    Get all available campuses (for dropdown selection)
+// @route   GET /api/properties/campuses
 // @access  Public
-export const getNearbyCollegesForLocation = async (req, res) => {
+export const getAllCampuses = async (req, res) => {
     try {
-        const { lat, lon, maxDistance = 10 } = req.query;
-
-        if (!lat || !lon) {
-            return res.status(400).json({
-                success: false,
-                message: "Latitude and longitude are required",
-            });
-        }
-
-        const nearbyColleges = calculateNearbyColleges(
-            parseFloat(lat),
-            parseFloat(lon),
-            parseFloat(maxDistance)
-        );
+        // Return list of all campuses for selection
+        const campuses = popularColleges.map(college => ({
+            name: college.shortName || college.name,
+            fullName: college.name,
+            city: college.address.city,
+            state: college.address.state,
+            type: college.type
+        }));
 
         res.status(200).json({
             success: true,
-            data: { nearbyColleges },
+            data: { campuses },
         });
     } catch (error) {
-        console.error("Get Nearby Colleges Error:", error);
+        console.error("Get Campuses Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error finding nearby colleges",
+            message: "Error fetching campuses",
             error: error.message,
         });
     }
@@ -476,7 +449,6 @@ export const getPropertiesNearCollege = async (req, res) => {
     try {
         const {
             collegeName,
-            maxDistance = 5, // default 5km radius
             page = 1,
             limit = 10,
             roomType,
@@ -484,7 +456,7 @@ export const getPropertiesNearCollege = async (req, res) => {
             minPrice,
             maxPrice,
             amenities,
-            sortBy = "distance",
+            sortBy = "price",
             order = "asc",
         } = req.query;
 
@@ -495,7 +467,7 @@ export const getPropertiesNearCollege = async (req, res) => {
             });
         }
 
-        // Find college
+        // Find college to verify it exists
         const college = getCollegeByName(collegeName);
 
         if (!college) {
@@ -506,7 +478,13 @@ export const getPropertiesNearCollege = async (req, res) => {
         }
 
         // Build filter object
-        const filter = { isActive: true }; // Show all active properties (verified or not)
+        const filter = {
+            isActive: true,
+            // Match properties where nearbyColleges array contains this campus name
+            "nearbyColleges.name": {
+                $regex: new RegExp(`^${college.name}$|^${college.shortName}$`, 'i')
+            }
+        };
 
         if (roomType) filter.roomType = roomType;
         if (gender) filter.gender = { $in: [gender, "any"] };
@@ -520,47 +498,23 @@ export const getPropertiesNearCollege = async (req, res) => {
             filter.amenities = { $all: amenitiesArray };
         }
 
-        // Use $geoWithin with $centerSphere for radius search (compatible with all MongoDB versions)
-        // Convert distance from km to radians (divide by Earth's radius in km)
-        const radiusInRadians = Number(maxDistance) / 6371;
+        // Count total matching properties
+        const total = await Property.countDocuments(filter);
 
-        filter.location = {
-            $geoWithin: {
-                $centerSphere: [
-                    college.location.coordinates, // [longitude, latitude]
-                    radiusInRadians
-                ]
-            }
-        };
-
-        // Find all properties within radius (no pagination initially for distance sorting)
+        // Find properties with pagination
+        const skip = (Number(page) - 1) * Number(limit);
         const properties = await Property.find(filter)
             .populate("landlordId", "name email phone profileImage")
+            .sort({ [sortBy]: order === "asc" ? 1 : -1 })
+            .skip(skip)
+            .limit(Number(limit))
             .lean();
 
-        // Calculate distance for each property
-        const propertiesWithDistance = properties.map((property) => {
-            const distance = calculateDistance(
-                college.location.coordinates[1], // latitude
-                college.location.coordinates[0], // longitude
-                property.location.coordinates[1],
-                property.location.coordinates[0]
-            );
-
-            return {
-                ...property,
-                distance: distance * 1000, // convert to meters
-                distanceInKm: parseFloat(distance.toFixed(2)),
-                landlord: property.landlordId,
-            };
-        });
-
-        // Sort by distance
-        propertiesWithDistance.sort((a, b) => a.distance - b.distance);
-
-        // Apply pagination after sorting
-        const skip = (Number(page) - 1) * Number(limit);
-        const paginatedProperties = propertiesWithDistance.slice(skip, skip + Number(limit));
+        // Format response
+        const formattedProperties = properties.map((property) => ({
+            ...property,
+            landlord: property.landlordId,
+        }));
 
         res.status(200).json({
             success: true,
@@ -571,14 +525,13 @@ export const getPropertiesNearCollege = async (req, res) => {
                     city: college.address.city,
                     state: college.address.state,
                 },
-                properties: paginatedProperties,
+                properties: formattedProperties,
                 pagination: {
                     page: Number(page),
                     limit: Number(limit),
-                    total: propertiesWithDistance.length,
-                    pages: Math.ceil(propertiesWithDistance.length / Number(limit)),
+                    total,
+                    pages: Math.ceil(total / Number(limit)),
                 },
-                searchRadius: `${maxDistance}km`,
             },
         });
     } catch (error) {

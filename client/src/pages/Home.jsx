@@ -1,45 +1,31 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
+import { propertyAPI } from '../utils/api';
 
 const Home = () => {
-    // Mock data
-    const featuredProperties = [
-        {
-            id: 1,
-            name: 'Sunrise Boys PG',
-            location: 'Near IIT Delhi, Hauz Khas',
-            price: 8500,
-            rating: 4.8,
-            type: 'Boys PG',
-            image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400',
-        },
-        {
-            id: 2,
-            name: 'Elite Girls Hostel',
-            location: 'DU North Campus, Delhi',
-            price: 9500,
-            rating: 4.9,
-            type: 'Girls PG',
-            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400',
-        },
-        {
-            id: 3,
-            name: 'Urban Co-Living',
-            location: 'Near NIT, Kurukshetra',
-            price: 7500,
-            rating: 4.6,
-            type: 'Co-Living',
-            image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400',
-        },
-    ];
-
-    const popularLocations = [
-        { name: 'IIT Delhi', count: 45, image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400' },
-        { name: 'DU Campus', count: 120, image: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400' },
-        { name: 'BITS Pilani', count: 38, image: 'https://images.unsplash.com/photo-1628744448840-55bdb2497bd4?w=400' },
-    ];
+    const [featuredProperties, setFeaturedProperties] = useState([]);
+    const [loading, setLoading] = useState(true);
+    // Fetch real properties from API
+    useEffect(() => {
+        const fetchProperties = async () => {
+            try {
+                setLoading(true);
+                const response = await propertyAPI.getAllProperties({ limit: 8 });
+                if (response.success) {
+                    setFeaturedProperties(response.data.properties || []);
+                }
+            } catch (error) {
+                console.error('Error fetching properties:', error);
+                setFeaturedProperties([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProperties();
+    }, []);
 
     const stats = [
         { value: '500+', label: 'Verified PGs' },
@@ -199,58 +185,45 @@ const Home = () => {
                         </Link>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:justify-items-center">
-                        {featuredProperties.map((property, index) => (
-                            <motion.div
-                                key={property.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
-                            >
-                                <PropertyCard property={property} />
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Popular Locations */}
-            <section className="py-20 bg-neutral-50">
-                <div className="container mx-auto px-4">
-                    <div className="text-center mb-12">
-                        <span className="text-primary-600 font-semibold text-sm uppercase tracking-wider">Explore</span>
-                        <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-800 mt-2">
-                            Popular College Areas
-                        </h2>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {popularLocations.map((location, index) => (
-                            <motion.div
-                                key={location.name}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
-                                whileHover={{ y: -8 }}
-                                className="relative h-72 rounded-2xl overflow-hidden cursor-pointer group shadow-card"
-                            >
-                                <img
-                                    src={location.image}
-                                    alt={location.name}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/80 via-neutral-900/20 to-transparent" />
-                                <div className="absolute bottom-0 left-0 right-0 p-6">
-                                    <h3 className="text-2xl font-display font-bold text-white mb-1">{location.name}</h3>
-                                    <p className="text-white/70">{location.count} PGs Available</p>
+                    {loading ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {[1, 2, 3, 4].map((i) => (
+                                <div key={i} className="animate-pulse">
+                                    <div className="bg-neutral-200 rounded-2xl h-72"></div>
                                 </div>
-                            </motion.div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    ) : featuredProperties.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:justify-items-center">
+                            {featuredProperties.map((property, index) => (
+                                <motion.div
+                                    key={property._id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.1 }}
+                                >
+                                    <PropertyCard property={property} />
+                                </motion.div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <div className="w-16 h-16 mx-auto mb-4 bg-neutral-100 rounded-full flex items-center justify-center">
+                                <svg className="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-semibold text-neutral-700 mb-2">No Properties Yet</h3>
+                            <p className="text-neutral-500 mb-6">Be the first to list a property!</p>
+                            <Link to="/landlord/add-property" className="btn-primary inline-flex">
+                                List Your Property
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </section>
+
 
             {/* Why Choose Us */}
             <section className="py-20 bg-white">

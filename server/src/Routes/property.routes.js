@@ -10,7 +10,7 @@ import {
     getLandlordStats,
     searchCollegesAPI,
     getPropertiesNearCollege,
-    getNearbyCollegesForLocation,
+    getAllCampuses,
 } from "../Controllers/property.controller.js";
 import { protect, authorize } from "../Middlewares/auth.middleware.js";
 import { body } from "express-validator";
@@ -67,8 +67,8 @@ const propertyValidation = [
 
 // Public routes
 router.get("/", getAllProperties);
+router.get("/campuses", getAllCampuses);
 router.get("/colleges/search", searchCollegesAPI);
-router.get("/nearby-colleges", getNearbyCollegesForLocation);
 router.get("/near-college", getPropertiesNearCollege);
 router.get("/:id", getPropertyById);
 

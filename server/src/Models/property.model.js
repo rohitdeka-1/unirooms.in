@@ -93,14 +93,11 @@ const propertySchema = new mongoose.Schema(
       required: [true, "Phone number is required"],
       match: [/^[0-9]{10}$/, "Please provide a valid 10-digit phone number"],
     },
-    nearbyColleges: [
-      {
-        name: {
-          type: String,
-          required: true,
-        },
-      },
-    ],
+    campusName: {
+      type: String,
+      required: [true, "Campus name is required"],
+      trim: true,
+    },
     roomType: {
       type: String,
       enum: ["single", "double", "triple", "shared"],

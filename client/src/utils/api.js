@@ -91,9 +91,8 @@ export const propertyAPI = {
         return apiCall(`/properties/near-college?${queryString}`);
     },
 
-    getNearbyColleges: (lat, lon, maxDistance = 10) => {
-        const queryString = new URLSearchParams({ lat, lon, maxDistance }).toString();
-        return apiCall(`/properties/nearby-colleges?${queryString}`);
+    getAllCampuses: () => {
+        return apiCall(`/properties/campuses`);
     },
 };
 

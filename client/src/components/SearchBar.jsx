@@ -74,17 +74,27 @@ const SearchBar = ({ onSearch, variant = 'default' }) => {
 
     const handleCollegeSelect = (college) => {
         const searchTerm = college.shortName || college.name;
-        setLocation(searchTerm);
         setShowSuggestions(false);
         
-        // Navigate to browse page with college filter
-        navigate(`/browse?college=${encodeURIComponent(searchTerm)}`);
+        // Clear any pending search timeouts
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        
+        // Navigate to browse page with campus filter
+        navigate(`/browse?campus=${encodeURIComponent(searchTerm)}`);
     };
 
     const handlePopularClick = (place) => {
-        setLocation(place);
+        setShowSuggestions(false);
+        
+        // Clear any pending search timeouts
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        
         // Trigger search for popular colleges
-        navigate(`/browse?college=${encodeURIComponent(place)}`);
+        navigate(`/browse?campus=${encodeURIComponent(place)}`);
     };
 
     const isHero = variant === 'hero';
@@ -99,16 +109,6 @@ const SearchBar = ({ onSearch, variant = 'default' }) => {
         >
             <form onSubmit={handleSearch}>
                 <div className={`relative flex items-center ${isHero ? 'bg-white rounded-2xl p-2 shadow-lg border border-neutral-200' : 'bg-white rounded-xl shadow-card'}`}>
-                    {/* Location Icon */}
-                    {/* <div className={`flex items-center ${isHero ? 'pl-4' : 'pl-5'}`}>
-                        <div className={`${isHero ? 'w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl' : 'w-10 h-10 bg-primary-50 rounded-lg'} flex items-center justify-center`}>
-                            <svg className={`${isHero ? 'w-6 h-6 text-white' : 'w-5 h-5 text-primary-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </div>
-                    </div> */}
-
                     <div className="flex-1 px-4">
                         <input
                             type="text"
@@ -122,24 +122,6 @@ const SearchBar = ({ onSearch, variant = 'default' }) => {
                             }}
                             className={`w-full bg-transparent outline-none ${isHero ? 'text-neutral-700 placeholder-neutral-400 text-lg py-4' : 'text-neutral-700 placeholder-neutral-400 py-3'}`}
                         />
-                    </div>
-
-                    <div className={` ${isHero ? 'pr-2' : 'pr-3'}`}   >
-                        <button
-                            type="submit"
-                            className={`${isHero ? 'px-5 py-4' : 'px-4 py-3'} btn-accent rounded-full flex items-center space-x-2`}
-                        >
-                            {isSearchingCollege ? (
-                                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            ) : (
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            )}
-                        </button>
                     </div>
                 </div>
 

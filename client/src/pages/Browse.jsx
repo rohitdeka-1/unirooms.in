@@ -8,9 +8,12 @@ import { propertyAPI } from '../utils/api';
 const Browse = () => {
     const [searchParams] = useSearchParams();
     const initialSearch = searchParams.get('search') || '';
-    const collegeParam = searchParams.get('college') || '';
+    // Support both 'campus' and 'college' URL parameters for backward compatibility
+    const campusParam = searchParams.get('campus') || searchParams.get('college') || '';
     const [searchQuery, setSearchQuery] = useState(initialSearch);
-    const [collegeName, setCollegeName] = useState(collegeParam);
+    const [selectedCampus, setSelectedCampus] = useState(campusParam);
+    const [campuses, setCampuses] = useState([]);
+    const [campusSearchQuery, setCampusSearchQuery] = useState('');
     const [selectedType, setSelectedType] = useState('all');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     const [minRating, setMinRating] = useState(0);
@@ -19,7 +22,21 @@ const Browse = () => {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [collegeInfo, setCollegeInfo] = useState(null);
+
+    // Fetch campuses on mount
+    useEffect(() => {
+        const fetchCampuses = async () => {
+            try {
+                const response = await propertyAPI.getAllCampuses();
+                if (response.success) {
+                    setCampuses(response.data.campuses || []);
+                }
+            } catch (err) {
+                console.error('Error fetching campuses:', err);
+            }
+        };
+        fetchCampuses();
+    }, []);
 
     useEffect(() => {
         const fetchProperties = async () => {
@@ -27,68 +44,34 @@ const Browse = () => {
             setError(null);
 
             try {
-                console.log('Fetching properties...', { collegeName, selectedType, priceRange });
+                const params = {};
 
-                if (collegeName) {
-                    const params = {
-                        collegeName: collegeName,
-                        maxDistance: 5,
-                    };
+                if (selectedCampus) params.campusName = selectedCampus;
+                if (searchQuery) params.search = searchQuery;
+                if (selectedType !== 'all') params.roomType = selectedType.toLowerCase().replace(' pg', '');
+                if (priceRange.min) params.minPrice = priceRange.min;
+                if (priceRange.max) params.maxPrice = priceRange.max;
 
-                    if (selectedType !== 'all') params.roomType = selectedType.toLowerCase().replace(' pg', '');
-                    if (priceRange.min) params.minPrice = priceRange.min;
-                    if (priceRange.max) params.maxPrice = priceRange.max;
+                const response = await propertyAPI.getAllProperties(params);
 
-                    console.log('Fetching properties near college:', params);
-                    const response = await propertyAPI.getPropertiesNearCollege(params);
-                    console.log('API Response:', response);
-
-                    if (response.success) {
-                        console.log('Properties found:', response.data.properties?.length || 0);
-                        setProperties(response.data.properties || []);
-                        setCollegeInfo(response.data.college);
-                    } else {
-                        console.log('No success in response');
-                        setProperties([]);
-                        setCollegeInfo(null);
-                    }
-                } else {
-                    const params = {};
-                    if (searchQuery) params.search = searchQuery;
-                    if (selectedType !== 'all') params.roomType = selectedType.toLowerCase().replace(' pg', '');
-                    if (priceRange.min) params.minPrice = priceRange.min;
-                    if (priceRange.max) params.maxPrice = priceRange.max;
-
-                    console.log('Fetching all properties:', params);
-                    const response = await propertyAPI.getAllProperties(params);
-                    console.log('API Response:', response);
-
-                    if (response.success) {
-                        console.log('Properties found:', response.data.properties?.length || 0);
-                        setProperties(response.data.properties || []);
-                        setCollegeInfo(null);
-                    } else {
-                        console.log('No success in response');
-                        setProperties([]);
-                        setCollegeInfo(null);
-                    }
+                if (response.success) {
+                    setProperties(response.data.properties || []);
                 }
             } catch (err) {
                 console.error('Error fetching properties:', err);
                 setError(err.message || 'Failed to fetch properties');
                 setProperties([]);
-                setCollegeInfo(null);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchProperties();
-    }, [collegeName, selectedType, priceRange, searchQuery]);
+    }, [selectedCampus, selectedType, priceRange, searchQuery]);
 
     useEffect(() => {
-        const newCollegeName = searchParams.get('college') || '';
-        setCollegeName(newCollegeName);
+        const newCampus = searchParams.get('campus') || searchParams.get('college') || '';
+        setSelectedCampus(newCampus);
     }, [searchParams]);
 
     const propertyTypes = [
@@ -99,32 +82,38 @@ const Browse = () => {
         { value: 'Hostel', label: 'Hostel' },
     ];
 
-    const sortOptions = collegeName ? [
-        { value: 'distance', label: 'Nearest First' },
-        { value: 'recommended', label: 'Recommended' },
-        { value: 'price-low', label: 'Price: Low to High' },
-        { value: 'price-high', label: 'Price: High to Low' },
-        { value: 'rating', label: 'Highest Rated' },
-    ] : [
+    const sortOptions = [
         { value: 'recommended', label: 'Recommended' },
         { value: 'price-low', label: 'Price: Low to High' },
         { value: 'price-high', label: 'Price: High to Low' },
         { value: 'rating', label: 'Highest Rated' },
     ];
 
+    // Filter campuses based on search query
+    const filteredCampuses = useMemo(() => {
+        return campuses.filter(campus =>
+            campus.name.toLowerCase().includes(campusSearchQuery.toLowerCase()) ||
+            campus.city.toLowerCase().includes(campusSearchQuery.toLowerCase())
+        );
+    }, [campuses, campusSearchQuery]);
+
     const filteredProperties = useMemo(() => {
         let result = [...properties];
 
-        if (searchQuery && !collegeName) {
+        if (searchQuery && !selectedCampus) {
             const query = searchQuery.toLowerCase();
             result = result.filter(
                 (p) =>
                     (p.name || p.title)?.toLowerCase().includes(query) ||
-                    (p.location || p.address?.locality)?.toLowerCase().includes(query)
+                    p.city?.toLowerCase().includes(query) ||
+                    p.state?.toLowerCase().includes(query) ||
+                    p.address?.locality?.toLowerCase().includes(query) ||
+                    p.address?.street?.toLowerCase().includes(query) ||
+                    p.campusName?.toLowerCase().includes(query)
             );
         }
 
-        if (selectedType !== 'all' && !collegeName) {
+        if (selectedType !== 'all' && !selectedCampus) {
             result = result.filter((p) => p.type === selectedType || p.roomType === selectedType.toLowerCase().replace(' pg', ''));
         }
         if (minRating > 0) {
@@ -141,17 +130,12 @@ const Browse = () => {
             case 'rating':
                 result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
                 break;
-            case 'distance':
-                if (collegeName) {
-                    result.sort((a, b) => (a.distanceInKm || 0) - (b.distanceInKm || 0));
-                }
-                break;
             default:
                 break;
         }
 
         return result;
-    }, [properties, searchQuery, selectedType, minRating, sortBy, collegeName]);
+    }, [properties, searchQuery, selectedType, minRating, sortBy, selectedCampus]);
 
     const clearFilters = () => {
         setSelectedType('all');
@@ -159,7 +143,8 @@ const Browse = () => {
         setMinRating(0);
         setSortBy('recommended');
         setSearchQuery('');
-        setCollegeName('');
+        setSelectedCampus('');
+        setCampusSearchQuery('');
         window.history.pushState({}, '', '/browse');
     };
 
@@ -169,7 +154,7 @@ const Browse = () => {
         priceRange.max ||
         minRating > 0 ||
         searchQuery ||
-        collegeName;
+        selectedCampus;
 
     return (
         <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
@@ -191,8 +176,8 @@ const Browse = () => {
                         <span className="text-neutral-700 font-medium">Browse PGs</span>
                     </div>
 
-                    {/* College Info Banner */}
-                    {collegeInfo && (
+                    {/* Campus Selection Banner */}
+                    {selectedCampus && (
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -206,9 +191,8 @@ const Browse = () => {
                                         </svg>
                                     </div>
                                     <div>
-                                        <p className="text-sm text-neutral-600">Showing PGs near</p>
-                                        <h3 className="text-lg font-bold text-neutral-800">{collegeInfo.shortName || collegeInfo.name}</h3>
-                                        <p className="text-xs text-neutral-500">{collegeInfo.city}, {collegeInfo.state}</p>
+                                        <p className="text-sm text-neutral-600">Showing properties for</p>
+                                        <h3 className="text-lg font-bold text-neutral-800">{selectedCampus}</h3>
                                     </div>
                                 </div>
                                 <button
@@ -224,7 +208,7 @@ const Browse = () => {
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div>
                             <h1 className="text-3xl md:text-4xl font-display font-bold text-neutral-800">
-                                {collegeName ? `PGs near ${collegeName}` : 'Browse Properties'}
+                                {selectedCampus ? `PGs for ${selectedCampus}` : 'Browse Properties'}
                             </h1>
                             <p className="text-neutral-500 mt-1">
                                 {loading ? 'Loading...' : `${filteredProperties.length} properties available`}
@@ -262,6 +246,32 @@ const Browse = () => {
                                         Clear All
                                     </button>
                                 )}
+                            </div>
+
+                            {/* Campus Selection */}
+                            <div className="mb-6">
+                                <h3 className="text-sm font-semibold text-neutral-700 mb-3">
+                                    Select Campus
+                                </h3>
+                                <input
+                                    type="text"
+                                    value={campusSearchQuery}
+                                    onChange={(e) => setCampusSearchQuery(e.target.value)}
+                                    className="input mb-2 text-sm"
+                                    placeholder="Search campus..."
+                                />
+                                <select
+                                    value={selectedCampus}
+                                    onChange={(e) => setSelectedCampus(e.target.value)}
+                                    className="input text-sm"
+                                >
+                                    <option value="">All Campuses</option>
+                                    {filteredCampuses.map((campus, index) => (
+                                        <option key={index} value={campus.name}>
+                                            {campus.name} - {campus.city}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             {/* Property Type */}
@@ -483,8 +493,8 @@ const Browse = () => {
                                     No Properties Found
                                 </h3>
                                 <p className="text-neutral-500 mb-6">
-                                    {collegeName
-                                        ? `No properties available near ${collegeName}. Try searching for a different college or check back later.`
+                                    {selectedCampus
+                                        ? `No properties available for ${selectedCampus}. Try searching for a different campus or check back later.`
                                         : 'Try adjusting your filters or search criteria'
                                     }
                                 </p>
