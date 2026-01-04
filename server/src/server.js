@@ -8,7 +8,10 @@ const PORT = config.PORT;
 
 connectDb().then(() => {
     app.listen(PORT, () => {
-        console.log(chalk.magenta(`Running on  http://localhost:${PORT}`))
+        console.log(chalk.magenta(`Running on  http://localhost:${PORT}`));
+        console.log(chalk.cyan('CORS Configuration:'));
+        console.log(chalk.cyan('  - Production: https://unirooms-in.vercel.app'));
+        console.log(chalk.cyan('  - Development: http://localhost:5173'));
     })
 }).catch((err) => {
     console.log("ERROR")

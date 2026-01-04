@@ -14,33 +14,24 @@ app.use(express.urlencoded({
     limit:"1024KB"
 }))
 
-// CORS Configuration
-const allowedOrigins = [
-    'https://unirooms-in.vercel.app',
-    'http://localhost:5173', // for local development
-];
+// CORS Configuration - Allow production and development origins
+const corsOptions = {
+    origin: ['https://unirooms-in.vercel.app', 'http://localhost:5173'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Set-Cookie'],
+    maxAge: 86400, // 24 hours
+    optionsSuccessStatus: 200
+};
 
-app.use(
-    cors({
-        origin: (origin, callback) => {
-            // Allow requests with no origin (like mobile apps or curl)
-            if (!origin) return callback(null, true);
-            
-            if (allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error('Not allowed by CORS'));
-            }
-        },
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-        exposedHeaders: ['Set-Cookie'],
-    })
-);
+app.use(cors(corsOptions));
 
-// Handle preflight requests
-app.options('*', cors());
+// Log all requests for debugging
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url} - Origin: ${req.get('origin')}`);
+    next();
+});
 
 app.use(cookieParser());
 
