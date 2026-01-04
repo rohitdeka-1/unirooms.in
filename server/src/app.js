@@ -14,14 +14,33 @@ app.use(express.urlencoded({
     limit:"1024KB"
 }))
 
+// CORS Configuration
+const allowedOrigins = [
+    'https://unirooms-in.vercel.app',
+    'http://localhost:5173', // for local development
+];
+
 app.use(
     cors({
-        origin: process.env.FRONTEND_URL || "https://unirooms-in.vercel.app",
+        origin: (origin, callback) => {
+            // Allow requests with no origin (like mobile apps or curl)
+            if (!origin) return callback(null, true);
+            
+            if (allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
+        exposedHeaders: ['Set-Cookie'],
     })
-)
+);
+
+// Handle preflight requests
+app.options('*', cors());
 
 app.use(cookieParser());
 
