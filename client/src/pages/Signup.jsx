@@ -116,11 +116,11 @@ const Signup = () => {
             </div>
 
             {/* Right Side - Form */}
-            <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-8 relative z-10 bg-white">
+            <div className="w-full lg:flex-1 flex items-center justify-center px-4 sm:px-6 py-12 lg:px-8 relative z-10 bg-white">
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="w-full max-w-md"
+                    className="w-full max-w-md mx-auto"
                 >
                     <div className="mb-8">
                         <Link to="/" className="inline-flex items-center space-x-2 mb-8">
@@ -169,29 +169,44 @@ const Signup = () => {
                         </motion.div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Role Selection */}
-                        <div>
-                            <label className="block text-sm font-medium text-dark-700 mb-3">I am a</label>
-                            <div className="grid grid-cols-2 gap-3">
-                                {['student', 'landlord'].map((role) => (
-                                    <button
-                                        key={role}
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, role })}
-                                        className={`py-3 px-4 rounded-xl border-2 font-medium transition-all duration-200 ${formData.role === role
-                                            ? 'border-primary-500 bg-primary-50 text-primary-700'
-                                            : 'border-dark-200 text-dark-600 hover:border-dark-300'
-                                            }`}
-                                    >
-                                        {role === 'student' ? '🎓 Student' : '🏠 Landlord'}
-                                    </button>
-                                ))}
-                            </div>
+                    {/* Step 1: Role Selection - Prominent */}
+                    <div className="mb-6 p-6 bg-gradient-to-r from-primary-50 to-accent-50 rounded-xl border-2 border-primary-200">
+                        <label className="block text-base font-semibold text-neutral-800 mb-4">
+                            <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary-600 text-white text-sm font-bold mr-2">1</span>
+                            First, tell us who you are
+                        </label>
+                        <div className="grid grid-cols-2 gap-4">
+                            {['student', 'landlord'].map((role) => (
+                                <button
+                                    key={role}
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, role })}
+                                    className={`py-4 px-4 rounded-xl border-2 font-semibold transition-all duration-200 ${formData.role === role
+                                        ? 'border-primary-600 bg-white text-primary-700 shadow-lg scale-105'
+                                        : 'border-neutral-300 bg-white text-neutral-600 hover:border-neutral-400'
+                                        }`}
+                                >
+                                    <div className="text-2xl mb-2">{role === 'student' ? '🎓' : '🏠'}</div>
+                                    <div>{role === 'student' ? 'Student' : 'Landlord'}</div>
+                                    {formData.role === role && (
+                                        <div className="mt-2">
+                                            <svg className="w-5 h-5 mx-auto text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                    )}
+                                </button>
+                            ))}
                         </div>
+                    </div>
 
-                        {/* Google Sign Up Button */}
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {/* Google Sign Up Button - Disabled until role selected */}
                         <div className="mb-2">
+                            <label className="block text-sm font-medium text-neutral-700 mb-3 flex items-center">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-bold mr-2">2</span>
+                                Choose your signup method
+                            </label>
                             {googleLoading ? (
                                 <div className="w-full flex items-center justify-center py-3.5 px-4 bg-neutral-100 border-2 border-neutral-200 rounded-xl">
                                     <svg className="animate-spin h-5 w-5 text-neutral-500" fill="none" viewBox="0 0 24 24">
@@ -200,17 +215,29 @@ const Signup = () => {
                                     </svg>
                                 </div>
                             ) : (
-                                <div className="flex justify-center">
-                                    <GoogleLogin
-                                        onSuccess={handleGoogleSuccess}
-                                        onError={handleGoogleError}
-                                        theme="outline"
-                                        size="large"
-                                        text="continue_with"
-                                        shape="rectangular"
-                                        width="400"
-                                    />
+                                <div className={`flex justify-center p-4 rounded-xl border-2 transition-all ${
+                                    formData.role ? 'border-neutral-200 bg-white' : 'border-neutral-200 bg-neutral-50 opacity-50 cursor-not-allowed'
+                                }`}>
+                                    <div className={formData.role ? '' : 'pointer-events-none'}>
+                                        <GoogleLogin
+                                            onSuccess={handleGoogleSuccess}
+                                            onError={handleGoogleError}
+                                            theme="outline"
+                                            size="large"
+                                            text="signup_with"
+                                            shape="rectangular"
+                                            width="360"
+                                        />
+                                    </div>
                                 </div>
+                            )}
+                            {!formData.role && (
+                                <p className="text-xs text-amber-600 mt-2 flex items-center">
+                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    Please select your role above before using Google signup
+                                </p>
                             )}
                         </div>
 
@@ -287,8 +314,8 @@ const Signup = () => {
 
                         <p className="text-xs text-center text-dark-400">
                             By signing up, you agree to our{' '}
-                            <a href="#" className="text-primary-600 hover:underline">Terms</a> and{' '}
-                            <a href="#" className="text-primary-600 hover:underline">Privacy Policy</a>
+                            <Link to="/terms" className="text-primary-600 hover:underline">Terms</Link> and{' '}
+                            <Link to="/privacy" className="text-primary-600 hover:underline">Privacy Policy</Link>
                         </p>
                     </form>
 

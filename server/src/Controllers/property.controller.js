@@ -13,11 +13,8 @@ export const getAllProperties = async (req, res) => {
             page = 1,
             limit = 10,
             city,
-            campusName,
             roomType,
             gender,
-            minPrice,
-            maxPrice,
             amenities,
             search,
             sortBy = "createdAt",
@@ -27,18 +24,9 @@ export const getAllProperties = async (req, res) => {
         // Build filter object
         const filter = { isActive: true }; // Show all active properties (verified or not)
 
-        if (campusName) {
-            // Use regex for flexible campus name matching (supports both full name and shortName)
-            filter.campusName = { $regex: campusName, $options: "i" };
-        }
         if (city) filter.city = { $regex: city, $options: "i" };
         if (roomType) filter.roomType = roomType;
         if (gender) filter.gender = { $in: [gender, "any"] };
-        if (minPrice || maxPrice) {
-            filter.price = {};
-            if (minPrice) filter.price.$gte = Number(minPrice);
-            if (maxPrice) filter.price.$lte = Number(maxPrice);
-        }
         if (amenities) {
             const amenitiesArray = amenities.split(",");
             filter.amenities = { $all: amenitiesArray };

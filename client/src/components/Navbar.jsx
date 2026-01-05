@@ -47,6 +47,26 @@ const Navbar = () => {
                                         )}
                                     </Link>
                                 ))}
+                                
+                                {/* Dashboard link for landlords only */}
+                                {isAuthenticated && user?.role === 'landlord' && (
+                                    <Link
+                                        to="/landlord/dashboard"
+                                        className={`relative px-4 py-2 rounded-xl font-medium transition-all duration-200 ${isActive('/landlord/dashboard')
+                                            ? 'text-primary-700'
+                                            : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
+                                            }`}
+                                    >
+                                        Dashboard
+                                        {isActive('/landlord/dashboard') && (
+                                            <motion.div
+                                                layoutId="activeTab"
+                                                className="absolute inset-0 bg-primary-50 border border-primary-100 rounded-xl -z-10"
+                                                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                                            />
+                                        )}
+                                    </Link>
+                                )}
                             </div>
 
                             {/* Auth Section */}
@@ -145,6 +165,21 @@ const Navbar = () => {
                                     {item.label}
                                 </Link>
                             ))}
+                            
+                            {/* Dashboard link for landlords only */}
+                            {isAuthenticated && user?.role === 'landlord' && (
+                                <Link
+                                    to="/landlord/dashboard"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className={`block px-4 py-3 rounded-xl font-medium transition-colors ${isActive('/landlord/dashboard')
+                                        ? 'bg-primary-50 text-primary-700'
+                                        : 'text-neutral-600 hover:bg-neutral-100'
+                                        }`}
+                                >
+                                    Dashboard
+                                </Link>
+                            )}
+                            
                             <div className="pt-2 border-t border-neutral-200 space-y-2">
                                 {!isAuthenticated ? (
                                     <>

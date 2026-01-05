@@ -196,7 +196,7 @@ const AddProperty = () => {
                     <h1 className="text-4xl md:text-5xl font-display font-bold bg-gradient-to-r from-neutral-800 via-neutral-700 to-primary-600 bg-clip-text text-transparent mb-3">
                         Add New Property
                     </h1>
-                    <p className="text-neutral-600 text-lg">Fill in the details to list your property for just ₹100</p>
+                    <p className="text-neutral-600 text-lg">Fill in the details to list your property for just ₹99</p>
 
                     {/* Progress Steps */}
                     <div className="mt-8 flex items-center justify-center gap-2">
@@ -546,7 +546,6 @@ const AddProperty = () => {
                                             location: {
                                                 coordinates: locationData.coordinates
                                             },
-                                            // Auto-fill address fields if available
                                             address: {
                                                 ...prev.address,
                                                 street: locationData.addressComponents?.street || prev.address.street,

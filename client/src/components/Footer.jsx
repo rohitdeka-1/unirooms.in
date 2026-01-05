@@ -6,33 +6,29 @@ const Footer = () => {
     const footerLinks = {
         company: [
             { name: 'About Us', path: '/about' },
-            { name: 'Careers', path: '/careers' },
             { name: 'Contact', path: '/contact' },
-            { name: 'Blog', path: '/blog' },
         ],
         support: [
-            { name: 'Help Center', path: '/help' },
             { name: 'Safety', path: '/safety' },
             { name: 'Terms of Service', path: '/terms' },
             { name: 'Privacy Policy', path: '/privacy' },
+            { name: 'Refund Policy', path: '/refund-policy' },
         ],
         explore: [
-            { name: 'Browse', path: '/properties' },
-            { name: 'Near VIT Bhopal', path: '/properties?location=iit-delhi' },
-            { name: 'Near VIT Chennai', path: '/properties?location=du' },
-            { name: 'Near VIT Vellore', path: '/properties?location=bits' },
+            { name: 'Browse', path: '/browse' },
+            { name: 'Pricing', path: '/pricing' },
+            { name: 'Near VIT Bhopal', path: '/browse?location=vit-bhopal' },
+            { name: 'Near VIT Chennai', path: '/browse?location=vit-chennai' },
         ],
         landlords: [
             { name: 'List Your Property', path: '/list-property' },
-            { name: 'Landlord Dashboard', path: '/dashboard' },
-            { name: 'Pricing', path: '/pricing' },
-            { name: 'Resources', path: '/resources' },
+            { name: 'Landlord Dashboard', path: '/landlord/dashboard' },
         ],
     };
 
     return (
         <footer className="bg-neutral-900 text-white pb-20 md:pb-0">
-            {/* Main Footer */}
+                {/* Main Footer */}
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
                     {/* Brand */}
@@ -44,6 +40,23 @@ const Footer = () => {
                         <p className="text-neutral-400 text-sm mb-4">
                             Find your perfect PG accommodation near your university. Verified listings, trusted landlords.
                         </p>
+                        
+                        {/* Contact Info */}
+                        <div className="space-y-2 mb-4">
+                            <a href="mailto:unirooms.in@gmail.com" className="flex items-center space-x-2 text-neutral-400 hover:text-white text-sm transition-colors">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <span>unirooms.in@gmail.com</span>
+                            </a>
+                            <a href="tel:+918420514587" className="flex items-center space-x-2 text-neutral-400 hover:text-white text-sm transition-colors">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                </svg>
+                                <span>+91 8420514587</span>
+                            </a>
+                        </div>
+                        
                         {/* Social Links */}
                         <div className="flex space-x-3">
                             <a href="https://twitter.com/unirooms" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors">

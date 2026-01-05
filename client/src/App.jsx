@@ -15,6 +15,14 @@ import VerifyEmailPending from './pages/VerifyEmailPending';
 import PropertyDetail from './pages/PropertyDetail';
 import LandlordDashboard from './pages/LandlordDashboard';
 import AddProperty from './pages/AddProperty';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Safety from './pages/Safety';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import RefundPolicy from './pages/RefundPolicy';
+import Pricing from './pages/Pricing';
+import ListPropertyRedirect from './pages/ListPropertyRedirect';
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -34,8 +42,8 @@ const Layout = ({ children }) => {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
+    <AuthProvider>
+      <Router>
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -50,10 +58,18 @@ function App() {
             <Route path="/landlord/dashboard" element={<LandlordDashboard />} />
             <Route path="/landlord/add-property" element={<AddProperty />} />
             <Route path="/landlord/edit-property/:id" element={<AddProperty />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/safety" element={<Safety />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/refund-policy" element={<RefundPolicy />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/list-property" element={<ListPropertyRedirect />} />
           </Routes>
         </Layout>
-      </AuthProvider>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 

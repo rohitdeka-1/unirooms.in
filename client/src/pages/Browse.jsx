@@ -11,11 +11,7 @@ const Browse = () => {
     // Support both 'campus' and 'college' URL parameters for backward compatibility
     const campusParam = searchParams.get('campus') || searchParams.get('college') || '';
     const [searchQuery, setSearchQuery] = useState(initialSearch);
-    const [selectedCampus, setSelectedCampus] = useState(campusParam);
-    const [campuses, setCampuses] = useState([]);
-    const [campusSearchQuery, setCampusSearchQuery] = useState('');
     const [selectedType, setSelectedType] = useState('all');
-    const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     const [minRating, setMinRating] = useState(0);
     const [sortBy, setSortBy] = useState('recommended');
     const [showFilters, setShowFilters] = useState(false);
@@ -23,20 +19,7 @@ const Browse = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Fetch campuses on mount
-    useEffect(() => {
-        const fetchCampuses = async () => {
-            try {
-                const response = await propertyAPI.getAllCampuses();
-                if (response.success) {
-                    setCampuses(response.data.campuses || []);
-                }
-            } catch (err) {
-                console.error('Error fetching campuses:', err);
-            }
-        };
-        fetchCampuses();
-    }, []);
+
 
     useEffect(() => {
         const fetchProperties = async () => {
@@ -46,11 +29,8 @@ const Browse = () => {
             try {
                 const params = {};
 
-                if (selectedCampus) params.campusName = selectedCampus;
                 if (searchQuery) params.search = searchQuery;
                 if (selectedType !== 'all') params.roomType = selectedType.toLowerCase().replace(' pg', '');
-                if (priceRange.min) params.minPrice = priceRange.min;
-                if (priceRange.max) params.maxPrice = priceRange.max;
 
                 const response = await propertyAPI.getAllProperties(params);
 
@@ -67,12 +47,9 @@ const Browse = () => {
         };
 
         fetchProperties();
-    }, [selectedCampus, selectedType, priceRange, searchQuery]);
+    }, [selectedType, searchQuery]);
 
-    useEffect(() => {
-        const newCampus = searchParams.get('campus') || searchParams.get('college') || '';
-        setSelectedCampus(newCampus);
-    }, [searchParams]);
+
 
     const propertyTypes = [
         { value: 'all', label: 'All Types' },
@@ -89,18 +66,12 @@ const Browse = () => {
         { value: 'rating', label: 'Highest Rated' },
     ];
 
-    // Filter campuses based on search query
-    const filteredCampuses = useMemo(() => {
-        return campuses.filter(campus =>
-            campus.name.toLowerCase().includes(campusSearchQuery.toLowerCase()) ||
-            campus.city.toLowerCase().includes(campusSearchQuery.toLowerCase())
-        );
-    }, [campuses, campusSearchQuery]);
+
 
     const filteredProperties = useMemo(() => {
         let result = [...properties];
 
-        if (searchQuery && !selectedCampus) {
+        if (searchQuery) {
             const query = searchQuery.toLowerCase();
             result = result.filter(
                 (p) =>
@@ -113,7 +84,7 @@ const Browse = () => {
             );
         }
 
-        if (selectedType !== 'all' && !selectedCampus) {
+        if (selectedType !== 'all') {
             result = result.filter((p) => p.type === selectedType || p.roomType === selectedType.toLowerCase().replace(' pg', ''));
         }
         if (minRating > 0) {
@@ -135,26 +106,20 @@ const Browse = () => {
         }
 
         return result;
-    }, [properties, searchQuery, selectedType, minRating, sortBy, selectedCampus]);
+    }, [properties, searchQuery, selectedType, minRating, sortBy]);
 
     const clearFilters = () => {
         setSelectedType('all');
-        setPriceRange({ min: '', max: '' });
         setMinRating(0);
         setSortBy('recommended');
         setSearchQuery('');
-        setSelectedCampus('');
-        setCampusSearchQuery('');
         window.history.pushState({}, '', '/browse');
     };
 
     const hasActiveFilters =
         selectedType !== 'all' ||
-        priceRange.min ||
-        priceRange.max ||
         minRating > 0 ||
-        searchQuery ||
-        selectedCampus;
+        searchQuery;
 
     return (
         <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
@@ -176,39 +141,12 @@ const Browse = () => {
                         <span className="text-neutral-700 font-medium">Browse PGs</span>
                     </div>
 
-                    {/* Campus Selection Banner */}
-                    {selectedCampus && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="mb-4 p-4 bg-gradient-to-r from-primary-50 to-accent-50 rounded-xl border border-primary-200"
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
-                                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-neutral-600">Showing properties for</p>
-                                        <h3 className="text-lg font-bold text-neutral-800">{selectedCampus}</h3>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={clearFilters}
-                                    className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-white rounded-lg transition-colors"
-                                >
-                                    Clear
-                                </button>
-                            </div>
-                        </motion.div>
-                    )}
+
 
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div>
                             <h1 className="text-3xl md:text-4xl font-display font-bold text-neutral-800">
-                                {selectedCampus ? `PGs for ${selectedCampus}` : 'Browse Properties'}
+                                Browse Properties
                             </h1>
                             <p className="text-neutral-500 mt-1">
                                 {loading ? 'Loading...' : `${filteredProperties.length} properties available`}
@@ -248,32 +186,6 @@ const Browse = () => {
                                 )}
                             </div>
 
-                            {/* Campus Selection */}
-                            <div className="mb-6">
-                                <h3 className="text-sm font-semibold text-neutral-700 mb-3">
-                                    Select Campus
-                                </h3>
-                                <input
-                                    type="text"
-                                    value={campusSearchQuery}
-                                    onChange={(e) => setCampusSearchQuery(e.target.value)}
-                                    className="input mb-2 text-sm"
-                                    placeholder="Search campus..."
-                                />
-                                <select
-                                    value={selectedCampus}
-                                    onChange={(e) => setSelectedCampus(e.target.value)}
-                                    className="input text-sm"
-                                >
-                                    <option value="">All Campuses</option>
-                                    {filteredCampuses.map((campus, index) => (
-                                        <option key={index} value={campus.name}>
-                                            {campus.name} - {campus.city}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
                             {/* Property Type */}
                             <div className="mb-6">
                                 <h3 className="text-sm font-semibold text-neutral-700 mb-3">
@@ -284,6 +196,7 @@ const Browse = () => {
                                         <label
                                             key={type.value}
                                             className="flex items-center space-x-3 cursor-pointer group"
+                                            onClick={() => setSelectedType(type.value)}
                                         >
                                             <div
                                                 className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all ${selectedType === type.value
@@ -300,52 +213,16 @@ const Browse = () => {
                                             <span className="text-neutral-600 group-hover:text-neutral-800 transition-colors">
                                                 {type.label}
                                             </span>
+                                            <input
+                                                type="radio"
+                                                name="propertyType"
+                                                value={type.value}
+                                                checked={selectedType === type.value}
+                                                onChange={(e) => setSelectedType(e.target.value)}
+                                                className="sr-only"
+                                            />
                                         </label>
                                     ))}
-                                    <input
-                                        type="hidden"
-                                        onChange={(e) => setSelectedType(e.target.value)}
-                                        value={selectedType}
-                                    />
-                                    {propertyTypes.map((type) => (
-                                        <input
-                                            key={type.value}
-                                            type="radio"
-                                            name="propertyType"
-                                            value={type.value}
-                                            checked={selectedType === type.value}
-                                            onChange={(e) => setSelectedType(e.target.value)}
-                                            className="sr-only"
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Price Range */}
-                            <div className="mb-6">
-                                <h3 className="text-sm font-semibold text-neutral-700 mb-3">
-                                    Price Range
-                                </h3>
-                                <div className="flex items-center space-x-2">
-                                    <input
-                                        type="number"
-                                        placeholder="Min"
-                                        value={priceRange.min}
-                                        onChange={(e) =>
-                                            setPriceRange((prev) => ({ ...prev, min: e.target.value }))
-                                        }
-                                        className="input-field text-sm py-2"
-                                    />
-                                    <span className="text-neutral-400">-</span>
-                                    <input
-                                        type="number"
-                                        placeholder="Max"
-                                        value={priceRange.max}
-                                        onChange={(e) =>
-                                            setPriceRange((prev) => ({ ...prev, max: e.target.value }))
-                                        }
-                                        className="input-field text-sm py-2"
-                                    />
                                 </div>
                             </div>
 
@@ -493,10 +370,7 @@ const Browse = () => {
                                     No Properties Found
                                 </h3>
                                 <p className="text-neutral-500 mb-6">
-                                    {selectedCampus
-                                        ? `No properties available for ${selectedCampus}. Try searching for a different campus or check back later.`
-                                        : 'Try adjusting your filters or search criteria'
-                                    }
+                                    Try adjusting your filters or search criteria
                                 </p>
                                 {hasActiveFilters && (
                                     <button
@@ -572,33 +446,7 @@ const Browse = () => {
                                     </div>
                                 </div>
 
-                                {/* Price Range */}
-                                <div className="mb-6">
-                                    <h3 className="text-sm font-semibold text-neutral-700 mb-3">
-                                        Price Range
-                                    </h3>
-                                    <div className="flex items-center space-x-2">
-                                        <input
-                                            type="number"
-                                            placeholder="Min"
-                                            value={priceRange.min}
-                                            onChange={(e) =>
-                                                setPriceRange((prev) => ({ ...prev, min: e.target.value }))
-                                            }
-                                            className="input-field text-sm"
-                                        />
-                                        <span className="text-neutral-400">-</span>
-                                        <input
-                                            type="number"
-                                            placeholder="Max"
-                                            value={priceRange.max}
-                                            onChange={(e) =>
-                                                setPriceRange((prev) => ({ ...prev, max: e.target.value }))
-                                            }
-                                            className="input-field text-sm"
-                                        />
-                                    </div>
-                                </div>
+
 
                                 {/* Rating Filter */}
                                 <div className="mb-8">

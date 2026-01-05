@@ -60,11 +60,11 @@ const Login = () => {
     return (
         <div className="min-h-screen flex relative overflow-hidden">
             {/* Left Side - Form */}
-            <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-8 relative z-10 bg-white">
+            <div className="w-full lg:flex-1 flex items-center justify-center px-4 sm:px-6 py-12 lg:px-8 relative z-10 bg-white">
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="w-full max-w-md"
+                    className="w-full max-w-md mx-auto"
                 >
                     <div className="mb-10">
                         <Link to="/" className="inline-flex items-center space-x-2 mb-8">
