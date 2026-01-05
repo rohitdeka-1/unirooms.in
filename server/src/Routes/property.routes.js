@@ -16,6 +16,7 @@ import {
     declineProperty,
 } from "../Controllers/property.controller.js";
 import { protect, authorize } from "../Middlewares/auth.middleware.js";
+import { isAdmin } from "../Middlewares/admin.middleware.js";
 import { body } from "express-validator";
 
 const router = express.Router();
@@ -83,9 +84,9 @@ router.put("/:id", protect, authorize("landlord"), updateProperty);
 router.delete("/:id", protect, authorize("landlord"), deleteProperty);
 router.patch("/:id/toggle-active", protect, authorize("landlord"), togglePropertyStatus);
 
-// Admin routes
-router.get("/admin/all", protect, getAllPropertiesAdmin);
-router.put("/admin/:id/approve", protect, approveProperty);
-router.delete("/admin/:id/decline", protect, declineProperty);
+// Admin routes (restricted to alkardorhd@gmail.com)
+router.get("/admin/all", protect, isAdmin, getAllPropertiesAdmin);
+router.put("/admin/:id/approve", protect, isAdmin, approveProperty);
+router.delete("/admin/:id/decline", protect, isAdmin, declineProperty);
 
 export default router;

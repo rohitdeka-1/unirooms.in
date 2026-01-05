@@ -67,6 +67,26 @@ const Navbar = () => {
                                         )}
                                     </Link>
                                 )}
+                                
+                                {/* Admin link for alkardorhd@gmail.com only */}
+                                {isAuthenticated && user?.email === 'alkardorhd@gmail.com' && (
+                                    <Link
+                                        to="/admin/properties"
+                                        className={`relative px-4 py-2 rounded-xl font-medium transition-all duration-200 ${isActive('/admin/properties')
+                                            ? 'text-red-700'
+                                            : 'text-red-600 hover:text-red-800 hover:bg-red-50'
+                                            }`}
+                                    >
+                                        Admin
+                                        {isActive('/admin/properties') && (
+                                            <motion.div
+                                                layoutId="activeTab"
+                                                className="absolute inset-0 bg-red-50 border border-red-100 rounded-xl -z-10"
+                                                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                                            />
+                                        )}
+                                    </Link>
+                                )}
                             </div>
 
                             {/* Auth Section */}
@@ -177,6 +197,20 @@ const Navbar = () => {
                                         }`}
                                 >
                                     Dashboard
+                                </Link>
+                            )}
+                            
+                            {/* Admin link for alkardorhd@gmail.com only */}
+                            {isAuthenticated && user?.email === 'alkardorhd@gmail.com' && (
+                                <Link
+                                    to="/admin/properties"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className={`block px-4 py-3 rounded-xl font-medium transition-colors ${isActive('/admin/properties')
+                                        ? 'bg-red-50 text-red-700'
+                                        : 'text-red-600 hover:bg-red-50'
+                                        }`}
+                                >
+                                    Admin Panel
                                 </Link>
                             )}
                             
