@@ -23,6 +23,7 @@ import Privacy from './pages/Privacy';
 import RefundPolicy from './pages/RefundPolicy';
 import Pricing from './pages/Pricing';
 import ListPropertyRedirect from './pages/ListPropertyRedirect';
+import AdminProperties from './pages/AdminProperties';
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -66,6 +67,7 @@ function App() {
             <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/list-property" element={<ListPropertyRedirect />} />
+            <Route path="/admin/properties" element={<AdminProperties />} />
           </Routes>
         </Layout>
       </Router>

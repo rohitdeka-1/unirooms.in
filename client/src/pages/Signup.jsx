@@ -27,11 +27,11 @@ const Signup = () => {
 
         try {
             const response = await register(formData);
-            
+
             // Check if email verification is required
             if (response.data.requiresEmailVerification) {
                 // Navigate to verification pending page with email
-                navigate('/verify-email-pending', { 
+                navigate('/verify-email-pending', {
                     state: { email: formData.email }
                 });
             } else {
@@ -55,7 +55,7 @@ const Signup = () => {
         try {
             // credentialResponse.credential is the ID token
             const response = await googleSignup(credentialResponse.credential, formData.role);
-            
+
             // Redirect based on user role
             if (formData.role === 'landlord') {
                 navigate('/landlord/dashboard');
@@ -215,9 +215,8 @@ const Signup = () => {
                                     </svg>
                                 </div>
                             ) : (
-                                <div className={`flex justify-center p-4 rounded-xl border-2 transition-all ${
-                                    formData.role ? 'border-neutral-200 bg-white' : 'border-neutral-200 bg-neutral-50 opacity-50 cursor-not-allowed'
-                                }`}>
+                                <div className={`flex justify-center p-4 rounded-xl border-2 transition-all ${formData.role ? 'border-neutral-200 bg-white' : 'border-neutral-200 bg-neutral-50 opacity-50 cursor-not-allowed'
+                                    }`}>
                                     <div className={formData.role ? '' : 'pointer-events-none'}>
                                         <GoogleLogin
                                             onSuccess={handleGoogleSuccess}

@@ -3,6 +3,7 @@ import Payment from "../Models/payment.model.js";
 import User from "../Models/user.model.js";
 import { validationResult } from "express-validator";
 import { searchColleges, getCollegeByName, popularColleges } from "../Services/college.service.js";
+import { sendNewPropertyNotification } from "../Services/email.service.js";
 
 // @desc    Get all properties with filters
 // @route   GET /api/properties
@@ -201,6 +202,22 @@ export const createProperty = async (req, res) => {
         };
 
         const property = await Property.create(propertyData);
+
+        // Send notification email to admin
+        try {
+            const landlord = await User.findById(req.user.id);
+            await sendNewPropertyNotification({
+                title: property.title,
+                landlordName: landlord.name,
+                landlordEmail: landlord.email,
+                city: property.city,
+                price: property.price,
+                propertyId: property._id,
+            });
+        } catch (emailError) {
+            console.error("Failed to send admin notification:", emailError);
+            // Don't fail the property creation if email fails
+        }
 
         res.status(201).json({
             success: true,
@@ -554,4 +571,103 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 function toRadians(degrees) {
     return degrees * (Math.PI / 180);
 }
+
+// @desc    Get all properties (Admin only)
+// @route   GET /api/properties/admin/all
+// @access  Private (Admin)
+export const getAllPropertiesAdmin = async (req, res) => {
+    try {
+        const { status } = req.query; // 'pending', 'verified', 'all'
+        
+        let filter = {};
+        if (status === 'pending') {
+            filter.isVerified = false;
+        } else if (status === 'verified') {
+            filter.isVerified = true;
+        }
+
+        const properties = await Property.find(filter)
+            .populate("landlordId", "name email phone")
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            data: { properties },
+        });
+    } catch (error) {
+        console.error("Get All Properties Admin Error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching properties",
+            error: error.message,
+        });
+    }
+};
+
+// @desc    Approve property (Admin only)
+// @route   PUT /api/properties/admin/:id/approve
+// @access  Private (Admin)
+export const approveProperty = async (req, res) => {
+    try {
+        const property = await Property.findById(req.params.id);
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: "Property not found",
+            });
+        }
+
+        property.isVerified = true;
+        await property.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Property approved successfully",
+            data: { property },
+        });
+    } catch (error) {
+        console.error("Approve Property Error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error approving property",
+            error: error.message,
+        });
+    }
+};
+
+// @desc    Decline/Delete property (Admin only)
+// @route   DELETE /api/properties/admin/:id/decline
+// @access  Private (Admin)
+export const declineProperty = async (req, res) => {
+    try {
+        const { reason } = req.body;
+        const property = await Property.findById(req.params.id).populate("landlordId", "name email");
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: "Property not found",
+            });
+        }
+
+        // Delete the property
+        await Property.findByIdAndDelete(req.params.id);
+
+        // Optionally send email to landlord about rejection
+        // You can implement this later if needed
+
+        res.status(200).json({
+            success: true,
+            message: "Property declined and removed",
+        });
+    } catch (error) {
+        console.error("Decline Property Error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error declining property",
+            error: error.message,
+        });
+    }
+};
 

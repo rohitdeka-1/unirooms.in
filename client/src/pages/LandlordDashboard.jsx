@@ -176,9 +176,11 @@ const LandlordDashboard = () => {
                                                         <span className={`px-2 py-1 rounded-lg text-xs font-medium ${property.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                                             {property.isActive ? 'Active' : 'Inactive'}
                                                         </span>
-                                                        <span className={`px-2 py-1 rounded-lg text-xs font-medium ${property.isVerified ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                                            {property.isVerified ? 'Verified' : 'Pending'}
-                                                        </span>
+                                                        {!property.isVerified && (
+                                                            <span className="px-2 py-1 rounded-lg text-xs font-medium bg-yellow-100 text-yellow-700" title="Property is awaiting admin verification">
+                                                                Pending Verification
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>

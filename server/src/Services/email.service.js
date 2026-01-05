@@ -206,6 +206,93 @@ export const sendPasswordResetEmail = async (email, name, resetToken) => {
   }
 };
 
+// Send Admin Notification for New Property
+export const sendNewPropertyNotification = async (propertyDetails) => {
+  try {
+    const adminEmail = "alkardorhd@gmail.com";
+    const { title, landlordName, landlordEmail, city, price, propertyId } = propertyDetails;
+    
+    const reviewUrl = `${config.FRONTEND_URL}/admin/properties`;
+
+    const mailOptions = {
+      from: `"${config.EMAIL_FROM_NAME}" <${config.GMAIL_USER}>`,
+      to: adminEmail,
+      subject: "New Property Listing - Action Required",
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .property-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+            .label { font-weight: bold; color: #555; }
+            .value { color: #333; }
+            .button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 10px 5px; }
+            .footer { text-align: center; color: #777; font-size: 12px; margin-top: 30px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🏠 New Property Listing</h1>
+              <p>A new property has been submitted for review</p>
+            </div>
+            <div class="content">
+              <div class="property-details">
+                <h2 style="margin-top: 0; color: #667eea;">${title}</h2>
+                <div class="detail-row">
+                  <span class="label">Property ID:</span>
+                  <span class="value">${propertyId}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Landlord:</span>
+                  <span class="value">${landlordName}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Email:</span>
+                  <span class="value">${landlordEmail}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Location:</span>
+                  <span class="value">${city}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Price:</span>
+                  <span class="value">₹${price}/month</span>
+                </div>
+              </div>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <p><strong>Action Required:</strong> Please review this property listing</p>
+                <a href="${reviewUrl}" class="button">Review Property</a>
+              </div>
+              
+              <p style="color: #777; font-size: 14px; text-align: center;">
+                Login to your admin dashboard to approve or decline this listing
+              </p>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Unirooms. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Admin notification email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error sending admin notification email:", error);
+    throw error;
+  }
+};
+
 export default {
   sendOTPEmail,
   sendVerificationEmail,
@@ -213,4 +300,5 @@ export default {
   sendLoginNotificationEmail,
   sendPasswordResetOTP,
   sendPasswordResetEmail,
+  sendNewPropertyNotification,
 };
