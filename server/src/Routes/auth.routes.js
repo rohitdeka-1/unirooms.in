@@ -6,6 +6,7 @@ import {
   googleSignup,
   googleLogin,
   getCurrentUser,
+  updateProfile,
   logout,
   requestLoginOTP,
   verifyLoginOTP,
@@ -109,6 +110,11 @@ authRoute.post("/reset-password", resetPassword);
 // @desc    Get current logged in user
 // @access  Private
 authRoute.get("/me", verifyToken, getCurrentUser);
+
+// @route   PUT /api/v1/auth/profile
+// @desc    Update user profile
+// @access  Private
+authRoute.put("/profile", verifyToken, updateProfile);
 
 // @route   POST /api/v1/auth/logout
 // @desc    Logout user (client-side token removal)

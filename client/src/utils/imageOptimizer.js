@@ -1,6 +1,4 @@
-/**
- * Image optimization utility for Cloudinary and other image URLs
- */
+
 
 /**
  * Optimizes Cloudinary image URLs with transformations

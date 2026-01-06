@@ -48,6 +48,11 @@ export const authAPI = {
 
     getCurrentUser: () => apiCall('/auth/me'),
 
+    updateProfile: (data) => apiCall('/auth/profile', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    }),
+
     logout: () => apiCall('/auth/logout', { method: 'POST' }),
 };
 

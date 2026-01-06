@@ -94,6 +94,17 @@ export const AuthProvider = ({ children }) => {
         return response;
     };
 
+    const refreshUser = async () => {
+        try {
+            const response = await authAPI.getCurrentUser();
+            setUser(response.data.user);
+            return response.data.user;
+        } catch (error) {
+            console.error('Error refreshing user:', error);
+            throw error;
+        }
+    };
+
     const value = {
         user,
         isAuthenticated,
@@ -103,6 +114,7 @@ export const AuthProvider = ({ children }) => {
         googleLogin,
         googleSignup,
         logout,
+        refreshUser,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

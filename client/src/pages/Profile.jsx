@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { authAPI } from '../utils/api';
 
 const Profile = () => {
-    const { isAuthenticated, user, logout } = useAuth();
+    const { isAuthenticated, user, logout, refreshUser } = useAuth();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview');
     const [isEditing, setIsEditing] = useState(false);
@@ -47,10 +48,28 @@ const Profile = () => {
     const handleSaveProfile = async () => {
         setLoading(true);
         try {
-            // TODO: Implement API call to update user profile
+            // Validate phone number if provided
+            if (formData.phone && !/^[6-9]\d{9}$/.test(formData.phone)) {
+                alert('Please enter a valid 10-digit Indian phone number');
+                setLoading(false);
+                return;
+            }
+
+            await authAPI.updateProfile({
+                name: formData.name,
+                phone: formData.phone || undefined,
+                college: formData.college || undefined,
+            });
+
+            // Refresh user data in context
+            if (refreshUser) {
+                await refreshUser();
+            }
+
             setIsEditing(false);
         } catch (error) {
             console.error('Error updating profile:', error);
+            alert(error.message || 'Failed to update profile');
         } finally {
             setLoading(false);
         }

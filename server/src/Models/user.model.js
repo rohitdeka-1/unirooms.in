@@ -47,6 +47,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: "https://res.cloudinary.com/default-avatar.png",
         },
+        college: {
+            type: String,
+            trim: true,
+            maxlength: [100, "College name cannot exceed 100 characters"],
+        },
         isVerified: {
             type: Boolean,
             default: false,

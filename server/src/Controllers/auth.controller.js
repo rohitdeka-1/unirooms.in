@@ -577,6 +577,65 @@ export const getCurrentUser = async (req, res) => {
     }
 };
 
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+export const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { name, phone, college } = req.body;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        // Update fields if provided
+        if (name) user.name = name;
+        if (phone) {
+            // Check if phone is already taken by another user
+            const existingUser = await User.findOne({ phone, _id: { $ne: userId } });
+            if (existingUser) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Phone number already in use",
+                });
+            }
+            user.phone = phone;
+        }
+        if (college !== undefined) user.college = college;
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            data: {
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    phone: user.phone,
+                    college: user.college,
+                    role: user.role,
+                    profileImage: user.profileImage,
+                },
+            },
+        });
+    } catch (error) {
+        console.error("Update Profile Error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error updating profile",
+            error: error.message,
+        });
+    }
+};
+
 // @desc    Logout user
 // @route   POST /api/auth/logout
 // @access  Private
