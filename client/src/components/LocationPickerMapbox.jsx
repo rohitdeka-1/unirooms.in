@@ -12,7 +12,7 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
         initialLocation || { lat: 28.6139, lng: 77.2090 } // Default: New Delhi
     );
     const [address, setAddress] = useState('');
-    const [mapStyle, setMapStyle] = useState('streets-v12'); // 'streets-v12' or 'satellite-v9'
+    const [mapStyle, setMapStyle] = useState('satellite-v9'); // 'streets-v12' or 'satellite-v9'
     const [isLocating, setIsLocating] = useState(false);
 
     const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
@@ -39,8 +39,9 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
             accessToken: mapboxgl.accessToken,
             mapboxgl: mapboxgl,
             marker: false,
-            countries: 'in', // Restrict to India
-            placeholder: '🔍 Search colleges, landmarks, or addresses...',
+            countries: 'in',
+            placeholder: 'Search location...',
+            types: 'poi,address,place',
         });
 
         map.current.addControl(geocoder, 'top-left');
@@ -179,65 +180,60 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
 
     return (
         <div className="space-y-4">
-            {/* Auto-Detect Button - Most Prominent */}
-            <div className="flex items-center justify-center">
-                <button
-                    type="button"
-                    onClick={handleAutoDetect}
-                    disabled={isLocating}
-                    className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold text-lg rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {isLocating ? (
-                        <>
-                            <svg className="animate-spin h-6 w-6" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Detecting...
-                        </>
-                    ) : (
-                        <>
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            📍 Auto-Detect My Location
-                        </>
-                    )}
-                </button>
-            </div>
+            {/* Auto-Detect Button */}
+            <button
+                type="button"
+                onClick={handleAutoDetect}
+                disabled={isLocating}
+                className="w-full px-4 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+                {isLocating ? (
+                    <>
+                        <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Detecting Location...</span>
+                    </>
+                ) : (
+                    <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>Use My Current Location</span>
+                    </>
+                )}
+            </button>
 
-            {/* Map Type Toggle */}
-            <div className="flex items-center justify-between">
-                <p className="text-sm text-neutral-600 flex items-center gap-2">
-                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Search above or click/drag marker on map
-                </p>
+            {/* Map Controls */}
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                <div className="flex-1 text-sm text-neutral-600">
+                    Search or click map to select location
+                </div>
                 
-                <div className="flex bg-neutral-100 rounded-xl p-1.5 gap-1">
+                <div className="flex bg-neutral-100 rounded-lg p-1 gap-1 self-start sm:self-auto">
                     <button
                         type="button"
                         onClick={() => setMapStyle('streets-v12')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                        className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
                             mapStyle === 'streets-v12'
-                                ? 'bg-white text-green-600 shadow-sm'
-                                : 'text-neutral-600 hover:text-neutral-800'
+                                ? 'bg-white text-primary-600 shadow-sm'
+                                : 'text-neutral-600'
                         }`}
                     >
-                        🗺️ Street
+                        Street
                     </button>
                     <button
                         type="button"
                         onClick={() => setMapStyle('satellite-v9')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
+                        className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
                             mapStyle === 'satellite-v9'
-                                ? 'bg-white text-green-600 shadow-sm'
-                                : 'text-neutral-600 hover:text-neutral-800'
+                                ? 'bg-white text-primary-600 shadow-sm'
+                                : 'text-neutral-600'
                         }`}
                     >
-                        🛰️ Satellite
+                        Satellite
                     </button>
                 </div>
             </div>
@@ -245,24 +241,23 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
             {/* Map Container */}
             <div 
                 ref={mapContainer} 
-                className="relative rounded-xl overflow-hidden shadow-lg border-2 border-neutral-200"
-                style={{ height: '500px' }}
+                className="relative rounded-lg overflow-hidden shadow-md border border-neutral-200"
+                style={{ height: '400px' }}
             />
 
             {/* Selected Location Display */}
             {address && (
-                <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4">
-                    <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div className="flex items-start gap-2">
+                        <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
                         <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-semibold text-green-900 mb-1">Selected Location</h4>
+                            <p className="text-xs font-medium text-green-900 mb-1">Selected Location</p>
                             <p className="text-sm text-green-700 break-words">{address}</p>
                             <p className="text-xs text-green-600 mt-1 font-mono">
-                                📍 {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
+                                {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
                             </p>
                         </div>
                     </div>
@@ -270,22 +265,13 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
             )}
 
             {/* Instructions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <div className="flex gap-3">
-                    <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div className="text-sm text-blue-800 space-y-1">
-                        <p className="font-semibold">How to set location:</p>
-                        <ul className="list-disc list-inside space-y-1 ml-2">
-                            <li>Click "Auto-Detect My Location" for instant GPS location</li>
-                            <li>Use search bar to find colleges, landmarks, or addresses</li>
-                            <li>Click anywhere on the map to pin location</li>
-                            <li>Drag the green marker to adjust position</li>
-                            <li>Toggle between Street and Satellite views</li>
-                        </ul>
-                    </div>
-                </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-xs text-blue-900 font-medium mb-1">Quick Guide:</p>
+                <ul className="text-xs text-blue-800 space-y-1">
+                    <li>• Use search bar to find colleges or addresses</li>
+                    <li>• Click on map to pin exact location</li>
+                    <li>• Drag marker to adjust position</li>
+                </ul>
             </div>
         </div>
     );
