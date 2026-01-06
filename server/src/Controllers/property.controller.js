@@ -4,6 +4,8 @@ import User from "../Models/user.model.js";
 import { validationResult } from "express-validator";
 import { searchColleges, getCollegeByName, popularColleges } from "../Services/college.service.js";
 import { sendNewPropertyNotification } from "../Services/email.service.js";
+import cloudinary from "../Config/cloudinary.config.js";
+import streamifier from 'streamifier';
 
 // @desc    Get all properties with filters
 // @route   GET /api/properties
@@ -194,11 +196,51 @@ export const createProperty = async (req, res) => {
             });
         }
 
+        // Handle image uploads to Cloudinary
+        let uploadedImages = [];
+        if (req.files && req.files.length > 0) {
+            // Limit to 5 images
+            const filesToUpload = req.files.slice(0, 5);
+            
+            const uploadPromises = filesToUpload.map(file => {
+                return new Promise((resolve, reject) => {
+                    const uploadStream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: 'properties',
+                            transformation: [
+                                { width: 1200, height: 800, crop: 'limit' },
+                                { quality: 'auto:good' }
+                            ]
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve({
+                                url: result.secure_url,
+                                publicId: result.public_id
+                            });
+                        }
+                    );
+                    streamifier.createReadStream(file.buffer).pipe(uploadStream);
+                });
+            });
+
+            try {
+                uploadedImages = await Promise.all(uploadPromises);
+            } catch (uploadError) {
+                console.error("Image upload error:", uploadError);
+                return res.status(500).json({
+                    success: false,
+                    message: "Error uploading images. Please try again.",
+                });
+            }
+        }
+
         // Create property
         const propertyData = {
             ...req.body,
             landlordId: req.user.id,
             paymentId,
+            images: uploadedImages.length > 0 ? uploadedImages : []
         };
 
         const property = await Property.create(propertyData);
@@ -284,13 +326,65 @@ export const updateProperty = async (req, res) => {
             });
         }
 
+        // Handle new image uploads to Cloudinary
+        let newImages = [];
+        if (req.files && req.files.length > 0) {
+            // Calculate how many images we can add
+            const existingImagesCount = property.images?.length || 0;
+            const availableSlots = 5 - existingImagesCount;
+            const filesToUpload = req.files.slice(0, availableSlots);
+            
+            if (filesToUpload.length > 0) {
+                const uploadPromises = filesToUpload.map(file => {
+                    return new Promise((resolve, reject) => {
+                        const uploadStream = cloudinary.uploader.upload_stream(
+                            {
+                                folder: 'properties',
+                                transformation: [
+                                    { width: 1200, height: 800, crop: 'limit' },
+                                    { quality: 'auto:good' }
+                                ]
+                            },
+                            (error, result) => {
+                                if (error) reject(error);
+                                else resolve({
+                                    url: result.secure_url,
+                                    publicId: result.public_id
+                                });
+                            }
+                        );
+                        streamifier.createReadStream(file.buffer).pipe(uploadStream);
+                    });
+                });
+
+                try {
+                    newImages = await Promise.all(uploadPromises);
+                } catch (uploadError) {
+                    console.error("Image upload error:", uploadError);
+                    return res.status(500).json({
+                        success: false,
+                        message: "Error uploading images. Please try again.",
+                    });
+                }
+            }
+        }
+
         // Don't allow updating landlordId or paymentId
         delete req.body.landlordId;
         delete req.body.paymentId;
 
+        // Merge new images with existing ones
+        const updateData = {
+            ...req.body,
+        };
+        
+        if (newImages.length > 0) {
+            updateData.images = [...(property.images || []), ...newImages];
+        }
+
         const updatedProperty = await Property.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            updateData,
             { new: true, runValidators: true }
         );
 

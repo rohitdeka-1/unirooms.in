@@ -63,15 +63,57 @@ export const propertyAPI = {
 
     getStats: () => apiCall('/properties/landlord/stats'),
 
-    createProperty: (data) => apiCall('/properties', {
-        method: 'POST',
-        body: JSON.stringify(data),
-    }),
+    createProperty: async (data) => {
+        const token = localStorage.getItem('accessToken');
+        
+        // Check if data is FormData (for file upload)
+        if (data instanceof FormData) {
+            const response = await fetch(`${API_BASE_URL}/properties`, {
+                method: 'POST',
+                headers: {
+                    ...(token && { Authorization: `Bearer ${token}` }),
+                },
+                body: data,
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.message || 'Something went wrong');
+            }
+            return result;
+        }
+        
+        // Regular JSON data
+        return apiCall('/properties', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    },
 
-    updateProperty: (id, data) => apiCall(`/properties/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-    }),
+    updateProperty: async (id, data) => {
+        const token = localStorage.getItem('accessToken');
+        
+        // Check if data is FormData (for file upload)
+        if (data instanceof FormData) {
+            const response = await fetch(`${API_BASE_URL}/properties/${id}`, {
+                method: 'PUT',
+                headers: {
+                    ...(token && { Authorization: `Bearer ${token}` }),
+                },
+                body: data,
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.message || 'Something went wrong');
+            }
+            return result;
+        }
+        
+        // Regular JSON data
+        return apiCall(`/properties/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    },
 
     deleteProperty: (id) => apiCall(`/properties/${id}`, {
         method: 'DELETE',

@@ -164,7 +164,7 @@ const PropertyDetail = () => {
                                 </button>
 
                                 {/* Favorite */}
-                                <button className="absolute top-4 right-4 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition">
+                                <button className="absolute top-4 right-4 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg transition">
                                     <svg className="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                                     </svg>
@@ -172,12 +172,12 @@ const PropertyDetail = () => {
                             </div>
 
                             {/* Thumbnails */}
-                            <div className="flex gap-2 p-4 bg-dark-50">
+                            <div className="flex gap-2 p-4 bg-dark-50 overflow-x-auto">
                                 {propertyImages.map((img, index) => (
                                     <button
                                         key={index}
                                         onClick={() => setCurrentImage(index)}
-                                        className={`flex-1 h-20 rounded-lg overflow-hidden transition-all ${currentImage === index ? 'ring-2 ring-primary-500 ring-offset-2' : 'opacity-60 hover:opacity-100'
+                                        className={`flex-shrink-0 w-24 h-20 rounded-lg overflow-hidden transition-all ${currentImage === index ? 'ring-2 ring-primary-500 ring-offset-2' : 'opacity-60 hover:opacity-100'
                                             }`}
                                     >
                                         <img src={img} alt="" className="w-full h-full object-cover" />

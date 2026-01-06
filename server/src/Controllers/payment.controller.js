@@ -28,7 +28,7 @@ export const createPaymentOrder = async (req, res) => {
         }
 
         const user = await User.findById(req.user.id);
-        const amount = 100; // ₹100 per property listing
+        const amount = 99; // ₹99 per property listing
         const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
         // Create Cashfree order request

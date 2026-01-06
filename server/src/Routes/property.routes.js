@@ -17,9 +17,27 @@ import {
 } from "../Controllers/property.controller.js";
 import { protect, authorize } from "../Middlewares/auth.middleware.js";
 import { isAdmin } from "../Middlewares/admin.middleware.js";
+import upload from "../Middlewares/upload.middleware.js";
 import { body } from "express-validator";
 
 const router = express.Router();
+
+// Middleware to parse JSON fields from FormData
+const parseFormData = (req, res, next) => {
+    if (req.body.location && typeof req.body.location === 'string') {
+        req.body.location = JSON.parse(req.body.location);
+    }
+    if (req.body.address && typeof req.body.address === 'string') {
+        req.body.address = JSON.parse(req.body.address);
+    }
+    if (req.body['amenities[]']) {
+        req.body.amenities = Array.isArray(req.body['amenities[]']) 
+            ? req.body['amenities[]'] 
+            : [req.body['amenities[]']];
+        delete req.body['amenities[]'];
+    }
+    next();
+};
 
 // Validation middleware
 const propertyValidation = [
@@ -79,8 +97,8 @@ router.get("/:id", getPropertyById);
 // Landlord protected routes
 router.get("/landlord/my-properties", protect, authorize("landlord"), getLandlordProperties);
 router.get("/landlord/stats", protect, authorize("landlord"), getLandlordStats);
-router.post("/", protect, authorize("landlord"), propertyValidation, createProperty);
-router.put("/:id", protect, authorize("landlord"), updateProperty);
+router.post("/", protect, authorize("landlord"), upload.array('images', 5), parseFormData, propertyValidation, createProperty);
+router.put("/:id", protect, authorize("landlord"), upload.array('images', 5), parseFormData, updateProperty);
 router.delete("/:id", protect, authorize("landlord"), deleteProperty);
 router.patch("/:id/toggle-active", protect, authorize("landlord"), togglePropertyStatus);
 

@@ -117,7 +117,7 @@ const PaymentModal = ({ onClose, onSuccess }) => {
                             <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 mb-6">
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-neutral-700 font-medium">Property Listing Fee</span>
-                                    <span className="text-2xl font-bold text-primary-600">₹100</span>
+                                    <span className="text-2xl font-bold text-primary-600">₹99</span>
                                 </div>
                                 <p className="text-sm text-neutral-600">
                                     Your property will be listed for 6 months
@@ -145,7 +145,7 @@ const PaymentModal = ({ onClose, onSuccess }) => {
                                     disabled={loading}
                                     className="btn-primary flex-1"
                                 >
-                                    {loading ? 'Processing...' : 'Pay ₹100'}
+                                    {loading ? 'Processing...' : 'Pay ₹99'}
                                 </button>
                             </div>
                         </>
