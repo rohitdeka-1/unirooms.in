@@ -28,9 +28,9 @@ const Home = () => {
     }, []);
 
     const stats = [
-        { value: '500+', label: 'Verified PGs' },
-        { value: '10k+', label: 'Happy Students' },
-        { value: '50+', label: 'College Areas' },
+        { value: '5', label: 'Verified PGs' },
+        { value: '10', label: 'Happy Students' },
+        { value: '5', label: 'College Areas' },
         { value: '4.8', label: 'Avg Rating' },
     ];
 
@@ -139,9 +139,9 @@ const Home = () => {
                         >
                             <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
                                 {[
-                                    { img: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400', label: 'Boys PG', price: '₹8,500/mo' },
-                                    { img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400', label: 'Girls PG', price: '₹9,500/mo' },
-                                    { img: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400', label: 'Co-Living', price: '₹7,500/mo' },
+                                    { img: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400', label: 'Boys PG', price: '₹4,500/mo' },
+                                    { img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400', label: 'Girls PG', price: '₹4,500/mo' },
+                                    { img: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400', label: 'Co-Living', price: '₹7,000/mo' },
                                 ].map((item, index) => (
                                     <div key={index} className="flex-shrink-0 w-56 snap-start first:ml-0 last:mr-0">
                                         <div className="rounded-2xl overflow-hidden shadow-card h-36 relative">

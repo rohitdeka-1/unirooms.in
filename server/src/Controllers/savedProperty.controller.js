@@ -95,7 +95,7 @@ export const getSavedProperties = async (req, res) => {
                 path: "propertyId",
                 match: { isActive: true, isVerified: true },
                 populate: {
-                    path: "landlord",
+                    path: "landlordId",
                     select: "name phone email",
                 },
             });
