@@ -40,16 +40,16 @@ const AdminProperties = () => {
         try {
             setLoading(true);
             setError("");
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("accessToken");
             const response = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/properties/admin/all?status=${filter}`,
+                `${import.meta.env.VITE_API_URL}/properties/admin/all?status=${filter}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 }
             );
-            setProperties(response.data.properties);
+            setProperties(response.data.data.properties);
         } catch (err) {
             setError(err.response?.data?.message || "Failed to fetch properties");
         } finally {
@@ -59,9 +59,9 @@ const AdminProperties = () => {
 
     const handleApprove = async (propertyId) => {
         try {
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("accessToken");
             await axios.put(
-                `${import.meta.env.VITE_API_URL}/api/properties/admin/${propertyId}/approve`,
+                `${import.meta.env.VITE_API_URL}/properties/admin/${propertyId}/approve`,
                 {},
                 {
                     headers: {
@@ -82,9 +82,9 @@ const AdminProperties = () => {
             return;
         }
         try {
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("accessToken");
             await axios.delete(
-                `${import.meta.env.VITE_API_URL}/api/properties/admin/${propertyId}/decline`,
+                `${import.meta.env.VITE_API_URL}/properties/admin/${propertyId}/decline`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -240,12 +240,12 @@ const AdminProperties = () => {
                                             <p className="flex items-center gap-2">
                                                 <FaUser className="text-gray-400" />
                                                 <span className="font-medium">Name:</span>
-                                                {property.landlord?.name || "N/A"}
+                                                {property.landlordId?.name || "N/A"}
                                             </p>
                                             <p className="flex items-center gap-2">
                                                 <FaEnvelope className="text-gray-400" />
                                                 <span className="font-medium">Email:</span>
-                                                {property.landlord?.email || "N/A"}
+                                                {property.landlordId?.email || "N/A"}
                                             </p>
                                             <p className="flex items-center gap-2">
                                                 <FaPhone className="text-gray-400" />
@@ -278,7 +278,9 @@ const AdminProperties = () => {
                                         <div className="bg-blue-50 p-3 rounded-lg">
                                             <p className="text-xs text-gray-600 mb-1">Near College</p>
                                             <p className="font-semibold text-gray-900">
-                                                {property.nearbyColleges?.[0]?.name?.substring(0, 20) || "N/A"}...
+                                                {property.nearbyColleges?.[0]?.name ? 
+                                                    property.nearbyColleges[0].name.substring(0, 20) + '...' : 
+                                                    'N/A'}
                                             </p>
                                         </div>
                                     </div>
