@@ -101,9 +101,9 @@ export const registerStudent = async (req, res) => {
                 const verificationToken = existingUser.generateEmailVerificationToken();
                 await existingUser.save();
 
-                sendVerificationEmail(email, name, verificationToken).catch((err) =>
-                    console.error("Failed to send verification email:", err)
-                );
+                sendVerificationEmail(email, name, verificationToken)
+                    .then(() => console.log("✅ Verification email sent to:", email))
+                    .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
 
                 return res.status(201).json({
                     success: true,
@@ -139,9 +139,9 @@ export const registerStudent = async (req, res) => {
         const verificationToken = user.generateEmailVerificationToken();
         await user.save();
 
-        sendVerificationEmail(email, name, verificationToken).catch((err) =>
-            console.error("Failed to send verification email:", err)
-        );
+        sendVerificationEmail(email, name, verificationToken)
+            .then(() => console.log("✅ Verification email sent to:", email))
+            .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
 
         // Don't send tokens - user must verify email first
         res.status(201).json({
@@ -209,9 +209,9 @@ export const registerLandlord = async (req, res) => {
                 const verificationToken = existingUser.generateEmailVerificationToken();
                 await existingUser.save();
 
-                sendVerificationEmail(email, name, verificationToken).catch((err) =>
-                    console.error("Failed to send verification email:", err)
-                );
+                sendVerificationEmail(email, name, verificationToken)
+                    .then(() => console.log("✅ Verification email sent to:", email))
+                    .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
 
                 return res.status(201).json({
                     success: true,
@@ -250,9 +250,9 @@ export const registerLandlord = async (req, res) => {
         const verificationToken = user.generateEmailVerificationToken();
         await user.save();
 
-        sendVerificationEmail(email, name, verificationToken).catch((err) =>
-            console.error("Failed to send verification email:", err)
-        );
+        sendVerificationEmail(email, name, verificationToken)
+            .then(() => console.log("✅ Verification email sent to:", email))
+            .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
 
         // Don't send tokens - user must verify email first
         res.status(201).json({
@@ -344,9 +344,11 @@ export const login = async (req, res) => {
             location: "India",
         };
 
-        sendLoginNotificationEmail(user.email, user.name, loginInfo).catch((err) =>
-            console.error("Failed to send login notification:", err)
-        );
+        // Send login notification (don't wait for it)
+        sendLoginNotificationEmail(user.email, user.name, loginInfo)
+            .then(() => console.log("✅ Login notification sent to:", user.email))
+            .catch((err) => console.error("❌ Failed to send login notification to", user.email, ":", err.message));
+        
         sendTokenResponse(user, 200, res, "Login successful");
     } catch (error) {
         console.error("Login Error:", error);
@@ -410,9 +412,9 @@ export const googleSignup = async (req, res) => {
         });
 
         // Send welcome email for Google signup
-        sendWelcomeEmail(user.email, user.name, user.role).catch((err) =>
-            console.error("Failed to send welcome email:", err)
-        );
+        sendWelcomeEmail(user.email, user.name, user.role)
+            .then(() => console.log("✅ Welcome email sent to:", user.email))
+            .catch((err) => console.error("❌ Failed to send welcome email to", user.email, ":", err.message));
 
         sendTokenResponse(
             user,
@@ -486,9 +488,9 @@ export const googleLogin = async (req, res) => {
             location: "India",
         };
 
-        sendLoginNotificationEmail(user.email, user.name, loginInfo).catch((err) =>
-            console.error("Failed to send login notification:", err)
-        );
+        sendLoginNotificationEmail(user.email, user.name, loginInfo)
+            .then(() => console.log("✅ Login notification sent to:", user.email))
+            .catch((err) => console.error("❌ Failed to send login notification to", user.email, ":", err.message));
 
         sendTokenResponse(user, 200, res, "Login successful");
     } catch (error) {
