@@ -54,7 +54,7 @@ const Home = () => {
                         >
                             <span className="inline-flex items-center px-4 py-2 bg-primary-50 text-primary-700 rounded-full text-sm font-medium mb-6 border border-primary-100">
                                 <span className="w-2 h-2 bg-primary-500 rounded-full mr-2 animate-pulse" />
-                                Trusted by 10,000+ Students
+                                Trusted by Students
                             </span>
 
                             <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-neutral-900 mb-4 md:mb-6 leading-tight">

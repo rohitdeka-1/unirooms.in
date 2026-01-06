@@ -7,79 +7,91 @@
     <title>Verify Your Email - UniRooms</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background-color: #f4f4f4;
+            color: #2c3e50;
+            background-color: #ecf0f1;
             margin: 0;
             padding: 0;
         }
 
         .container {
             max-width: 600px;
-            margin: 20px auto;
+            margin: 30px auto;
             background: #ffffff;
-            border-radius: 8px;
+            border-radius: 4px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #2c3e50;
             color: #ffffff;
-            padding: 40px 20px;
+            padding: 30px 20px;
             text-align: center;
+            border-bottom: 3px solid #34495e;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 32px;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         .content {
-            padding: 40px 30px;
-        }
-
-        .icon {
-            font-size: 60px;
-            text-align: center;
-            margin: 20px 0;
+            padding: 40px 35px;
         }
 
         .info-box {
             background: #f8f9fa;
-            border-left: 4px solid #667eea;
-            border-radius: 4px;
-            padding: 20px;
-            margin: 20px 0;
+            border-left: 3px solid #3498db;
+            border-radius: 2px;
+            padding: 15px 20px;
+            margin: 25px 0;
         }
 
         .button {
             display: inline-block;
-            padding: 15px 40px;
-            background: #667eea;
+            padding: 14px 35px;
+            background: #3498db;
             color: #ffffff !important;
             text-decoration: none;
-            border-radius: 5px;
-            margin: 20px 0;
-            font-weight: bold;
+            border-radius: 3px;
+            margin: 25px 0;
+            font-weight: 600;
+            letter-spacing: 0.3px;
         }
 
         .button:hover {
-            background: #5568d3;
+            background: #2980b9;
         }
 
         .footer {
             background: #f8f9fa;
-            padding: 20px;
+            padding: 25px 20px;
             text-align: center;
-            font-size: 12px;
-            color: #666;
+            font-size: 13px;
+            color: #7f8c8d;
+            border-top: 1px solid #e0e0e0;
         }
 
         .warning {
-            color: #e74c3c;
-            font-weight: bold;
+            background: #fff8e1;
+            border-left: 3px solid #ffa000;
+            padding: 15px 20px;
+            margin: 25px 0;
+            color: #666;
+        }
+
+        .url-box {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 3px;
+            word-break: break-all;
+            color: #3498db;
+            font-size: 12px;
+            border: 1px solid #e0e0e0;
         }
     </style>
 </head>
@@ -87,41 +99,39 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>✉️ Verify Your Email</h1>
+            <h1>Email Verification Required</h1>
         </div>
 
         <div class="content">
-            <div class="icon">🔐</div>
+            <p>Dear <strong>{{name}}</strong>,</p>
 
-            <p>Hi <strong>{{name}}</strong>,</p>
-
-            <p>Thank you for registering with UniRooms! To complete your registration and start using your account,
-                please verify your email address.</p>
+            <p>Thank you for registering with UniRooms. To complete your registration and activate your account, please verify your email address by clicking the button below.</p>
 
             <div style="text-align: center;">
                 <a href="{{verificationUrl}}" class="button">Verify Email Address</a>
             </div>
 
             <div class="info-box">
-                <p style="margin: 0;"><strong>⏰ Important:</strong></p>
-                <p style="margin: 10px 0 0 0;">This verification link will expire in <strong>{{expiryTime}}</strong>. If
-                    the link expires, you can request a new verification email.</p>
+                <p style="margin: 0;"><strong>Important Notice:</strong></p>
+                <p style="margin: 10px 0 0 0;">This verification link will expire in <strong>{{expiryTime}}</strong>. If the link expires, you may request a new verification email from your account settings.</p>
             </div>
 
-            <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #667eea;">{{verificationUrl}}</p>
+            <p>If the button above does not work, please copy and paste the following URL into your web browser:</p>
+            <div class="url-box">{{verificationUrl}}</div>
 
-            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
 
-            <p class="warning">⚠️ If you didn't create an account with UniRooms, please ignore this email or contact
-                our support team.</p>
+            <div class="warning">
+                <strong>Security Notice:</strong> If you did not create an account with UniRooms, please disregard this email. No further action is required.
+            </div>
 
             <p>Best regards,<br><strong>The UniRooms Team</strong></p>
         </div>
 
         <div class="footer">
+            <p><strong>UniRooms</strong> - Student Accommodation Platform</p>
             <p>© {{year}} UniRooms. All rights reserved.</p>
-            <p>📧 support@pgfinder.com | 📱 +91-XXXXXXXXXX</p>
+            <p>Email: support@pgfinder.com</p>
         </div>
     </div>
 </body>
