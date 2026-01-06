@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from "mongoose";
 import { sendOTPEmail, sendVerificationEmail, sendLoginNotificationEmail } from "../Services/email.service.js";
 
 const router = express.Router();
@@ -51,6 +52,59 @@ router.post("/send-email", async (req, res) => {
             success: false,
             message: "Failed to send test email",
             error: error.message,
+        });
+    }
+});
+
+// @desc    Fix phone index for Google OAuth (run once in production)
+// @route   GET /api/test/fix-phone-index
+// @access  Public (remove after running once)
+router.get("/fix-phone-index", async (req, res) => {
+    try {
+        const db = mongoose.connection.db;
+        const usersCollection = db.collection("users");
+        
+        // Get current indexes
+        const existingIndexes = await usersCollection.indexes();
+        const phoneIndex = existingIndexes.find(idx => idx.key.phone === 1);
+        
+        let message = "";
+        
+        if (phoneIndex && !phoneIndex.sparse) {
+            // Drop old non-sparse index
+            await usersCollection.dropIndex("phone_1");
+            message += "Dropped old non-sparse phone index. ";
+        }
+        
+        if (!phoneIndex || !phoneIndex.sparse) {
+            // Create sparse index
+            await usersCollection.createIndex(
+                { phone: 1 }, 
+                { unique: true, sparse: true, name: "phone_1" }
+            );
+            message += "Created new sparse unique index. ";
+        } else {
+            message = "Phone index is already sparse - no action needed.";
+        }
+        
+        // Get updated indexes
+        const updatedIndexes = await usersCollection.indexes();
+        
+        res.json({ 
+            success: true, 
+            message,
+            indexes: updatedIndexes.map(idx => ({
+                name: idx.name,
+                key: idx.key,
+                sparse: idx.sparse || false,
+                unique: idx.unique || false
+            }))
+        });
+    } catch (error) {
+        console.error("Error fixing phone index:", error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message 
         });
     }
 });

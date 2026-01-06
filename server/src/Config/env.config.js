@@ -30,9 +30,16 @@ const config = {
   CASHFREE_ENVIRONMENT: process.env.CASHFREE_ENVIRONMENT || "TEST",
   
   // Gmail Configuration (using App Password)
-  GMAIL_USER: process.env.GMAIL_USER, // your-email@gmail.com
-  GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD, // 16-digit app password
+  // Support multiple env var names for flexibility (production/development)
+  GMAIL_USER: process.env.GMAIL_USER || process.env.EMAIL_USER || process.env.SMTP_USER,
+  GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD || process.env.EMAIL_PASSWORD || process.env.SMTP_PASS,
+  GMAIL_USE_SSL: process.env.GMAIL_USE_SSL === "true", // Use port 465 if true
   EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME || "UniRooms",
+  
+  // SendGrid Configuration (alternative to Gmail, works better in production)
+  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+  USE_SENDGRID: process.env.USE_SENDGRID === "true",
+  EMAIL_FROM: process.env.EMAIL_FROM || process.env.GMAIL_USER,
   
   GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
   

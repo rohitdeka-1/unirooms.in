@@ -14,12 +14,29 @@ handlebars.registerHelper('eq', function(a, b) {
   return a === b;
 });
 
+// Check if email credentials are configured
+if (!config.GMAIL_USER || !config.GMAIL_APP_PASSWORD) {
+  console.error(chalk.red("❌ EMAIL CONFIGURATION ERROR:"));
+  console.error(chalk.yellow("  GMAIL_USER:", config.GMAIL_USER ? "✓ Set" : "✗ Missing"));
+  console.error(chalk.yellow("  GMAIL_APP_PASSWORD:", config.GMAIL_APP_PASSWORD ? "✓ Set" : "✗ Missing"));
+  console.error(chalk.red("  Email service will NOT work until these are configured!"));
+}
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // Use TLS
   auth: {
     user: config.GMAIL_USER,
     pass: config.GMAIL_APP_PASSWORD,
   },
+  tls: {
+    rejectUnauthorized: false, // For production environments
+  },
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
 // Verify transporter connection on startup
