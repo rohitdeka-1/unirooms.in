@@ -4,7 +4,6 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import config from "../Config/env.config.js";
-import chalk from "chalk";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,39 +13,21 @@ handlebars.registerHelper('eq', function(a, b) {
   return a === b;
 });
 
-// Check if email credentials are configured
-if (!config.GMAIL_USER || !config.GMAIL_APP_PASSWORD) {
-  console.error(chalk.red("❌ EMAIL CONFIGURATION ERROR:"));
-  console.error(chalk.yellow("  GMAIL_USER:", config.GMAIL_USER ? "✓ Set" : "✗ Missing"));
-  console.error(chalk.yellow("  GMAIL_APP_PASSWORD:", config.GMAIL_APP_PASSWORD ? "✓ Set" : "✗ Missing"));
-  console.error(chalk.red("  Email service will NOT work until these are configured!"));
-}
-
 const transporter = nodemailer.createTransport({
   service: "gmail",
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // Use TLS
   auth: {
     user: config.GMAIL_USER,
     pass: config.GMAIL_APP_PASSWORD,
   },
-  tls: {
-    rejectUnauthorized: false, // For production environments
-  },
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
 });
 
 // Verify transporter connection on startup
 transporter.verify((error, success) => {
   if (error) {
-    console.error(chalk.red("Email service connection failed:"), error.message);
-    console.error(chalk.yellow("Please check GMAIL_USER and GMAIL_APP_PASSWORD in .env"));
+    console.error("❌ Email service connection failed:", error.message);
   } else {
-    console.log(chalk.magenta("Email service is ready to send emails"));
-    console.log(chalk.cyan(`Sending from: ${config.GMAIL_USER}`));
+    console.log("✅ Email service is ready to send emails");
+    console.log(`📧 Sending from: ${config.GMAIL_USER}`);
   }
 });
 
