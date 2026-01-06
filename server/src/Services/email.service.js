@@ -25,11 +25,11 @@ const transporter = nodemailer.createTransport({
 // Verify transporter connection on startup
 transporter.verify((error, success) => {
   if (error) {
-    console.error(chalk.red("❌ Email service connection failed:"), error.message);
-    console.error(chalk.yellow("⚠️  Please check GMAIL_USER and GMAIL_APP_PASSWORD in .env"));
+    console.error(chalk.red("Email service connection failed:"), error.message);
+    console.error(chalk.yellow("Please check GMAIL_USER and GMAIL_APP_PASSWORD in .env"));
   } else {
-    console.log(chalk.magenta("✅ Email service is ready to send emails"));
-    console.log(chalk.cyan(`📧 Sending from: ${config.GMAIL_USER}`));
+    console.log(chalk.magenta("Email service is ready to send emails"));
+    console.log(chalk.cyan(`Sending from: ${config.GMAIL_USER}`));
   }
 });
 
@@ -61,7 +61,7 @@ export const sendOTPEmail = async (email, name, otp) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ OTP email sent:", info.messageId);
+    console.log("OTP email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("Error sending OTP email:", error);
@@ -88,12 +88,12 @@ export const sendVerificationEmail = async (email, name, verificationToken) => {
       html,
     };
 
-    console.log(`📤 Sending verification email to: ${email}`);
+    console.log(`Sending verification email to: ${email}`);
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Verification email sent:", info.messageId);
+    console.log("Verification email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("❌ Error sending verification email to", email, ":", error.message);
+    console.error("Error sending verification email to", email, ":", error.message);
     if (error.code) console.error("Error code:", error.code);
     throw error;
   }
@@ -115,12 +115,12 @@ export const sendWelcomeEmail = async (email, name, role) => {
       html,
     };
 
-    console.log(`📤 Sending welcome email to: ${email}`);
+    console.log(`Sending welcome email to: ${email}`);
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Welcome email sent:", info.messageId);
+    console.log("Welcome email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("❌ Error sending welcome email to", email, ":", error.message);
+    console.error(" Error sending welcome email to", email, ":", error.message);
     if (error.code) console.error("Error code:", error.code);
     throw error;
   }
@@ -149,12 +149,12 @@ export const sendLoginNotificationEmail = async (email, name, loginInfo) => {
       html,
     };
 
-    console.log(`📤 Sending login notification to: ${email}`);
+    console.log(`Sending login notification to: ${email}`);
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Login notification email sent:", info.messageId);
+    console.log("Login notification email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("❌ Error sending login notification to", email, ":", error.message);
+    console.error(" Error sending login notification to", email, ":", error.message);
     if (error.code) console.error("Error code:", error.code);
     // Don't throw error for login notification (non-critical)
     return { success: false, error: error.message };
@@ -179,7 +179,7 @@ export const sendPasswordResetOTP = async (email, name, otp) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Password reset OTP email sent:", info.messageId);
+    console.log("Password reset OTP email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error("Error sending password reset OTP email:", error);
