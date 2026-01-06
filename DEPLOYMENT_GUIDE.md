@@ -2,13 +2,13 @@
 
 ## URLs
 - **Frontend (Vercel):** https://unirooms-in.vercel.app
-- **Backend (Railway):** https://uniroomsin-production.up.railway.app
+- **Backend (Heroku):** https://unirooms-api-2026-be019c91a062.herokuapp.com
 
 ---
 
-## Backend (Railway) - Environment Variables
+## Backend (Heroku) - Environment Variables
 
-Add these environment variables in Railway Dashboard:
+Add these environment variables in Heroku Dashboard:
 
 ```bash
 # Server
@@ -72,7 +72,7 @@ Add these in Vercel Dashboard → Settings → Environment Variables:
 
 ```bash
 # Production API URL
-VITE_API_URL=https://uniroomsin-production.up.railway.app/api/v1
+VITE_API_URL=https://unirooms-api-2026-be019c91a062.herokuapp.com/api/v1
 ```
 
 ### Vercel Deployment Steps:
