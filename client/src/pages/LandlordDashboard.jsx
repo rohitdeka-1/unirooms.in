@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI } from '../utils/api';
+import { getOptimizedImageUrl } from '../utils/imageOptimizer';
 
 const LandlordDashboard = () => {
     const { user, logout } = useAuth();
@@ -152,7 +153,13 @@ const LandlordDashboard = () => {
                                         <div className="flex-shrink-0">
                                             <div className="w-24 h-24 bg-neutral-200 rounded-xl overflow-hidden">
                                                 {property.images?.[0]?.url ? (
-                                                    <img src={property.images[0].url} alt={property.title} className="w-full h-full object-cover" />
+                                                    <img 
+                                                        src={getOptimizedImageUrl(property.images[0].url, 'thumb')} 
+                                                        alt={property.title} 
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        className="w-full h-full object-cover" 
+                                                    />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-neutral-400">
                                                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">

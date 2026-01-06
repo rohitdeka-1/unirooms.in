@@ -15,7 +15,7 @@ import {
     approveProperty,
     declineProperty,
 } from "../Controllers/property.controller.js";
-import { protect, authorize } from "../Middlewares/auth.middleware.js";
+import { protect, authorize, optionalAuth } from "../Middlewares/auth.middleware.js";
 import { isAdmin } from "../Middlewares/admin.middleware.js";
 import upload from "../Middlewares/upload.middleware.js";
 import { body } from "express-validator";
@@ -92,7 +92,7 @@ router.get("/", getAllProperties);
 router.get("/campuses", getAllCampuses);
 router.get("/colleges/search", searchCollegesAPI);
 router.get("/near-college", getPropertiesNearCollege);
-router.get("/:id", getPropertyById);
+router.get("/:id", optionalAuth, getPropertyById); // Optional auth to let landlords see their own unverified properties
 
 // Landlord protected routes
 router.get("/landlord/my-properties", protect, authorize("landlord"), getLandlordProperties);

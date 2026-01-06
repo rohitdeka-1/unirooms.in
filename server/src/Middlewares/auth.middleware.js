@@ -113,3 +113,39 @@ export const checkSubscription = async (req, res, next) => {
 // Alias exports for convenience
 export const protect = verifyToken;
 export const authorize = checkRole;
+
+// Optional authentication - sets req.user if token is present but doesn't fail if not
+export const optionalAuth = async (req, res, next) => {
+    try {
+        let token;
+
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith("Bearer ")) {
+            token = authHeader.split(" ")[1];
+        }
+
+        if (!token && req.cookies && req.cookies.accessToken) {
+            token = req.cookies.accessToken;
+        }
+
+        if (token) {
+            try {
+                const decoded = jwt.verify(token, config.JWT_ACCESS_SECRET);
+                req.user = {
+                    id: decoded.id,
+                    role: decoded.role,
+                    email: decoded.email,
+                };
+            } catch (error) {
+                // Token is invalid or expired, but we don't fail - just continue without user
+                req.user = null;
+            }
+        }
+
+        next();
+    } catch (error) {
+        // Don't fail on errors in optional auth
+        req.user = null;
+        next();
+    }
+};

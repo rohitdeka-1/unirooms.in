@@ -12,6 +12,11 @@ const ListPropertyRedirect = () => {
         if (isAuthenticated && user?.role === 'landlord') {
             navigate('/landlord/add-property', { replace: true });
         }
+        // If user is authenticated but not a landlord, redirect to home
+        else if (isAuthenticated && user?.role !== 'landlord') {
+            alert('Only landlords can list properties. Please create a landlord account.');
+            navigate('/', { replace: true });
+        }
     }, [isAuthenticated, user, navigate]);
 
     return (

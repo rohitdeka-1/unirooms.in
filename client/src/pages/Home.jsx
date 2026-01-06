@@ -175,7 +175,7 @@ const Home = () => {
                             </p>
                         </div>
                         <Link
-                            to="/properties"
+                            to="/browse"
                             className="mt-4 md:mt-0 inline-flex items-center space-x-2 text-primary-600 font-semibold hover:text-primary-700 group"
                         >
                             <span>View All Properties</span>
@@ -187,14 +187,14 @@ const Home = () => {
 
                     {loading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {[1, 2, 3, 4].map((i) => (
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
                                 <div key={i} className="animate-pulse">
-                                    <div className="bg-neutral-200 rounded-2xl h-72"></div>
+                                    <div className="bg-neutral-200 rounded-2xl h-96"></div>
                                 </div>
                             ))}
                         </div>
                     ) : featuredProperties.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:justify-items-center">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {featuredProperties.map((property, index) => (
                                 <motion.div
                                     key={property._id}
@@ -202,6 +202,7 @@ const Home = () => {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: index * 0.1 }}
+                                    className="h-full"
                                 >
                                     <PropertyCard property={property} />
                                 </motion.div>

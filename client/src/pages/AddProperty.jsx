@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI, paymentAPI } from '../utils/api';
 import PaymentModal from '../components/PaymentModal';
@@ -10,12 +10,16 @@ import { getRandomDescription } from '../utils/pgDescriptions';
 const AddProperty = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const { id: propertyId } = useParams(); // Get property ID from URL params
+    const isEditMode = Boolean(propertyId);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [paymentId, setPaymentId] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [loadingProperty, setLoadingProperty] = useState(isEditMode);
     const [campuses, setCampuses] = useState([]);
     const [loadingCampuses, setLoadingCampuses] = useState(false);
     const [campusSearchQuery, setCampusSearchQuery] = useState('');
+    const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -62,6 +66,64 @@ const AddProperty = () => {
 
         fetchCampuses();
     }, []);
+
+    // Fetch property data in edit mode
+    useEffect(() => {
+        const fetchPropertyData = async () => {
+            if (!isEditMode || !propertyId) return;
+
+            try {
+                setLoadingProperty(true);
+                const response = await propertyAPI.getMyProperties();
+                const property = response.data.properties.find(p => p._id === propertyId);
+                
+                if (!property) {
+                    alert('Property not found or you do not have permission to edit it');
+                    navigate('/landlord/dashboard');
+                    return;
+                }
+
+                // Pre-populate form with existing data
+                setFormData({
+                    title: property.title || '',
+                    description: property.description || '',
+                    price: property.price || '',
+                    securityDeposit: property.securityDeposit || '',
+                    location: {
+                        coordinates: property.location?.coordinates || ['', ''],
+                    },
+                    address: {
+                        street: property.address?.street || '',
+                        locality: property.address?.locality || '',
+                        landmark: property.address?.landmark || '',
+                        pincode: property.address?.pincode || '',
+                    },
+                    city: property.city || '',
+                    state: property.state || '',
+                    phone: property.phone || '',
+                    campusName: property.campusName || '',
+                    roomType: property.roomType || 'single',
+                    gender: property.gender || 'any',
+                    totalRooms: property.totalRooms || '',
+                    availableRooms: property.availableRooms || '',
+                    amenities: property.amenities || [],
+                    images: property.images?.map(img => img.url) || [],
+                    imageFiles: [], // Existing images are already uploaded
+                });
+
+                // Store payment ID from existing property
+                setPaymentId(property.paymentId);
+            } catch (error) {
+                console.error('Error fetching property:', error);
+                alert('Failed to load property data');
+                navigate('/landlord/dashboard');
+            } finally {
+                setLoadingProperty(false);
+            }
+        };
+
+        fetchPropertyData();
+    }, [isEditMode, propertyId, navigate]);
 
     // Filter campuses based on search query
     const filteredCampuses = campuses.filter(campus =>
@@ -131,7 +193,7 @@ const AddProperty = () => {
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
         const maxImages = 5;
-        
+
         // Check if adding these files would exceed the limit
         if (formData.imageFiles.length + files.length > maxImages) {
             alert(`You can only upload up to ${maxImages} images`);
@@ -140,7 +202,7 @@ const AddProperty = () => {
 
         // Create preview URLs
         const newImagePreviews = files.map(file => URL.createObjectURL(file));
-        
+
         setFormData(prev => ({
             ...prev,
             images: [...prev.images, ...newImagePreviews],
@@ -151,7 +213,7 @@ const AddProperty = () => {
     const handleRemoveImage = (index) => {
         // Revoke the URL to free up memory
         URL.revokeObjectURL(formData.images[index]);
-        
+
         setFormData(prev => ({
             ...prev,
             images: prev.images.filter((_, i) => i !== index),
@@ -181,8 +243,8 @@ const AddProperty = () => {
 
             // Create FormData for file upload
             const formDataToSend = new FormData();
-            
-            // Append images
+
+            // Append only new image files (not existing URLs)
             formData.imageFiles.forEach((file) => {
                 formDataToSend.append('images', file);
             });
@@ -201,13 +263,17 @@ const AddProperty = () => {
                         Number(formData.location.coordinates[1])
                     ]
                 },
-                paymentId: pId,
             };
-            
+
+            // Only add paymentId for new properties
+            if (!isEditMode) {
+                propertyData.paymentId = pId;
+            }
+
             // Remove images and imageFiles from data to send as JSON
             delete propertyData.images;
             delete propertyData.imageFiles;
-            
+
             // Append each field individually
             Object.keys(propertyData).forEach(key => {
                 if (key === 'location' || key === 'address') {
@@ -221,12 +287,20 @@ const AddProperty = () => {
                 }
             });
 
-            await propertyAPI.createProperty(formDataToSend);
-            alert('Property created successfully!');
+            if (isEditMode) {
+                // Update existing property
+                await propertyAPI.updateProperty(propertyId, formDataToSend);
+                alert('Property updated successfully!');
+            } else {
+                // Create new property
+                await propertyAPI.createProperty(formDataToSend);
+                alert('Property created successfully!');
+            }
+            
             navigate('/landlord/dashboard');
         } catch (error) {
-            console.error('Error creating property:', error);
-            alert(error.message || 'Failed to create property');
+            console.error(`Error ${isEditMode ? 'updating' : 'creating'} property:`, error);
+            alert(error.message || `Failed to ${isEditMode ? 'update' : 'create'} property`);
         } finally {
             setLoading(false);
         }
@@ -235,15 +309,114 @@ const AddProperty = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate form
-        if (!formData.title || !formData.description || !formData.price) {
-            alert('Please fill all required fields');
+        // Clear previous errors
+        setErrors({});
+        const newErrors = {};
+
+        // Validate all required fields
+        if (!formData.title || formData.title.trim().length < 10) {
+            newErrors.title = 'Title must be at least 10 characters';
+        }
+
+        if (!formData.description || formData.description.trim().length < 20) {
+            newErrors.description = 'Description must be at least 20 characters';
+        }
+
+        if (!formData.price || formData.price < 500) {
+            newErrors.price = 'Price must be at least ₹500';
+        }
+
+        if (formData.price > 100000) {
+            newErrors.price = 'Price cannot exceed ₹1,00,000';
+        }
+
+        if (!formData.location.coordinates[0] || !formData.location.coordinates[1]) {
+            newErrors.location = 'Please select property location on the map';
+        }
+
+        if (!formData.address.street || formData.address.street.trim().length === 0) {
+            newErrors.street = 'Street address is required';
+        }
+
+        if (!formData.address.locality || formData.address.locality.trim().length === 0) {
+            newErrors.locality = 'Locality is required';
+        }
+
+        if (!formData.address.pincode || !/^\d{6}$/.test(formData.address.pincode)) {
+            newErrors.pincode = 'Please enter a valid 6-digit pincode';
+        }
+
+        if (!formData.city || formData.city.trim().length === 0) {
+            newErrors.city = 'City is required';
+        }
+
+        if (!formData.state || formData.state.trim().length === 0) {
+            newErrors.state = 'State is required';
+        }
+
+        if (!formData.phone || !/^[0-9]{10}$/.test(formData.phone)) {
+            newErrors.phone = 'Please enter a valid 10-digit phone number';
+        }
+
+        if (!formData.campusName || formData.campusName.trim().length === 0) {
+            newErrors.campusName = 'Please select a nearby campus';
+        }
+
+        if (!formData.totalRooms || formData.totalRooms < 1) {
+            newErrors.totalRooms = 'Total rooms must be at least 1';
+        }
+
+        if (!formData.availableRooms || formData.availableRooms < 0) {
+            newErrors.availableRooms = 'Available rooms cannot be negative';
+        }
+
+        if (formData.availableRooms > formData.totalRooms) {
+            newErrors.availableRooms = 'Available rooms cannot exceed total rooms';
+        }
+
+        if (formData.imageFiles.length === 0 && !isEditMode) {
+            newErrors.images = 'Please upload at least 1 property image';
+        }
+
+        if (formData.amenities.length === 0) {
+            newErrors.amenities = 'Please select at least one amenity';
+        }
+
+        // If there are errors, set them and show alert
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            // Scroll to first error
+            const firstErrorField = Object.keys(newErrors)[0];
+            const errorElement = document.querySelector(`[name="${firstErrorField}"]`) || 
+                                document.querySelector(`[data-field="${firstErrorField}"]`);
+            if (errorElement) {
+                errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            alert('Please fix the validation errors in the form');
             return;
         }
 
-        // Show payment modal
+        // In edit mode, skip payment and directly submit
+        if (isEditMode) {
+            await handleSubmitProperty(paymentId);
+            return;
+        }
+
+        // Show payment modal for new properties
         setShowPaymentModal(true);
     };
+
+    // Show loading state while fetching property in edit mode
+    if (loadingProperty) {
+        return (
+            <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent mx-auto mb-4"></div>
+                    <p className="text-neutral-600">Loading property data...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50/20 pt-28 pb-24 md:pb-12">
@@ -258,30 +431,34 @@ const AddProperty = () => {
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
                         </svg>
-                        List Your Property
+                        {isEditMode ? 'Edit Your Property' : 'List Your Property'}
                     </div>
                     <h1 className="text-4xl md:text-5xl font-display font-bold bg-gradient-to-r from-neutral-800 via-neutral-700 to-primary-600 bg-clip-text text-transparent mb-3">
-                        Add New Property
+                        {isEditMode ? 'Edit Property' : 'Add New Property'}
                     </h1>
-                    <p className="text-neutral-600 text-lg">Fill in the details to list your property for just ₹99</p>
+                    <p className="text-neutral-600 text-lg">
+                        {isEditMode ? 'Update your property details' : 'Fill in the details to list your property for just ₹99'}
+                    </p>
 
-                    {/* Progress Steps */}
-                    <div className="mt-8 flex items-center justify-center gap-2">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-sm font-semibold">1</div>
-                            <span className="text-sm font-medium text-neutral-700">Details</span>
+                    {/* Progress Steps - Only show for new properties */}
+                    {!isEditMode && (
+                        <div className="mt-8 flex items-center justify-center gap-2">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-sm font-semibold">1</div>
+                                <span className="text-sm font-medium text-neutral-700">Details</span>
+                            </div>
+                            <div className="w-12 h-0.5 bg-neutral-200"></div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-neutral-200 text-neutral-500 flex items-center justify-center text-sm font-semibold">2</div>
+                                <span className="text-sm font-medium text-neutral-500">Payment</span>
+                            </div>
+                            <div className="w-12 h-0.5 bg-neutral-200"></div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-neutral-200 text-neutral-500 flex items-center justify-center text-sm font-semibold">3</div>
+                                <span className="text-sm font-medium text-neutral-500">Live</span>
+                            </div>
                         </div>
-                        <div className="w-12 h-0.5 bg-neutral-200"></div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-neutral-200 text-neutral-500 flex items-center justify-center text-sm font-semibold">2</div>
-                            <span className="text-sm font-medium text-neutral-500">Payment</span>
-                        </div>
-                        <div className="w-12 h-0.5 bg-neutral-200"></div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-neutral-200 text-neutral-500 flex items-center justify-center text-sm font-semibold">3</div>
-                            <span className="text-sm font-medium text-neutral-500">Live</span>
-                        </div>
-                    </div>
+                    )}
                 </motion.div>
 
                 <motion.form
@@ -291,6 +468,33 @@ const AddProperty = () => {
                     onSubmit={handleSubmit}
                     className="space-y-6"
                 >
+                    {/* Validation Error Summary */}
+                    {Object.keys(errors).length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-red-50 border-2 border-red-200 rounded-xl p-5"
+                        >
+                            <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                    <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-red-800 font-bold text-lg mb-2">Please Fix the Following Errors:</h3>
+                                    <ul className="space-y-1">
+                                        {Object.entries(errors).map(([field, message]) => (
+                                            <li key={field} className="text-red-700 text-sm flex items-start gap-2">
+                                                <span className="text-red-500 mt-0.5">•</span>
+                                                <span><strong className="font-semibold capitalize">{field.replace(/([A-Z])/g, ' $1').trim()}:</strong> {message}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
                     {/* Location Picker - FIRST & MOST PROMINENT */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -301,6 +505,14 @@ const AddProperty = () => {
                         <div className="mb-4">
                             <h2 className="text-lg md:text-xl font-semibold text-neutral-900 mb-1">Property Location</h2>
                             <p className="text-sm text-neutral-600">Set the precise location of your property</p>
+                            {errors.location && (
+                                <p className="text-red-500 text-sm font-medium mt-2 flex items-center gap-1">
+                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                    </svg>
+                                    {errors.location}
+                                </p>
+                            )}
                         </div>
 
                         <div>
@@ -353,9 +565,19 @@ const AddProperty = () => {
                                     required
                                     minLength={10}
                                     maxLength={100}
-                                    className="w-full px-4 py-3.5 bg-neutral-50 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800 placeholder:text-neutral-400"
+                                    className={`w-full px-4 py-3.5 bg-neutral-50 border-2 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800 placeholder:text-neutral-400 ${
+                                        errors.title ? 'border-red-500 bg-red-50' : 'border-neutral-200'
+                                    }`}
                                     placeholder="e.g., Comfortable PG near VIT Bhopal Campus"
                                 />
+                                {errors.title && (
+                                    <p className="text-red-500 text-sm font-medium mt-1.5 flex items-center gap-1">
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                        </svg>
+                                        {errors.title}
+                                    </p>
+                                )}
                             </div>
 
                             <div>
@@ -409,10 +631,20 @@ const AddProperty = () => {
                                             required
                                             min={500}
                                             max={100000}
-                                            className="w-full pl-8 pr-4 py-3.5 bg-neutral-50 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800"
+                                            className={`w-full pl-8 pr-4 py-3.5 bg-neutral-50 border-2 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800 ${
+                                                errors.price ? 'border-red-500 bg-red-50' : 'border-neutral-200'
+                                            }`}
                                             placeholder="5000"
                                         />
                                     </div>
+                                    {errors.price && (
+                                        <p className="text-red-500 text-sm font-medium mt-1.5 flex items-center gap-1">
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                            </svg>
+                                            {errors.price}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -677,8 +909,6 @@ const AddProperty = () => {
                                                 placeholder="Search campus by name or city..."
                                             />
                                         </div>
-
-                                        {/* Campus Dropdown */}
                                         <div className="relative">
                                             <select
                                                 name="campusName"
@@ -888,17 +1118,28 @@ const AddProperty = () => {
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    Creating Property...
+                                    {isEditMode ? 'Updating Property...' : 'Creating Property...'}
                                 </span>
                             ) : (
                                 <span className="flex items-center justify-center gap-2">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    Pay ₹99 & List Property
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                    </svg>
+                                    {isEditMode ? (
+                                        <>
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Update Property
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            Pay ₹99 & List Property
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                            </svg>
+                                        </>
+                                    )}
                                 </span>
                             )}
                         </button>

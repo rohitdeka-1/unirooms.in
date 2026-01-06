@@ -398,14 +398,10 @@ export const googleSignup = async (req, res) => {
             });
         }
 
-        // Generate a valid 10-digit phone number placeholder for Google users
-        // Format: 9 followed by last 9 digits of googleId (ensures it passes validation)
-        const googlePhonePlaceholder = '9' + googleId.slice(-9).padStart(9, '0');
-        
         const user = await User.create({
             name,
             email,
-            phone: googlePhonePlaceholder,
+            phone: undefined, // No phone number for Google OAuth users
             password: `GOOGLE_AUTH_${googleId}_${Date.now()}`,
             role,
             profileImage: picture || undefined,

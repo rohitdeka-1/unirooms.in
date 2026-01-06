@@ -25,7 +25,7 @@ export const getAllProperties = async (req, res) => {
         } = req.query;
 
         // Build filter object
-        const filter = { isActive: true }; // Show all active properties (verified or not)
+        const filter = { isActive: true, isVerified: true }; // Only show verified properties publicly
 
         if (city) filter.city = { $regex: city, $options: "i" };
         if (roomType) filter.roomType = roomType;
@@ -86,6 +86,14 @@ export const getPropertyById = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "Property not found",
+            });
+        }
+
+        // Only show verified properties to public (unless it's the landlord viewing their own)
+        if (!property.isVerified && (!req.user || req.user.id !== property.landlordId.toString())) {
+            return res.status(404).json({
+                success: false,
+                message: "Property not found or not yet approved",
             });
         }
 

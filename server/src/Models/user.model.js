@@ -26,8 +26,9 @@ const userSchema = new mongoose.Schema(
         },
         phone: {
             type: String,
-            required: [true, "Phone number is required"],
+            required: false, // Optional for Google OAuth users
             unique: true,
+            sparse: true, // Allows multiple null/undefined values
             match: [/^[6-9]\d{9}$/, "Please provide a valid 10-digit Indian phone number"],
         },
         password: {

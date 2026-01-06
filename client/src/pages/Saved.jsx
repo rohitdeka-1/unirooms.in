@@ -1,51 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PropertyCard from '../components/PropertyCard';
+import { savedPropertyAPI } from '../utils/api';
 
 const Saved = () => {
     const { isAuthenticated } = useAuth();
-    const [activeTab, setActiveTab] = useState('all');
+    const [savedProperties, setSavedProperties] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const savedProperties = [
-        {
-            id: 1,
-            name: 'Sunrise Boys PG',
-            location: 'Near IIT Delhi, Hauz Khas',
-            price: 8500,
-            rating: 4.8,
-            type: 'Boys PG',
-            image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400',
-            savedAt: '2024-01-15',
-        },
-        {
-            id: 2,
-            name: 'Elite Girls Hostel',
-            location: 'DU North Campus, Delhi',
-            price: 9500,
-            rating: 4.9,
-            type: 'Girls PG',
-            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400',
-            savedAt: '2024-01-10',
-        },
-        {
-            id: 5,
-            name: 'Comfort Stay Girls',
-            location: 'SRM University, Chennai',
-            price: 11000,
-            rating: 4.7,
-            type: 'Girls PG',
-            image: 'https://images.unsplash.com/photo-1628744448840-55bdb2497bd4?w=400',
-            savedAt: '2024-01-05',
-        },
-    ];
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchSavedProperties();
+        }
+    }, [isAuthenticated]);
 
-    const tabs = [
-        { id: 'all', label: 'All Saved', count: savedProperties.length },
-        { id: 'recent', label: 'Recently Saved', count: 2 },
-        { id: 'contacted', label: 'Contacted', count: 1 },
-    ];
+    const fetchSavedProperties = async () => {
+        try {
+            setLoading(true);
+            const response = await savedPropertyAPI.getSavedProperties();
+            setSavedProperties(response.data || []);
+        } catch (error) {
+            console.error('Error fetching saved properties:', error);
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUnsave = async (propertyId) => {
+        try {
+            await savedPropertyAPI.unsaveProperty(propertyId);
+            setSavedProperties(savedProperties.filter(p => p._id !== propertyId));
+        } catch (error) {
+            console.error('Error unsaving property:', error);
+        }
+    };
 
     // If not authenticated, show login prompt
     if (!isAuthenticated) {
@@ -86,6 +78,18 @@ const Saved = () => {
                             </p>
                         </div>
                     </motion.div>
+                </div>
+            </div>
+        );
+    }
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
+                <div className="container mx-auto px-4">
+                    <div className="flex items-center justify-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+                    </div>
                 </div>
             </div>
         );
@@ -136,54 +140,24 @@ const Saved = () => {
                     </div>
                 </motion.div>
 
-                {/* Tabs */}
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="flex items-center space-x-2 mb-8 overflow-x-auto pb-2 scrollbar-hide"
-                >
-                    {tabs.map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`relative px-5 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all ${activeTab === tab.id
-                                ? 'text-primary-700'
-                                : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
-                                }`}
-                        >
-                            {tab.label}
-                            <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${activeTab === tab.id
-                                ? 'bg-primary-100 text-primary-700'
-                                : 'bg-neutral-100 text-neutral-500'
-                                }`}>
-                                {tab.count}
-                            </span>
-                            {activeTab === tab.id && (
-                                <motion.div
-                                    layoutId="activeTabIndicator"
-                                    className="absolute inset-0 bg-primary-50 border border-primary-100 rounded-xl -z-10"
-                                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                                />
-                            )}
-                        </button>
-                    ))}
-                </motion.div>
-
                 {/* Property Grid */}
                 {savedProperties.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         <AnimatePresence mode="popLayout">
                             {savedProperties.map((property, index) => (
                                 <motion.div
-                                    key={property.id}
+                                    key={property._id}
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     transition={{ delay: index * 0.05 }}
                                     layout
                                 >
-                                    <PropertyCard property={property} />
+                                    <PropertyCard 
+                                        property={property} 
+                                        onUnsave={() => handleUnsave(property._id)}
+                                        isSaved={true}
+                                    />
                                 </motion.div>
                             ))}
                         </AnimatePresence>

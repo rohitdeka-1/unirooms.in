@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI } from '../utils/api';
+import { getOptimizedImageUrl } from '../utils/imageOptimizer';
 
 const PropertyDetail = () => {
     const { id } = useParams();
@@ -79,8 +80,8 @@ const PropertyDetail = () => {
         ? `${property.address.locality}, ${property.city}`
         : property.location || 'Location not specified';
     const propertyImages = property.images?.length > 0 
-        ? property.images.map(img => img.url || img)
-        : ['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800'];
+        ? property.images.map(img => getOptimizedImageUrl(img.url || img, 'large'))
+        : [getOptimizedImageUrl('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800', 'large')];
     
     // Map amenities to display format
     const amenitiesMap = {
@@ -135,14 +136,16 @@ const PropertyDetail = () => {
                     <div className="lg:col-span-2 space-y-6">
                         {/* Image Gallery */}
                         <div className="card overflow-hidden">
-                            <div className="relative h-80 md:h-[450px]">
+                            <div className="relative h-80 md:h-[450px] bg-neutral-900">
                                 <motion.img
                                     key={currentImage}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     src={propertyImages[currentImage]}
                                     alt={propertyTitle}
-                                    className="w-full h-full object-cover"
+                                    loading="lazy"
+                                    decoding="async"
+                                    className="w-full h-full object-contain"
                                 />
 
                                 {/* Navigation Arrows */}
@@ -177,10 +180,17 @@ const PropertyDetail = () => {
                                     <button
                                         key={index}
                                         onClick={() => setCurrentImage(index)}
-                                        className={`flex-shrink-0 w-24 h-20 rounded-lg overflow-hidden transition-all ${currentImage === index ? 'ring-2 ring-primary-500 ring-offset-2' : 'opacity-60 hover:opacity-100'
-                                            }`}
+                                        className={`flex-shrink-0 w-24 h-20 rounded-lg overflow-hidden transition-all ${
+                                            currentImage === index ? 'ring-2 ring-primary-500 ring-offset-2' : 'opacity-60 hover:opacity-100'
+                                        }`}
                                     >
-                                        <img src={img} alt="" className="w-full h-full object-cover" />
+                                        <img 
+                                            src={img} 
+                                            alt="" 
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="w-full h-full object-cover" 
+                                        />
                                     </button>
                                 ))}
                             </div>
@@ -193,13 +203,40 @@ const PropertyDetail = () => {
                                     <h1 className="text-2xl md:text-3xl font-display font-bold text-dark-900 mb-2">
                                         {propertyTitle}
                                     </h1>
-                                    <p className="text-dark-500 flex items-center">
-                                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        {propertyLocation}
-                                    </p>
+                                    <div className="flex flex-col gap-2">
+                                        <p className="text-dark-500 flex items-center">
+                                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            {propertyLocation}
+                                        </p>
+                                        {property.location?.coordinates && (
+                                            isAuthenticated ? (
+                                                <a
+                                                    href={`https://www.google.com/maps?q=${property.location.coordinates[1]},${property.location.coordinates[0]}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors"
+                                                >
+                                                    <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                    View on Google Maps
+                                                </a>
+                                            ) : (
+                                                <button
+                                                    onClick={handleContactClick}
+                                                    className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors"
+                                                >
+                                                    <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                    </svg>
+                                                    Login to Get Location
+                                                </button>
+                                            )
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     {/* Campus Badge */}
@@ -310,9 +347,34 @@ const PropertyDetail = () => {
                                 )}
                             </div>
 
-                            <button className="w-full btn-primary py-3.5">
-                                Schedule Visit
-                            </button>
+                            {isAuthenticated ? (
+                                <a 
+                                    href={property.location?.coordinates 
+                                        ? `https://www.google.com/maps?q=${property.location.coordinates[1]},${property.location.coordinates[0]}`
+                                        : '#'
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full btn-primary py-3.5 flex items-center justify-center gap-2"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Visit on Maps
+                                </a>
+                            ) : (
+                                <div
+                                    onClick={handleContactClick}
+                                    className="w-full btn-primary py-3.5 flex items-center justify-center gap-2 cursor-pointer"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Login to Visit on Maps
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

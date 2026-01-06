@@ -53,7 +53,7 @@ export const sendOTPEmail = async (email, name, otp) => {
     const mailOptions = {
       from: `"${config.EMAIL_FROM_NAME}" <${config.GMAIL_USER}>`,
       to: email,
-      subject: "Your Login OTP - PG Finder",
+      subject: "Your Login OTP - UniRooms",
       html,
     };
 
@@ -81,7 +81,7 @@ export const sendVerificationEmail = async (email, name, verificationToken) => {
     const mailOptions = {
       from: `"${config.EMAIL_FROM_NAME}" <${config.GMAIL_USER}>`,
       to: email,
-      subject: "Verify Your Email - PG Finder",
+      subject: "Verify Your Email - UniRooms",
       html,
     };
 
@@ -106,7 +106,7 @@ export const sendWelcomeEmail = async (email, name, role) => {
     const mailOptions = {
       from: `"${config.EMAIL_FROM_NAME}" <${config.GMAIL_USER}>`,
       to: email,
-      subject: `Welcome to PG Finder, ${name}!`,
+      subject: `Welcome to UniRooms, ${name}!`,
       html,
     };
 
@@ -138,7 +138,7 @@ export const sendLoginNotificationEmail = async (email, name, loginInfo) => {
     const mailOptions = {
       from: `"${config.EMAIL_FROM_NAME}" <${config.GMAIL_USER}>`,
       to: email,
-      subject: "New Login to Your Account - PG Finder",
+      subject: "New Login to Your Account - UniRooms",
       html,
     };
 
@@ -165,7 +165,7 @@ export const sendPasswordResetOTP = async (email, name, otp) => {
     const mailOptions = {
       from: `"${config.EMAIL_FROM_NAME}" <${config.GMAIL_USER}>`,
       to: email,
-      subject: "Password Reset OTP - PG Finder",
+      subject: "Password Reset OTP - UniRooms",
       html,
     };
 
@@ -193,7 +193,7 @@ export const sendPasswordResetEmail = async (email, name, resetToken) => {
     const mailOptions = {
       from: `"${config.EMAIL_FROM_NAME}" <${config.GMAIL_USER}>`,
       to: email,
-      subject: "Password Reset Request - PG Finder",
+      subject: "Password Reset Request - UniRooms",
       html,
     };
 

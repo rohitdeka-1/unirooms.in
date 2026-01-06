@@ -32,7 +32,7 @@ const config = {
   // Gmail Configuration (using App Password)
   GMAIL_USER: process.env.GMAIL_USER, // your-email@gmail.com
   GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD, // 16-digit app password
-  EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME || "PG Finder",
+  EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME || "UniRooms",
   
   GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
   

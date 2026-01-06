@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -7,27 +7,29 @@ const Profile = () => {
     const { isAuthenticated, user, logout } = useAuth();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('overview');
+    const [isEditing, setIsEditing] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        college: ''
+    });
 
-    // Mock user stats
-    const userStats = {
-        savedProperties: 12,
-        contactedOwners: 5,
-        viewedProperties: 47,
-        memberSince: 'Jan 2024',
-    };
-
-    // Mock recent activity
-    const recentActivity = [
-        { id: 1, type: 'save', property: 'Sunrise Boys PG', time: '2 hours ago', icon: 'heart' },
-        { id: 2, type: 'contact', property: 'Elite Girls Hostel', time: '1 day ago', icon: 'phone' },
-        { id: 3, type: 'view', property: 'Urban Co-Living', time: '2 days ago', icon: 'eye' },
-        { id: 4, type: 'save', property: 'Premium Boys Lodge', time: '3 days ago', icon: 'heart' },
-    ];
+    useEffect(() => {
+        if (user) {
+            setFormData({
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                college: user.college || ''
+            });
+        }
+    }, [user]);
 
     const tabs = [
         { id: 'overview', label: 'Overview', icon: 'grid' },
         { id: 'settings', label: 'Settings', icon: 'cog' },
-        { id: 'notifications', label: 'Notifications', icon: 'bell' },
     ];
 
     const handleLogout = async () => {
@@ -35,23 +37,29 @@ const Profile = () => {
         navigate('/');
     };
 
-    const getActivityIcon = (type) => {
-        switch (type) {
-            case 'heart':
-                return (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                );
-            case 'phone':
-                return (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                );
-            case 'eye':
-                return (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                );
-            default:
-                return null;
+    const handleInputChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSaveProfile = async () => {
+        setLoading(true);
+        try {
+            // TODO: Implement API call to update user profile
+            setIsEditing(false);
+        } catch (error) {
+            console.error('Error updating profile:', error);
+        } finally {
+            setLoading(false);
         }
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return 'Recently';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
     };
 
     // If not authenticated, show login prompt
@@ -146,43 +154,32 @@ const Profile = () => {
                                                 <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                                 </svg>
-                                                {user?.role === 'owner' ? 'Property Owner' : 'Student'}
+                                                {user?.role === 'landlord' ? 'Landlord' : user?.role === 'admin' ? 'Admin' : 'Student'}
                                             </span>
-                                            <span className="text-neutral-400 text-sm">
-                                                Member since {userStats.memberSince}
-                                            </span>
+                                            {user?.createdAt && (
+                                                <span className="text-neutral-400 text-sm">
+                                                    Member since {formatDate(user.createdAt)}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
 
                                     {/* Actions */}
                                     <div className="flex items-center space-x-3">
-                                        <button className="btn-secondary text-sm">
-                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                            </svg>
-                                            Edit Profile
-                                        </button>
+                                        {user?.role === 'landlord' && (
+                                            <Link to="/landlord-dashboard" className="btn-secondary text-sm">
+                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                                </svg>
+                                                My Properties
+                                            </Link>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Stats */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-neutral-100">
-                            {[
-                                { label: 'Saved', value: userStats.savedProperties, icon: 'heart', color: 'text-red-500' },
-                                { label: 'Contacted', value: userStats.contactedOwners, icon: 'phone', color: 'text-green-500' },
-                                { label: 'Viewed', value: userStats.viewedProperties, icon: 'eye', color: 'text-primary-500' },
-                                { label: 'Member Since', value: userStats.memberSince, icon: 'calendar', color: 'text-accent-500' },
-                            ].map((stat, index) => (
-                                <div key={index} className="text-center">
-                                    <p className="text-2xl md:text-3xl font-display font-bold text-neutral-800">
-                                        {stat.value}
-                                    </p>
-                                    <p className="text-neutral-500 text-sm mt-1">{stat.label}</p>
-                                </div>
-                            ))}
-                        </div>
+                        {/* Stats - Removed dummy stats */}
                     </div>
                 </motion.div>
 
@@ -211,9 +208,6 @@ const Profile = () => {
                                             )}
                                             {tab.icon === 'cog' && (
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            )}
-                                            {tab.icon === 'bell' && (
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                             )}
                                         </svg>
                                         <span>{tab.label}</span>
@@ -285,40 +279,42 @@ const Profile = () => {
                                     </div>
                                 </div>
 
-                                {/* Recent Activity */}
+                                {/* Account Info */}
                                 <div className="card p-6">
                                     <h2 className="text-lg font-display font-bold text-neutral-800 mb-4">
-                                        Recent Activity
+                                        Account Information
                                     </h2>
                                     <div className="space-y-4">
-                                        {recentActivity.map((activity, index) => (
-                                            <motion.div
-                                                key={activity.id}
-                                                initial={{ opacity: 0, x: -10 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: index * 0.1 }}
-                                                className="flex items-center space-x-4 p-3 bg-neutral-50 rounded-xl"
-                                            >
-                                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${activity.type === 'save' ? 'bg-red-100' :
-                                                        activity.type === 'contact' ? 'bg-green-100' : 'bg-primary-100'
-                                                    }`}>
-                                                    <svg className={`w-5 h-5 ${activity.type === 'save' ? 'text-red-500' :
-                                                            activity.type === 'contact' ? 'text-green-500' : 'text-primary-500'
-                                                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        {getActivityIcon(activity.icon)}
+                                        <div className="flex items-start justify-between p-4 bg-neutral-50 rounded-xl">
+                                            <div className="flex items-start space-x-3">
+                                                <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                                    <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                                     </svg>
                                                 </div>
-                                                <div className="flex-1">
-                                                    <p className="font-medium text-neutral-700">
-                                                        {activity.type === 'save' && 'Saved '}
-                                                        {activity.type === 'contact' && 'Contacted owner of '}
-                                                        {activity.type === 'view' && 'Viewed '}
-                                                        <span className="text-primary-600">{activity.property}</span>
-                                                    </p>
-                                                    <p className="text-neutral-400 text-sm">{activity.time}</p>
+                                                <div>
+                                                    <p className="text-sm text-neutral-500">Email</p>
+                                                    <p className="font-medium text-neutral-700">{user?.email}</p>
                                                 </div>
-                                            </motion.div>
-                                        ))}
+                                            </div>
+                                            {user?.emailVerified && (
+                                                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                                                    Verified
+                                                </span>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="flex items-start space-x-3 p-4 bg-neutral-50 rounded-xl">
+                                            <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                                <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-neutral-500">Account Type</p>
+                                                <p className="font-medium text-neutral-700 capitalize">{user?.role || 'Student'}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -326,9 +322,22 @@ const Profile = () => {
 
                         {activeTab === 'settings' && (
                             <div className="card p-6">
-                                <h2 className="text-lg font-display font-bold text-neutral-800 mb-6">
-                                    Account Settings
-                                </h2>
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-lg font-display font-bold text-neutral-800">
+                                        Account Settings
+                                    </h2>
+                                    {!isEditing && (
+                                        <button 
+                                            onClick={() => setIsEditing(true)}
+                                            className="btn-secondary text-sm"
+                                        >
+                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                            </svg>
+                                            Edit Profile
+                                        </button>
+                                    )}
+                                </div>
                                 <div className="space-y-6">
                                     {/* Personal Information */}
                                     <div>
@@ -338,8 +347,11 @@ const Profile = () => {
                                                 <label className="block text-sm text-neutral-600 mb-2">Full Name</label>
                                                 <input
                                                     type="text"
-                                                    defaultValue={user?.name || ''}
-                                                    className="input-field"
+                                                    name="name"
+                                                    value={formData.name}
+                                                    onChange={handleInputChange}
+                                                    disabled={!isEditing}
+                                                    className="input-field disabled:bg-neutral-100 disabled:cursor-not-allowed"
                                                     placeholder="Your name"
                                                 />
                                             </div>
@@ -347,61 +359,71 @@ const Profile = () => {
                                                 <label className="block text-sm text-neutral-600 mb-2">Email</label>
                                                 <input
                                                     type="email"
-                                                    defaultValue={user?.email || ''}
-                                                    className="input-field"
+                                                    name="email"
+                                                    value={formData.email}
+                                                    onChange={handleInputChange}
+                                                    disabled={true}
+                                                    className="input-field disabled:bg-neutral-100 disabled:cursor-not-allowed"
                                                     placeholder="your@email.com"
                                                 />
+                                                <p className="text-xs text-neutral-500 mt-1">Email cannot be changed</p>
                                             </div>
                                             <div>
                                                 <label className="block text-sm text-neutral-600 mb-2">Phone</label>
                                                 <input
                                                     type="tel"
-                                                    className="input-field"
-                                                    placeholder="+91 XXXXX XXXXX"
+                                                    name="phone"
+                                                    value={formData.phone || ''}
+                                                    onChange={handleInputChange}
+                                                    disabled={!isEditing}
+                                                    className="input-field disabled:bg-neutral-100 disabled:cursor-not-allowed"
+                                                    placeholder="Enter 10-digit phone number"
+                                                    maxLength="10"
                                                 />
+                                                {!user?.phone && (
+                                                    <p className="text-xs text-amber-600 mt-1">⚠️ Please add your phone number</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm text-neutral-600 mb-2">College/University</label>
                                                 <input
                                                     type="text"
-                                                    className="input-field"
+                                                    name="college"
+                                                    value={formData.college}
+                                                    onChange={handleInputChange}
+                                                    disabled={!isEditing}
+                                                    className="input-field disabled:bg-neutral-100 disabled:cursor-not-allowed"
                                                     placeholder="Your college name"
                                                 />
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="border-t border-neutral-100 pt-6">
-                                        <button className="btn-primary">
-                                            Save Changes
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'notifications' && (
-                            <div className="card p-6">
-                                <h2 className="text-lg font-display font-bold text-neutral-800 mb-6">
-                                    Notification Preferences
-                                </h2>
-                                <div className="space-y-4">
-                                    {[
-                                        { id: 'email', label: 'Email Notifications', description: 'Receive updates about new properties matching your criteria' },
-                                        { id: 'sms', label: 'SMS Notifications', description: 'Get text messages for important updates' },
-                                        { id: 'push', label: 'Push Notifications', description: 'Receive in-app notifications' },
-                                        { id: 'marketing', label: 'Marketing Emails', description: 'Receive tips, offers, and promotional content' },
-                                    ].map((pref) => (
-                                        <div key={pref.id} className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl">
-                                            <div>
-                                                <p className="font-medium text-neutral-700">{pref.label}</p>
-                                                <p className="text-sm text-neutral-500">{pref.description}</p>
-                                            </div>
-                                            <button className="relative w-12 h-6 rounded-full bg-neutral-200 transition-colors hover:bg-neutral-300">
-                                                <span className="absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform" />
+                                    {isEditing && (
+                                        <div className="border-t border-neutral-100 pt-6 flex space-x-3">
+                                            <button 
+                                                onClick={handleSaveProfile}
+                                                disabled={loading}
+                                                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {loading ? 'Saving...' : 'Save Changes'}
+                                            </button>
+                                            <button 
+                                                onClick={() => {
+                                                    setIsEditing(false);
+                                                    setFormData({
+                                                        name: user?.name || '',
+                                                        email: user?.email || '',
+                                                        phone: user?.phone || '',
+                                                        college: user?.college || ''
+                                                    });
+                                                }}
+                                                className="btn-secondary"
+                                            >
+                                                Cancel
                                             </button>
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
                             </div>
                         )}

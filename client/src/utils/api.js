@@ -153,4 +153,18 @@ export const paymentAPI = {
     getPaymentById: (id) => apiCall(`/payments/${id}`),
 };
 
+export const savedPropertyAPI = {
+    getSavedProperties: () => apiCall('/saved'),
+
+    saveProperty: (propertyId) => apiCall(`/saved/${propertyId}`, {
+        method: 'POST',
+    }),
+
+    unsaveProperty: (propertyId) => apiCall(`/saved/${propertyId}`, {
+        method: 'DELETE',
+    }),
+
+    checkIfSaved: (propertyId) => apiCall(`/saved/check/${propertyId}`),
+};
+
 export default API_BASE_URL;

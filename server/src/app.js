@@ -39,7 +39,7 @@ app.use("/api/v1", apiRoutes);
 
 app.get('/', (req, res) => {
     res.json({
-        message: "PG Finder API is up and running!",
+        message: "UniRooms API is up and running!",
         version: "1.0.0",
         status: "active",
         endpoints: {
