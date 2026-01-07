@@ -32,7 +32,11 @@ export const updateMetaTags = ({
 
   // Update image
   if (image) {
-    const fullImageUrl = image.startsWith('http') ? image : `https://unirooms.in${image}`;
+    // Ensure image is a string (could be an array from property.images)
+    const imageUrl = Array.isArray(image) ? image[0] : image;
+    const fullImageUrl = (typeof imageUrl === 'string' && imageUrl.startsWith('http')) 
+      ? imageUrl 
+      : `https://unirooms.in${imageUrl || '/logo.png'}`;
     updateMetaTag('property', 'og:image', fullImageUrl);
     updateMetaTag('name', 'twitter:image', fullImageUrl);
   }
