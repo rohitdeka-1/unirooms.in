@@ -13,8 +13,8 @@ export const optimizeCloudinaryImage = (url, options = {}) => {
 
     const {
         width = 800,
-        quality = 'auto:good',
-        format = 'auto',
+        quality = 'auto:eco',
+        format = 'webp',
         crop = 'fill',
         gravity = 'auto',
     } = options;
@@ -47,7 +47,7 @@ export const getOptimizedImageUrl = (url, size = 'medium') => {
     if (!url) return '';
 
     const sizePresets = {
-        thumb: { width: 200, quality: 'auto:low' },
+        thumb: { width: 200, quality: 'auto:eco', format: 'webp' },
         small: { width: 400, quality: 'auto:good' },
         medium: { width: 800, quality: 'auto:good' },
         large: { width: 1200, quality: 'auto:best' },

@@ -85,6 +85,17 @@ app.use((req, res, next) => {
     next();
 });
 
+// 9. Cache control for API responses
+app.use('/api/', (req, res, next) => {
+    // Cache GET requests for 5 minutes
+    if (req.method === 'GET') {
+        res.setHeader('Cache-Control', 'public, max-age=300');
+    } else {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+    next();
+});
+
 app.use("/api/v1", apiRoutes);
 
 

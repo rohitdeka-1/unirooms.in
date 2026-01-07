@@ -35,8 +35,8 @@ const Navbar = () => {
                     <div className="container mx-auto px-6">
                         <div className="flex items-center justify-between h-16">
                             {/* Logo */}
-                            <Link to="/" className="flex items-center space-x-2 group">
-                                <img src="/logo.png" alt="Unirooms" className="w-10 h-10 rounded-xl" />
+                            <Link to="/" className="flex items-center space-x-2 group" aria-label="Unirooms Home">
+                                <img src="/logo.png" alt="Unirooms Logo" className="w-10 h-10 rounded-xl" loading="eager" />
                                 <span className="text-xl font-display font-bold text-neutral-800">Unirooms</span>
                             </Link>
 
