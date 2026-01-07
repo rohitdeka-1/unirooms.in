@@ -6,7 +6,7 @@ import config from "../Config/env.config.js";
 import { Cashfree, CFEnvironment } from "cashfree-pg";
 
 const cashfree = new Cashfree(
-    config.CASHFREE_ENVIRONMENT === "PRODUCTION" 
+    config.CASHFREE_ENVIRONMENT === "PRODUCTION" || config.CASHFREE_ENVIRONMENT === "PROD"
         ? CFEnvironment.PRODUCTION 
         : CFEnvironment.SANDBOX,
     config.CASHFREE_APP_ID,
