@@ -77,7 +77,7 @@ const AddProperty = () => {
                 setLoadingProperty(true);
                 const response = await propertyAPI.getMyProperties();
                 const property = response.data.properties.find(p => p._id === propertyId);
-                
+
                 if (!property) {
                     toast.error('Property not found or you do not have permission to edit it');
                     navigate('/landlord/dashboard');
@@ -297,7 +297,7 @@ const AddProperty = () => {
                 await propertyAPI.createProperty(formDataToSend);
                 toast.success('Property created successfully!');
             }
-            
+
             navigate('/landlord/dashboard');
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} property:`, error);
@@ -388,8 +388,8 @@ const AddProperty = () => {
             setErrors(newErrors);
             // Scroll to first error
             const firstErrorField = Object.keys(newErrors)[0];
-            const errorElement = document.querySelector(`[name="${firstErrorField}"]`) || 
-                                document.querySelector(`[data-field="${firstErrorField}"]`);
+            const errorElement = document.querySelector(`[name="${firstErrorField}"]`) ||
+                document.querySelector(`[data-field="${firstErrorField}"]`);
             if (errorElement) {
                 errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
@@ -568,9 +568,8 @@ const AddProperty = () => {
                                     required
                                     minLength={10}
                                     maxLength={100}
-                                    className={`w-full px-4 py-3.5 bg-neutral-50 border-2 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800 placeholder:text-neutral-400 ${
-                                        errors.title ? 'border-red-500 bg-red-50' : 'border-neutral-200'
-                                    }`}
+                                    className={`w-full px-4 py-3.5 bg-neutral-50 border-2 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800 placeholder:text-neutral-400 ${errors.title ? 'border-red-500 bg-red-50' : 'border-neutral-200'
+                                        }`}
                                     placeholder="e.g., Comfortable PG near VIT Bhopal Campus"
                                 />
                                 {errors.title && (
@@ -647,9 +646,8 @@ const AddProperty = () => {
                                             min={500}
                                             max={100000}
                                             step="1"
-                                            className={`w-full pl-8 pr-4 py-3.5 bg-neutral-50 border-2 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800 ${
-                                                errors.price ? 'border-red-500 bg-red-50' : 'border-neutral-200'
-                                            }`}
+                                            className={`w-full pl-8 pr-4 py-3.5 bg-neutral-50 border-2 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800 ${errors.price ? 'border-red-500 bg-red-50' : 'border-neutral-200'
+                                                }`}
                                             placeholder="5000"
                                         />
                                     </div>

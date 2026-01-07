@@ -1,0 +1,29 @@
+# robots.txt for Unirooms - PG Near Colleges
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /landlord/dashboard
+Disallow: /api/
+Disallow: /verify-email/
+Disallow: /verify-email-pending
+Disallow: /*.json$
+
+# Sitemap location
+Sitemap: https://unirooms.in/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
+
+# Popular Search Engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 5
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 5
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 5

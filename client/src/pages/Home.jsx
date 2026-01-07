@@ -4,10 +4,17 @@ import { Link } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
 import { propertyAPI } from '../utils/api';
+import { updateMetaTags, pageSEO } from '../utils/seo';
 
 const Home = () => {
     const [featuredProperties, setFeaturedProperties] = useState([]);
     const [loading, setLoading] = useState(true);
+    
+    // SEO Meta Tags
+    useEffect(() => {
+        updateMetaTags(pageSEO.home);
+    }, []);
+    
     // Fetch real properties from API
     useEffect(() => {
         const fetchProperties = async () => {
