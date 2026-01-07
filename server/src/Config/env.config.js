@@ -50,4 +50,22 @@ const requiredEnvVars = [
   "UPSTASH_REDIS_REST_TOKEN",
 ];
 
+// Validate required environment variables
+const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+
+if (missingEnvVars.length > 0) {
+  console.error("❌ Missing required environment variables:");
+  missingEnvVars.forEach(envVar => console.error(`  - ${envVar}`));
+  process.exit(1);
+}
+
+// Validate JWT secrets are strong enough
+if (process.env.JWT_ACCESS_SECRET && process.env.JWT_ACCESS_SECRET.length < 32) {
+  console.warn("⚠️  WARNING: JWT_ACCESS_SECRET should be at least 32 characters long");
+}
+
+if (process.env.JWT_REFRESH_SECRET && process.env.JWT_REFRESH_SECRET.length < 32) {
+  console.warn("⚠️  WARNING: JWT_REFRESH_SECRET should be at least 32 characters long");
+}
+
 export default config;

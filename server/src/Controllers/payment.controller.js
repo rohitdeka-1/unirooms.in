@@ -60,7 +60,9 @@ export const createPaymentOrder = async (req, res) => {
         
         const response = await cashfree.PGCreateOrder(request);
         
-        console.log("Cashfree Response:", JSON.stringify(response.data, null, 2));
+        if (process.env.NODE_ENV === 'development') {
+            console.log('Payment order created for user:', req.user.id);
+        }
 
         
         const payment = await Payment.create({
@@ -81,8 +83,6 @@ export const createPaymentOrder = async (req, res) => {
             order_id: response.data.order_id,
             cf_order_id: response.data.cf_order_id,
         };
-
-        console.log("Sending to frontend:", JSON.stringify(responseData, null, 2));
 
         res.status(201).json({
             success: true,

@@ -18,6 +18,12 @@ import {
     deleteRefreshToken,
     verifyRefreshToken,
 } from "../Services/redis.service.js";
+import {
+    isAccountLocked,
+    recordFailedLoginAttempt,
+    resetLoginAttempts,
+    getRemainingAttempts,
+} from "../Services/auth-security.service.js";
 
 const googleClient = new OAuth2Client(config.GOOGLE_CLIENT_ID);
 
@@ -84,7 +90,9 @@ export const registerStudent = async (req, res) => {
         if (existingUser) {
             
             if (!existingUser.isVerified && existingUser.email === email) {
-                console.log("Re-registering unverified user:", email);
+                if (process.env.NODE_ENV === 'development') {
+                    console.log("Re-registering unverified user:", email);
+                }
                 
                 existingUser.name = name;
                 existingUser.phone = phone;
@@ -94,8 +102,12 @@ export const registerStudent = async (req, res) => {
                 await existingUser.save();
 
                 sendVerificationEmail(email, name, verificationToken)
-                    .then(() => console.log(" Verification email sent to:", email))
-                    .catch((err) => console.error(" Failed to send verification email to", email, ":", err.message));
+                    .then(() => {
+                        if (process.env.NODE_ENV === 'development') {
+                            console.log("✅ Verification email sent to:", email);
+                        }
+                    })
+                    .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
 
                 return res.status(201).json({
                     success: true,
@@ -125,14 +137,20 @@ export const registerStudent = async (req, res) => {
             role: "student",
         });
 
-        console.log("Student registered:", email);
+        if (process.env.NODE_ENV === 'development') {
+            console.log("Student registered:", email);
+        }
 
         const verificationToken = user.generateEmailVerificationToken();
         await user.save();
 
         sendVerificationEmail(email, name, verificationToken)
-            .then(() => console.log(" Verification email sent to:", email))
-            .catch((err) => console.error(" Failed to send verification email to", email, ":", err.message));
+            .then(() => {
+                if (process.env.NODE_ENV === 'development') {
+                    console.log("✅ Verification email sent to:", email);
+                }
+            })
+            .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
 
         
         res.status(201).json({
@@ -183,7 +201,9 @@ export const registerLandlord = async (req, res) => {
         if (existingUser) {
             
             if (!existingUser.isVerified && existingUser.email === email) {
-                console.log("Re-registering unverified landlord:", email);
+                if (process.env.NODE_ENV === 'development') {
+                    console.log("Re-registering unverified landlord:", email);
+                }
                 
                 
                 existingUser.name = name;
@@ -197,8 +217,12 @@ export const registerLandlord = async (req, res) => {
                 await existingUser.save();
 
                 sendVerificationEmail(email, name, verificationToken)
-                    .then(() => console.log(" Verification email sent to:", email))
-                    .catch((err) => console.error(" Failed to send verification email to", email, ":", err.message));
+                    .then(() => {
+                        if (process.env.NODE_ENV === 'development') {
+                            console.log("✅ Verification email sent to:", email);
+                        }
+                    })
+                    .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
 
                 return res.status(201).json({
                     success: true,
@@ -231,15 +255,21 @@ export const registerLandlord = async (req, res) => {
             subscriptionStatus: "none",
         });
 
-        console.log("Landlord registered:", email);
+        if (process.env.NODE_ENV === 'development') {
+            console.log("Landlord registered:", email);
+        }
 
         
         const verificationToken = user.generateEmailVerificationToken();
         await user.save();
 
         sendVerificationEmail(email, name, verificationToken)
-            .then(() => console.log(" Verification email sent to:", email))
-            .catch((err) => console.error(" Failed to send verification email to", email, ":", err.message));
+            .then(() => {
+                if (process.env.NODE_ENV === 'development') {
+                    console.log("✅ Verification email sent to:", email);
+                }
+            })
+            .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
 
         
         res.status(201).json({
@@ -290,12 +320,27 @@ export const login = async (req, res) => {
 
         const { email, password } = req.body;
 
+        // Check if account is locked
+        const locked = await isAccountLocked(email);
+        if (locked) {
+            return res.status(423).json({
+                success: false,
+                message: "Account temporarily locked due to multiple failed login attempts. Please try again in 30 minutes.",
+                accountLocked: true,
+            });
+        }
+
         const user = await User.findOne({ email }).select("+password");
 
         if (!user) {
+            // Record failed attempt even for non-existent users to prevent enumeration attacks
+            await recordFailedLoginAttempt(email);
+            const remaining = await getRemainingAttempts(email);
+            
             return res.status(401).json({
                 success: false,
                 message: "Invalid email or password",
+                remainingAttempts: remaining > 0 ? remaining : undefined,
             });
         }
 
@@ -317,11 +362,19 @@ export const login = async (req, res) => {
         const isPasswordMatch = await user.comparePassword(password);
 
         if (!isPasswordMatch) {
+            // Record failed login attempt
+            await recordFailedLoginAttempt(email);
+            const remaining = await getRemainingAttempts(email);
+            
             return res.status(401).json({
                 success: false,
                 message: "Invalid email or password",
+                remainingAttempts: remaining > 0 ? remaining : undefined,
             });
         }
+
+        // Successful login - reset failed attempts
+        await resetLoginAttempts(email);
 
         user.password = undefined;
 
@@ -331,10 +384,14 @@ export const login = async (req, res) => {
             location: "India",
         };
 
-        
+        // Send login notification email asynchronously
         sendLoginNotificationEmail(user.email, user.name, loginInfo)
-            .then(() => console.log(" Login notification sent to:", user.email))
-            .catch((err) => console.error(" Failed to send login notification to", user.email, ":", err.message));
+            .then(() => {
+                if (process.env.NODE_ENV === 'development') {
+                    console.log("✅ Login notification sent to:", user.email);
+                }
+            })
+            .catch((err) => console.error("❌ Failed to send login notification to", user.email, ":", err.message));
         
         sendTokenResponse(user, 200, res, "Login successful");
     } catch (error) {
@@ -400,8 +457,12 @@ export const googleSignup = async (req, res) => {
 
         
         sendWelcomeEmail(user.email, user.name, user.role)
-            .then(() => console.log(" Welcome email sent to:", user.email))
-            .catch((err) => console.error(" Failed to send welcome email to", user.email, ":", err.message));
+            .then(() => {
+                if (process.env.NODE_ENV === 'development') {
+                    console.log("✅ Welcome email sent to:", user.email);
+                }
+            })
+            .catch((err) => console.error("❌ Failed to send welcome email to", user.email, ":", err.message));
 
         sendTokenResponse(
             user,
@@ -476,8 +537,12 @@ export const googleLogin = async (req, res) => {
         };
 
         sendLoginNotificationEmail(user.email, user.name, loginInfo)
-            .then(() => console.log(" Login notification sent to:", user.email))
-            .catch((err) => console.error(" Failed to send login notification to", user.email, ":", err.message));
+            .then(() => {
+                if (process.env.NODE_ENV === 'development') {
+                    console.log("✅ Login notification sent to:", user.email);
+                }
+            })
+            .catch((err) => console.error("❌ Failed to send login notification to", user.email, ":", err.message));
 
         sendTokenResponse(user, 200, res, "Login successful");
     } catch (error) {
@@ -894,32 +959,32 @@ export const verifyEmail = async (req, res) => {
             });
         }
 
-        console.log("Verifying token:", token.substring(0, 10) + "...");
-
-        
+        // Hash the token to compare with database
         const hashedToken = crypto
             .createHash("sha256")
             .update(token)
             .digest("hex");
 
-        console.log("Hashed token:", hashedToken.substring(0, 10) + "...");
-
-        
+        // Find user with this token
         const userWithToken = await User.findOne({
             emailVerificationToken: hashedToken,
         });
 
         if (!userWithToken) {
-            console.log("No user found with this token");
+            if (process.env.NODE_ENV === 'development') {
+                console.log("No user found with verification token");
+            }
             return res.status(400).json({
                 success: false,
                 message: "Invalid verification token. The link may be incorrect or the account may have been deleted.",
             });
         }
 
-        
+        // Check if user is already verified
         if (userWithToken.isVerified) {
-            console.log("User already verified:", userWithToken.email);
+            if (process.env.NODE_ENV === 'development') {
+                console.log("User already verified:", userWithToken.email);
+            }
             return res.status(200).json({
                 success: true,
                 message: "Email already verified! You can now login to your account.",
@@ -930,9 +995,11 @@ export const verifyEmail = async (req, res) => {
             });
         }
 
-        
+        // Check if token has expired
         if (userWithToken.emailVerificationExpire && userWithToken.emailVerificationExpire < Date.now()) {
-            console.log("Token expired for:", userWithToken.email);
+            if (process.env.NODE_ENV === 'development') {
+                console.log("Token expired for:", userWithToken.email);
+            }
             return res.status(400).json({
                 success: false,
                 message: "Verification token has expired. Please request a new verification email.",
@@ -949,7 +1016,9 @@ export const verifyEmail = async (req, res) => {
         userWithToken.emailVerificationExpire = undefined;
         await userWithToken.save();
 
-        console.log("Email verified successfully for:", userWithToken.email);
+        if (process.env.NODE_ENV === 'development') {
+            console.log("✅ Email verified successfully for:", userWithToken.email);
+        }
 
         
         sendWelcomeEmail(userWithToken.email, userWithToken.name, userWithToken.role).catch((err) =>

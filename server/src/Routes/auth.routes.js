@@ -24,25 +24,17 @@ import {
   validateGoogleSignup,
 } from "../Middlewares/validation.middleware.js";
 import { verifyToken } from "../Middlewares/auth.middleware.js";
+import { authLimiter, registrationLimiter } from "../Middlewares/security.middleware.js";
 
 const authRoute = express.Router();
 
+// Registration routes with rate limiting
+authRoute.post("/register/student", registrationLimiter, validateRegistration, registerStudent);
 
+authRoute.post("/register/landlord", registrationLimiter, validateRegistration, registerLandlord);
 
-
-
-
-authRoute.post("/register/student", validateRegistration, registerStudent);
-
-
-
-
-authRoute.post("/register/landlord", validateRegistration, registerLandlord);
-
-
-
-
-authRoute.post("/login", validateLogin, login);
+// Login route with strict rate limiting
+authRoute.post("/login", authLimiter, validateLogin, login);
 
 
 
