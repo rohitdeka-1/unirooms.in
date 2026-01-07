@@ -1,7 +1,12 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { updateMetaTags, pageSEO } from '../utils/seo';
 
 const Contact = () => {
+    useEffect(() => {
+        updateMetaTags(pageSEO.contact);
+    }, []);
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',

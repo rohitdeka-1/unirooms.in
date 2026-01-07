@@ -1,7 +1,13 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { updateMetaTags, pageSEO } from '../utils/seo';
 
 const About = () => {
+    useEffect(() => {
+        updateMetaTags(pageSEO.about);
+    }, []);
+
     return (
         <div className="min-h-screen bg-neutral-50 pt-24 mt-7 pb-24 md:pb-12">
             <div className="container mx-auto px-4">

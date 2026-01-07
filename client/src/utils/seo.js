@@ -132,6 +132,24 @@ export const generateBreadcrumbStructuredData = (breadcrumbs) => {
 };
 
 /**
+ * Generate FAQ structured data
+ */
+export const generateFAQStructuredData = (faqs) => {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
+};
+
+/**
  * Add structured data to page
  */
 export const addStructuredData = (data) => {
@@ -206,6 +224,7 @@ export default {
   updateMetaTags,
   generatePropertyStructuredData,
   generateBreadcrumbStructuredData,
+  generateFAQStructuredData,
   addStructuredData,
   generateSlug,
   pageSEO

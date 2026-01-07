@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI } from '../utils/api';
 import { getOptimizedImageUrl } from '../utils/imageOptimizer';
+import { updateMetaTags, generatePropertyStructuredData, addStructuredData } from '../utils/seo';
 
 const PropertyDetail = () => {
     const { id } = useParams();
@@ -36,6 +37,27 @@ const PropertyDetail = () => {
             fetchProperty();
         }
     }, [id]);
+
+    // Update SEO when property loads
+    useEffect(() => {
+        if (property) {
+            const propertyTitle = `${property.title || 'PG Accommodation'} | ${property.nearbyCollege || property.city || 'Near College'} | Unirooms`;
+            const propertyDescription = `${property.description || `Find ${property.roomType || 'PG accommodation'} near ${property.nearbyCollege || property.city}.`} ₹${property.rent || property.price}/month. ${property.amenities?.join(', ') || 'Great amenities'}. Book now!`;
+            
+            updateMetaTags({
+                title: propertyTitle,
+                description: propertyDescription,
+                keywords: `PG near ${property.nearbyCollege || property.city}, ${property.roomType}, ${property.gender} PG, PG accommodation, student housing`,
+                image: property.images?.[0] || '/logo.png',
+                url: `https://unirooms.in/property/${id}`,
+                type: 'product'
+            });
+
+            // Add structured data for property
+            const structuredData = generatePropertyStructuredData(property);
+            addStructuredData(structuredData);
+        }
+    }, [property, id]);
 
     const handleContactClick = () => {
         if (!isAuthenticated) {

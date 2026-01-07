@@ -1,6 +1,12 @@
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
+import { updateMetaTags, pageSEO } from '../utils/seo';
 
 const Safety = () => {
+    useEffect(() => {
+        updateMetaTags(pageSEO.safety);
+    }, []);
+
     const safetyTips = [
         {
             icon: (

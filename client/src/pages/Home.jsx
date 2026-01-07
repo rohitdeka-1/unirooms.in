@@ -4,15 +4,55 @@ import { Link } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
 import { propertyAPI } from '../utils/api';
-import { updateMetaTags, pageSEO } from '../utils/seo';
+import { updateMetaTags, pageSEO, generateFAQStructuredData, addStructuredData } from '../utils/seo';
 
 const Home = () => {
     const [featuredProperties, setFeaturedProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     
-    // SEO Meta Tags
+    // FAQ data for structured data
+    const faqs = [
+        {
+            question: 'How do I find PG near my college?',
+            answer: 'Use our search bar to enter your college name or location. You can filter by price, amenities, room type, and gender preference to find the perfect PG accommodation near your college.'
+        },
+        {
+            question: 'Are all PG listings verified?',
+            answer: 'Yes, we verify all property owners and conduct property checks to ensure authenticity. However, we always recommend visiting the property in person before making a final decision.'
+        },
+        {
+            question: 'What is the average rent for PG near colleges?',
+            answer: 'PG rents vary by location and amenities. On average, single rooms start from ₹4,500/month, double sharing from ₹3,500/month, and triple sharing from ₹3,000/month. Prices may vary based on location and facilities.'
+        },
+        {
+            question: 'Do I need to pay a security deposit?',
+            answer: 'Most PG accommodations require a security deposit, typically equal to 1-2 months rent. This is refundable when you vacate the property, subject to no damages.'
+        },
+        {
+            question: 'What amenities are included in PG?',
+            answer: 'Common amenities include WiFi, meals, laundry, housekeeping, AC/cooler, and 24/7 security. Specific amenities vary by property and are clearly listed on each PG profile.'
+        },
+        {
+            question: 'How do I contact the property owner?',
+            answer: 'Create a free account on Unirooms, browse properties, and click "Contact Owner" on any listing to get the owner\'s phone number and contact details.'
+        },
+        {
+            question: 'Is there a difference between Boys PG and Girls PG?',
+            answer: 'Boys PG and Girls PG refer to gender-specific accommodations. Some properties are exclusive for boys or girls, while co-living spaces accept both genders with separate floors or sections.'
+        },
+        {
+            question: 'Can I cancel my PG booking?',
+            answer: 'Cancellation policies vary by property. Always read the rental agreement carefully and discuss cancellation terms with the owner before booking. Most owners require 30 days notice.'
+        }
+    ];
+    
+    // SEO Meta Tags & Structured Data
     useEffect(() => {
         updateMetaTags(pageSEO.home);
+        
+        // Add FAQ structured data
+        const faqSchema = generateFAQStructuredData(faqs);
+        addStructuredData(faqSchema);
     }, []);
     
     // Fetch real properties from API
@@ -100,14 +140,14 @@ const Home = () => {
                                     <div className="rounded-2xl overflow-hidden shadow-card h-48">
                                         <img
                                             src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400"
-                                            alt="PG Room"
+                                            alt="Modern PG room near college with comfortable bed and study area"
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
                                     <div className="rounded-2xl overflow-hidden shadow-card h-64">
                                         <img
                                             src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400"
-                                            alt="Living Space"
+                                            alt="Spacious living area in student PG accommodation"
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
@@ -116,14 +156,14 @@ const Home = () => {
                                     <div className="rounded-2xl overflow-hidden shadow-card h-64">
                                         <img
                                             src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400"
-                                            alt="Modern Room"
+                                            alt="Affordable PG accommodation near university"
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
                                     <div className="rounded-2xl overflow-hidden shadow-card h-48 relative">
                                         <img
                                             src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400"
-                                            alt="Cozy Space"
+                                            alt="Cozy and comfortable PG room for students"
                                             className="w-full h-full object-cover"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/60 to-transparent flex items-end p-4">
@@ -308,12 +348,47 @@ const Home = () => {
                         Join thousands of students who found their ideal accommodation through Unirooms.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link to="/properties" className="btn-accent">
-                            Browse
+                        <Link to="/browse" className="btn-accent">
+                            Browse Properties
                         </Link>
                         <Link to="/signup" className="btn-secondary !bg-white/10 !text-white !border-white/20 hover:!bg-white/20">
                             Create Account
                         </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* FAQ Section - SEO Boost */}
+            <section className="py-20 bg-neutral-50">
+                <div className="container mx-auto px-4 max-w-4xl">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-800 mb-4">
+                            Frequently Asked Questions
+                        </h2>
+                        <p className="text-neutral-600">
+                            Everything you need to know about finding PG accommodation near your college
+                        </p>
+                    </div>
+                    <div className="space-y-4">
+                        {faqs.map((faq, index) => (
+                            <motion.details
+                                key={index}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className="card p-6 cursor-pointer group"
+                            >
+                                <summary className="font-semibold text-neutral-800 flex items-center justify-between group-hover:text-primary-600 transition-colors">
+                                    {faq.question}
+                                    <svg className="w-5 h-5 text-neutral-400 group-hover:text-primary-600 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </summary>
+                                <p className="mt-4 text-neutral-600 leading-relaxed">
+                                    {faq.answer}
+                                </p>
+                            </motion.details>
+                        ))}
                     </div>
                 </div>
             </section>

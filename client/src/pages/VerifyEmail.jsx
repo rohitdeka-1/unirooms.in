@@ -5,14 +5,13 @@ import { motion } from 'framer-motion';
 const VerifyEmail = () => {
     const { token } = useParams();
     const navigate = useNavigate();
-    const [status, setStatus] = useState('verifying'); // verifying, success, error
+    const [status, setStatus] = useState('verifying');  
     const [message, setMessage] = useState('');
     const hasVerified = useRef(false);
 
     useEffect(() => {
         const verifyEmail = async () => {
-            // Prevent multiple verification attempts
-            if (hasVerified.current) {
+             if (hasVerified.current) {
                 return;
             }
 
@@ -31,8 +30,7 @@ const VerifyEmail = () => {
                 if (response.ok) {
                     setStatus('success');
                     
-                    // Check if already verified
-                    if (data.data?.alreadyVerified) {
+                     if (data.data?.alreadyVerified) {
                         setMessage('Your email is already verified! You can login now.');
                         // Redirect to login for already verified users
                         setTimeout(() => {

@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import PropertyCard from '../components/PropertyCard';
 import SearchBar from '../components/SearchBar';
 import { propertyAPI } from '../utils/api';
+import { updateMetaTags, pageSEO } from '../utils/seo';
 
 const Browse = () => {
     const [searchParams] = useSearchParams();
@@ -19,7 +20,10 @@ const Browse = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-
+    // SEO Meta Tags
+    useEffect(() => {
+        updateMetaTags(pageSEO.browse);
+    }, []);
 
     useEffect(() => {
         const fetchProperties = async () => {
