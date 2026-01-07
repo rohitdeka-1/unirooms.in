@@ -33,6 +33,14 @@ const paymentSchema = new mongoose.Schema(
       enum: ["registration", "subscription_renewal", "property_listing"],
       required: [true, "Payment purpose is required"],
     },
+    propertiesCount: {
+      type: Number,
+      default: 1,
+      min: [1, "Properties count must be at least 1"],
+      required: function() {
+        return this.purpose === "property_listing";
+      }
+    },
     
     cashfreeOrderId: {
       type: String,

@@ -157,23 +157,38 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        const totalSuccessfulPayments = await Payment.countDocuments({
+        // Calculate total listing credits from successful payments
+        const successfulPayments = await Payment.find({
             userId: req.user.id,
             status: "success",
             purpose: "property_listing",
         });
+        
+        const totalPaidCredits = successfulPayments.reduce((sum, payment) => {
+            return sum + (payment.propertiesCount || 1);
+        }, 0);
 
-        const activePropertiesCount = await Property.countDocuments({
+        // Count total properties ever created (including deleted ones)
+        const totalPropertiesCreated = await Property.countDocuments({
             landlordId: req.user.id,
         });
 
-        if (activePropertiesCount >= totalSuccessfulPayments) {
+        const remainingCredits = totalPaidCredits - totalPropertiesCreated;
+
+        if (remainingCredits <= 0) {
+            const activePropertiesCount = await Property.countDocuments({
+                landlordId: req.user.id,
+                isActive: true,
+            });
+            
             return res.status(400).json({
                 success: false,
-                message: `You have reached your listing limit. You have ${totalSuccessfulPayments} listing credits and ${activePropertiesCount} active properties. Please make a payment to list more properties.`,
+                message: `You have used all your listing credits. You have paid for ${totalPaidCredits} listings and created ${totalPropertiesCreated} properties (${activePropertiesCount} currently active). Please make a payment to list more properties.`,
                 requiresPayment: true,
-                availableCredits: totalSuccessfulPayments,
-                usedCredits: activePropertiesCount,
+                totalPaidCredits: totalPaidCredits,
+                totalUsedCredits: totalPropertiesCreated,
+                activeProperties: activePropertiesCount,
+                remainingCredits: 0,
             });
         }
 

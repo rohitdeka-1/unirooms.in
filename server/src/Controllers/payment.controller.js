@@ -33,7 +33,7 @@ export const createPaymentOrder = async (req, res) => {
             });
         }
 
-        const amount = 99; 
+        const amount = 1; 
         const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
         
@@ -72,6 +72,7 @@ export const createPaymentOrder = async (req, res) => {
             status: "pending",
             purpose: "property_listing",
             cashfreeOrderId: orderId,
+            propertiesCount: 1, // Each payment is for 1 property listing credit
         });
 
         const responseData = {
