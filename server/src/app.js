@@ -51,7 +51,15 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // 5. Data sanitization against NoSQL query injection
-app.use(mongoSanitize());
+// Use replaceWith option for Express 5.x compatibility
+app.use(mongoSanitize({
+    replaceWith: '_',
+    onSanitize: ({ req, key }) => {
+        if (process.env.NODE_ENV === 'development') {
+            console.warn(`Sanitized key: ${key}`);
+        }
+    }
+}));
 
 // 6. Prevent HTTP Parameter Pollution
 app.use(hpp());
