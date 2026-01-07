@@ -302,11 +302,12 @@ const AddProperty = () => {
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} property:`, error);
             
-            // Check if error is due to missing payment
-            if (error.message && error.message.includes('listing limit')) {
-                toast.error('Payment required to list property');
-                // Open payment modal
+            // Check if error is due to missing payment/credits
+            if (!isEditMode && (error.message.includes('listing limit') || error.message.includes('listing credit'))) {
+                toast.error('No credits remaining. Please complete payment.');
+                // Open payment modal for user to purchase credits
                 setShowPaymentModal(true);
+                return; // Don't set loading to false yet, modal will handle it
             } else {
                 toast.error(error.message || `Failed to ${isEditMode ? 'update' : 'create'} property`);
             }
@@ -413,8 +414,10 @@ const AddProperty = () => {
             return;
         }
 
-        // Show payment modal for new properties
-        setShowPaymentModal(true);
+        // For new properties, check if user has remaining credits
+        // Try to create property without payment first
+        // Backend will tell us if payment is needed
+        await handleSubmitProperty(null);
     };
 
     // Show loading state while fetching property in edit mode

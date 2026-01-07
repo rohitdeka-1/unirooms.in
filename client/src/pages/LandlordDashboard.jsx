@@ -148,7 +148,7 @@ const LandlordDashboard = () => {
                             <div className="flex items-center gap-6">
                                 <div className="text-center">
                                     <p className="text-3xl font-bold text-primary-600">{credits.total}</p>
-                                    <p className="text-xs text-neutral-500 mt-1">Total Paid</p>
+                                    <p className="text-xs text-neutral-500 mt-1">Total</p>
                                 </div>
                                 <div className="text-center">
                                     <p className="text-3xl font-bold text-orange-600">{credits.used}</p>
