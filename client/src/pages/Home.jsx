@@ -139,9 +139,9 @@ const Home = () => {
                         >
                             <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
                                 {[
-                                    { img: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400', label: 'Boys PG', price: '₹4,500/mo' },
-                                    { img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400', label: 'Girls PG', price: '₹4,500/mo' },
-                                    { img: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400', label: 'Co-Living', price: '₹7,000/mo' },
+                                    { img: 'https://img.cofynd.com/images/latest_images_2024/990809bd3f06dba6b1e24bcd9799df4cd662e16f.webp', label: 'Boys PG', price: '₹4,500/mo' },
+                                    { img: 'https://is1-3.housingcdn.com/01c16c28/18454cf03cd329d0cd8f4d87e490679f/v0/medium/3_rk_-for-rent-sector_18_gurgaon-Gurgaon-bedroom.jpg', label: 'Girls PG', price: '₹4,500/mo' },
+                                    { img: 'https://img.cofynd.com/images/original/5d121352daa426393fc5581d5c307229d2f1f5ac.jpg', label: 'Co-Living', price: '₹7,000/mo' },
                                 ].map((item, index) => (
                                     <div key={index} className="flex-shrink-0 w-56 snap-start first:ml-0 last:mr-0">
                                         <div className="rounded-2xl overflow-hidden shadow-card h-36 relative">
