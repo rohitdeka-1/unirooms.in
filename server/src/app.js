@@ -2,7 +2,6 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import helmet from "helmet";
-import mongoSanitize from "express-mongo-sanitize";
 import hpp from "hpp";
 import apiRoutes from "./Routes/index.js";
 import { apiLimiter } from "./Middlewares/security.middleware.js";
@@ -50,16 +49,27 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// 5. Data sanitization against NoSQL query injection
-// Use replaceWith option for Express 5.x compatibility
-app.use(mongoSanitize({
-    replaceWith: '_',
-    onSanitize: ({ req, key }) => {
-        if (process.env.NODE_ENV === 'development') {
-            console.warn(`Sanitized key: ${key}`);
+// 5. Custom NoSQL injection protection middleware
+app.use((req, res, next) => {
+    const sanitize = (obj) => {
+        if (obj && typeof obj === 'object') {
+            Object.keys(obj).forEach(key => {
+                if (key.includes('$') || key.includes('.')) {
+                    delete obj[key];
+                } else if (typeof obj[key] === 'object') {
+                    sanitize(obj[key]);
+                }
+            });
         }
-    }
-}));
+        return obj;
+    };
+    
+    if (req.body) sanitize(req.body);
+    if (req.params) sanitize(req.params);
+    // Don't sanitize req.query as it's read-only in Express 5.x
+    
+    next();
+});
 
 // 6. Prevent HTTP Parameter Pollution
 app.use(hpp());
