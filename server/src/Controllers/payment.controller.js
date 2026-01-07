@@ -51,6 +51,9 @@ export const createPaymentOrder = async (req, res) => {
                 notify_url: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/v1/payments/webhook`,
             },
             order_note: "Property Listing Credit Purchase",
+            order_tags: {
+                payment_methods: "upi,cc,dc,nb,wallet"
+            }
         };
 
         

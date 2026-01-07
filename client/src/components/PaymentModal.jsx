@@ -44,6 +44,14 @@ const PaymentModal = ({ onClose, onSuccess }) => {
             const checkoutOptions = {
                 paymentSessionId: payment_session_id,
                 redirectTarget: "_modal", // Opens in modal
+                appearance: {
+                    theme: 'light'
+                },
+                style: {
+                    backgroundColor: '#ffffff',
+                    color: '#000000',
+                    fontFamily: 'Inter, system-ui, sans-serif'
+                }
             };
 
             // Open Cashfree checkout
