@@ -23,32 +23,15 @@ export const createPaymentOrder = async (req, res) => {
             });
         }
 
-        const { propertyId } = req.body;
-
-        if (!propertyId) {
+        const user = await User.findById(req.user.id);
+        
+        if (!user.phone) {
             return res.status(400).json({
                 success: false,
-                message: "Property ID is required",
+                message: "Please update your phone number in profile before making a payment",
             });
         }
 
-        const property = await Property.findById(propertyId);
-
-        if (!property) {
-            return res.status(404).json({
-                success: false,
-                message: "Property not found",
-            });
-        }
-
-        if (property.landlordId.toString() !== req.user.id) {
-            return res.status(403).json({
-                success: false,
-                message: "You can only create payment for your own properties",
-            });
-        }
-
-        const user = await User.findById(req.user.id);
         const amount = 99; 
         const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -61,13 +44,13 @@ export const createPaymentOrder = async (req, res) => {
                 customer_id: user._id.toString(),
                 customer_name: user.name,
                 customer_email: user.email,
-                customer_phone: property.phone,
+                customer_phone: user.phone,
             },
             order_meta: {
                 return_url: `${config.FRONTEND_URL}/landlord/payment-callback?order_id={order_id}`,
                 notify_url: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/v1/payments/webhook`,
             },
-            order_note: "Property Listing Payment",
+            order_note: "Property Listing Credit Purchase",
         };
 
         
@@ -76,7 +59,6 @@ export const createPaymentOrder = async (req, res) => {
         
         const payment = await Payment.create({
             userId: req.user.id,
-            propertyId: property._id,
             amount,
             currency: "INR",
             status: "pending",
