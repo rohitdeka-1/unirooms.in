@@ -1,5 +1,3 @@
-// Admin authorization middleware
-// Only allows access to alkardorhd@gmail.com
 export const isAdmin = (req, res, next) => {
     const ADMIN_EMAIL = 'alkardorhd@gmail.com';
     

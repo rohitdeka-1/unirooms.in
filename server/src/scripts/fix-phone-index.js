@@ -1,12 +1,4 @@
-/**
- * Fix Phone Index - Drop and Recreate as Sparse Index
- * 
- * This script fixes the duplicate key error for Google OAuth users
- * by ensuring the phone index is sparse (allows multiple null values)
- * 
- * Run this script once in production:
- * node src/scripts/fix-phone-index.js
- */
+
 
 import mongoose from "mongoose";
 import dotenv from "dotenv";
@@ -16,7 +8,7 @@ import { dirname, join } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables
+
 dotenv.config({ path: join(__dirname, "../../.env") });
 
 const MONGO_URI = process.env.MONGO_URI;
@@ -30,7 +22,7 @@ async function fixPhoneIndex() {
         const db = mongoose.connection.db;
         const usersCollection = db.collection("users");
 
-        // Check existing indexes
+        
         console.log("\n📋 Current indexes on 'users' collection:");
         const existingIndexes = await usersCollection.indexes();
         existingIndexes.forEach(index => {
@@ -38,7 +30,7 @@ async function fixPhoneIndex() {
                        index.sparse ? "(sparse)" : "(not sparse)");
         });
 
-        // Check if phone index exists and is not sparse
+        
         const phoneIndex = existingIndexes.find(idx => idx.key.phone === 1);
         
         if (phoneIndex && !phoneIndex.sparse) {
@@ -54,7 +46,7 @@ async function fixPhoneIndex() {
             console.log("\n⚠️  No phone index found");
         }
 
-        // Create sparse index
+        
         console.log("📝 Creating new sparse unique index on phone field...");
         await usersCollection.createIndex(
             { phone: 1 }, 
@@ -66,7 +58,7 @@ async function fixPhoneIndex() {
         );
         console.log("✅ Sparse unique index created successfully");
 
-        // Verify the new index
+        
         console.log("\n📋 Updated indexes:");
         const updatedIndexes = await usersCollection.indexes();
         updatedIndexes.forEach(index => {
@@ -86,5 +78,5 @@ async function fixPhoneIndex() {
     }
 }
 
-// Run the script
+
 fixPhoneIndex();

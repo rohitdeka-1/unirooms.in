@@ -26,9 +26,9 @@ const userSchema = new mongoose.Schema(
         },
         phone: {
             type: String,
-            required: false, // Optional for Google OAuth users
+            required: false,
             unique: true,
-            sparse: true, // Allows multiple null/undefined values
+            sparse: true,
             match: [/^[6-9]\d{9}$/, "Please provide a valid 10-digit Indian phone number"],
         },
         password: {
@@ -60,7 +60,6 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: true,
         },
-        // Landlord-specific fields
         subscriptionStatus: {
             type: String,
             enum: ["none", "active", "expired"],
@@ -142,7 +141,7 @@ userSchema.methods.generateEmailVerificationToken = function () {
         .update(verificationToken)
         .digest('hex');
 
-    this.emailVerificationExpire = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    this.emailVerificationExpire = new Date(Date.now() + 24 * 60 * 60 * 1000); 
 
     return verificationToken;
 };

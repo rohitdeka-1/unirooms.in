@@ -1,15 +1,11 @@
 import SavedProperty from "../Models/savedProperty.model.js";
 import Property from "../Models/property.model.js";
 
-// @desc    Save a property
-// @route   POST /api/saved/:propertyId
-// @access  Private (Student)
 export const saveProperty = async (req, res) => {
     try {
         const { propertyId } = req.params;
         const studentId = req.user.id;
 
-        // Check if property exists
         const property = await Property.findById(propertyId);
         if (!property) {
             return res.status(404).json({
@@ -18,7 +14,6 @@ export const saveProperty = async (req, res) => {
             });
         }
 
-        // Check if already saved
         const existingSave = await SavedProperty.findOne({ studentId, propertyId });
         if (existingSave) {
             return res.status(400).json({
@@ -27,7 +22,6 @@ export const saveProperty = async (req, res) => {
             });
         }
 
-        // Save property
         const savedProperty = await SavedProperty.create({
             studentId,
             propertyId,
@@ -48,9 +42,6 @@ export const saveProperty = async (req, res) => {
     }
 };
 
-// @desc    Unsave a property
-// @route   DELETE /api/saved/:propertyId
-// @access  Private (Student)
 export const unsaveProperty = async (req, res) => {
     try {
         const { propertyId } = req.params;
@@ -82,9 +73,6 @@ export const unsaveProperty = async (req, res) => {
     }
 };
 
-// @desc    Get all saved properties for logged in student
-// @route   GET /api/saved
-// @access  Private (Student)
 export const getSavedProperties = async (req, res) => {
     try {
         const studentId = req.user.id;
@@ -100,7 +88,6 @@ export const getSavedProperties = async (req, res) => {
                 },
             });
 
-        // Filter out any null properties (deleted or inactive)
         const validSavedProperties = savedProperties
             .filter((sp) => sp.propertyId)
             .map((sp) => ({
@@ -124,9 +111,6 @@ export const getSavedProperties = async (req, res) => {
     }
 };
 
-// @desc    Check if a property is saved
-// @route   GET /api/saved/check/:propertyId
-// @access  Private (Student)
 export const checkIfSaved = async (req, res) => {
     try {
         const { propertyId } = req.params;

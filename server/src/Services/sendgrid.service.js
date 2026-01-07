@@ -2,7 +2,7 @@ import sgMail from "@sendgrid/mail";
 import config from "../Config/env.config.js";
 import chalk from "chalk";
 
-// Initialize SendGrid
+
 if (config.SENDGRID_API_KEY) {
   sgMail.setApiKey(config.SENDGRID_API_KEY);
   console.log(chalk.magenta("✅ SendGrid email service is ready"));
@@ -11,9 +11,7 @@ if (config.SENDGRID_API_KEY) {
   console.error(chalk.red("❌ SENDGRID_API_KEY not configured"));
 }
 
-/**
- * Send email using SendGrid
- */
+
 export const sendEmailSendGrid = async (to, subject, html) => {
   try {
     const msg = {

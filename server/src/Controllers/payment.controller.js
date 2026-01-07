@@ -4,8 +4,6 @@ import crypto from "crypto";
 import config from "../Config/env.config.js";
 import { Cashfree, CFEnvironment } from "cashfree-pg";
 
-// Initialize Cashfree SDK
-// Constructor: new Cashfree(XEnvironment, XClientId, XClientSecret, ...)
 const cashfree = new Cashfree(
     config.CASHFREE_ENVIRONMENT === "PRODUCTION" 
         ? CFEnvironment.PRODUCTION 
@@ -14,12 +12,9 @@ const cashfree = new Cashfree(
     config.CASHFREE_SECRET_KEY
 );
 
-// @desc    Create payment order for property listing
-// @route   POST /api/payments/create-order
-// @access  Private (Landlord)
 export const createPaymentOrder = async (req, res) => {
     try {
-        // Check if user is landlord
+        
         if (req.user.role !== "landlord") {
             return res.status(403).json({
                 success: false,
@@ -28,10 +23,10 @@ export const createPaymentOrder = async (req, res) => {
         }
 
         const user = await User.findById(req.user.id);
-        const amount = 99; // ₹99 per property listing
+        const amount = 99; 
         const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-        // Create Cashfree order request
+        
         const request = {
             order_amount: amount,
             order_currency: "INR",
@@ -49,10 +44,10 @@ export const createPaymentOrder = async (req, res) => {
             order_note: "Property Listing Payment",
         };
 
-        // Create order with Cashfree
+        
         const response = await cashfree.PGCreateOrder(request);
 
-        // Create payment record in database
+        
         const payment = await Payment.create({
             userId: req.user.id,
             amount,
@@ -84,9 +79,6 @@ export const createPaymentOrder = async (req, res) => {
     }
 };
 
-// @desc    Verify payment with Cashfree
-// @route   POST /api/payments/verify
-// @access  Private (Landlord)
 export const verifyPayment = async (req, res) => {
     try {
         const { orderId } = req.body;
@@ -114,7 +106,7 @@ export const verifyPayment = async (req, res) => {
             });
         }
 
-        // Verify payment with Cashfree
+        
         const response = await cashfree.PGOrderFetchPayments(orderId);
 
         if (response.data && response.data.length > 0) {
@@ -162,25 +154,19 @@ export const verifyPayment = async (req, res) => {
     }
 };
 
-// @desc    Cashfree Webhook Handler
-// @route   POST /api/payments/webhook
-// @access  Public (Cashfree)
 export const handleWebhook = async (req, res) => {
     try {
         const { type, data } = req.body;
 
-        // Verify webhook signature (recommended in production)
         const signature = req.headers["x-webhook-signature"];
         const timestamp = req.headers["x-webhook-timestamp"];
         
-        // Find payment by order ID
         const payment = await Payment.findOne({ cashfreeOrderId: data.order.order_id });
 
         if (!payment) {
             return res.status(404).json({ success: false, message: "Payment not found" });
         }
 
-        // Handle different webhook events
         switch (type) {
             case "PAYMENT_SUCCESS_WEBHOOK":
                 payment.status = "success";
@@ -208,9 +194,6 @@ export const handleWebhook = async (req, res) => {
     }
 };
 
-// @desc    Get user's payment history
-// @route   GET /api/payments/my-payments
-// @access  Private
 export const getMyPayments = async (req, res) => {
     try {
         const payments = await Payment.find({ userId: req.user.id })
@@ -231,9 +214,6 @@ export const getMyPayments = async (req, res) => {
     }
 };
 
-// @desc    Get single payment by ID
-// @route   GET /api/payments/:id
-// @access  Private
 export const getPaymentById = async (req, res) => {
     try {
         const payment = await Payment.findById(req.params.id);
@@ -245,7 +225,6 @@ export const getPaymentById = async (req, res) => {
             });
         }
 
-        // Check ownership
         if (payment.userId.toString() !== req.user.id) {
             return res.status(403).json({
                 success: false,

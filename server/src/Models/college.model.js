@@ -12,7 +12,7 @@ const collegeSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    // Location with GeoJSON for geospatial queries
+    
     location: {
       type: {
         type: String,
@@ -20,7 +20,7 @@ const collegeSchema = new mongoose.Schema(
         default: "Point",
       },
       coordinates: {
-        type: [Number], // [longitude, latitude]
+        type: [Number], 
         required: true,
       },
     },
@@ -63,10 +63,10 @@ const collegeSchema = new mongoose.Schema(
   }
 );
 
-// Create geospatial index for location-based queries
+
 collegeSchema.index({ location: "2dsphere" });
 
-// Text index for search functionality
+
 collegeSchema.index({ name: "text", shortName: "text", "address.city": "text" });
 
 const College = mongoose.model("College", collegeSchema);

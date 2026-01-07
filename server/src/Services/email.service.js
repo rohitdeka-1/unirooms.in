@@ -8,7 +8,7 @@ import config from "../Config/env.config.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Register Handlebars helpers
+
 handlebars.registerHelper('eq', function(a, b) {
   return a === b;
 });
@@ -21,7 +21,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Verify transporter connection on startup
+
 transporter.verify((error, success) => {
   if (error) {
     console.error("❌ Email service connection failed:", error.message);
@@ -67,7 +67,7 @@ export const sendOTPEmail = async (email, name, otp) => {
   }
 };
 
-// Send Email Verification
+
 export const sendVerificationEmail = async (email, name, verificationToken) => {
   try {
     const verificationUrl = `${config.FRONTEND_URL}/verify-email/${verificationToken}`;
@@ -99,10 +99,14 @@ export const sendVerificationEmail = async (email, name, verificationToken) => {
 
 export const sendWelcomeEmail = async (email, name, role) => {
   try {
+    const dashboardUrl = role === "landlord" 
+      ? `${config.FRONTEND_URL}/landlord/dashboard`
+      : `${config.FRONTEND_URL}/`;
+    
     const html = compileTemplate("welcome", {
       name,
       role,
-      dashboardUrl: `${config.FRONTEND_URL}/dashboard`,
+      dashboardUrl,
       year: new Date().getFullYear(),
     });
 
@@ -124,7 +128,6 @@ export const sendWelcomeEmail = async (email, name, role) => {
   }
 };
 
-// Send Login Notification Email
 export const sendLoginNotificationEmail = async (email, name, loginInfo) => {
   try {
     const html = compileTemplate("loginNotification", {
@@ -154,12 +157,10 @@ export const sendLoginNotificationEmail = async (email, name, loginInfo) => {
   } catch (error) {
     console.error(" Error sending login notification to", email, ":", error.message);
     if (error.code) console.error("Error code:", error.code);
-    // Don't throw error for login notification (non-critical)
     return { success: false, error: error.message };
   }
 };
 
-// Send Password Reset OTP Email
 export const sendPasswordResetOTP = async (email, name, otp) => {
   try {
     const html = compileTemplate("passwordResetOTP", {
@@ -185,7 +186,7 @@ export const sendPasswordResetOTP = async (email, name, otp) => {
   }
 };
 
-// Send Password Reset Email
+
 export const sendPasswordResetEmail = async (email, name, resetToken) => {
   try {
     const resetUrl = `${config.FRONTEND_URL}/reset-password/${resetToken}`;
@@ -213,7 +214,7 @@ export const sendPasswordResetEmail = async (email, name, resetToken) => {
   }
 };
 
-// Send Admin Notification for New Property
+
 export const sendNewPropertyNotification = async (propertyDetails) => {
   try {
     const adminEmail = "alkardorhd@gmail.com";

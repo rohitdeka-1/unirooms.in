@@ -1,5 +1,5 @@
 export const popularColleges = [
-  // VIT Campuses
+  
   {
     name: "Vellore Institute of Technology, Vellore",
     shortName: "VIT Vellore",
@@ -43,7 +43,7 @@ export const popularColleges = [
     type: "Engineering",
   },
 
-  // SRM Campuses
+  
   {
     name: "SRM Institute of Science and Technology",
     shortName: "SRM University",
@@ -59,7 +59,7 @@ export const popularColleges = [
     type: "Engineering",
   },
 
-  // IIT Campuses
+  
   {
     name: "Indian Institute of Technology Delhi",
     shortName: "IIT Delhi",
@@ -145,7 +145,7 @@ export const popularColleges = [
     type: "Engineering",
   },
 
-  // NIT Campuses
+  
   {
     name: "National Institute of Technology Trichy",
     shortName: "NIT Trichy",
@@ -189,7 +189,7 @@ export const popularColleges = [
     type: "Engineering",
   },
 
-  // BITS Campuses
+  
   {
     name: "Birla Institute of Technology and Science Pilani",
     shortName: "BITS Pilani",
@@ -219,7 +219,7 @@ export const popularColleges = [
     type: "Engineering",
   },
 
-  // Delhi University Campuses
+  
   {
     name: "Delhi University North Campus",
     shortName: "DU North Campus",
@@ -249,7 +249,7 @@ export const popularColleges = [
     type: "University",
   },
 
-  // Other Major Institutes
+  
   {
     name: "Manipal Institute of Technology",
     shortName: "Manipal University",
@@ -336,7 +336,7 @@ export const popularColleges = [
   },
 ];
 
-// Function to search colleges by name
+
 export const searchColleges = (query) => {
   if (!query || query.trim().length < 2) {
     return [];
@@ -352,7 +352,7 @@ export const searchColleges = (query) => {
   );
 };
 
-// Function to get college by exact name match
+
 export const getCollegeByName = (name) => {
   const searchTerm = name.toLowerCase().trim();
 

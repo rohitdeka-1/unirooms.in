@@ -33,7 +33,7 @@ const paymentSchema = new mongoose.Schema(
       enum: ["registration", "subscription_renewal", "property_listing"],
       required: [true, "Payment purpose is required"],
     },
-    // Cashfree specific fields
+    
     cashfreeOrderId: {
       type: String,
       required: true,
@@ -42,12 +42,11 @@ const paymentSchema = new mongoose.Schema(
     cashfreePaymentId: {
       type: String,
       unique: true,
-      sparse: true, // Allows null values
+      sparse: true,
     },
     cashfreeSignature: {
       type: String,
     },
-    // Additional transaction info
     transactionMessage: {
       type: String,
     },
@@ -57,14 +56,12 @@ const paymentSchema = new mongoose.Schema(
     paymentDate: {
       type: Date,
     },
-    // Subscription validity (for registration payments)
     subscriptionStartDate: {
       type: Date,
     },
     subscriptionEndDate: {
       type: Date,
     },
-    // Refund info
     refundId: {
       type: String,
     },
@@ -83,11 +80,9 @@ const paymentSchema = new mongoose.Schema(
   }
 );
 
-// Indexes for queries
 paymentSchema.index({ userId: 1, status: 1 });
 paymentSchema.index({ status: 1, createdAt: -1 });
 
-// Method to mark payment as successful
 paymentSchema.methods.markAsSuccess = async function (paymentData) {
   this.status = "success";
   this.cashfreePaymentId = paymentData.cashfreePaymentId;
@@ -95,7 +90,6 @@ paymentSchema.methods.markAsSuccess = async function (paymentData) {
   this.paymentDate = new Date();
   this.transactionMessage = paymentData.message || "Payment successful";
   
-  // Set subscription dates (6 months validity)
   if (this.purpose === "registration" || this.purpose === "subscription_renewal") {
     this.subscriptionStartDate = new Date();
     this.subscriptionEndDate = new Date();
@@ -105,14 +99,12 @@ paymentSchema.methods.markAsSuccess = async function (paymentData) {
   return await this.save();
 };
 
-// Method to mark payment as failed
 paymentSchema.methods.markAsFailed = async function (reason) {
   this.status = "failed";
   this.failureReason = reason;
   return await this.save();
 };
 
-// Static method to get user's payment history
 paymentSchema.statics.getUserPayments = async function (userId) {
   return await this.find({ userId })
     .sort({ createdAt: -1 })

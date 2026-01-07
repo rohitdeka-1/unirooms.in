@@ -22,7 +22,7 @@ import { body } from "express-validator";
 
 const router = express.Router();
 
-// Middleware to parse JSON fields from FormData
+
 const parseFormData = (req, res, next) => {
     if (req.body.location && typeof req.body.location === 'string') {
         req.body.location = JSON.parse(req.body.location);
@@ -39,7 +39,7 @@ const parseFormData = (req, res, next) => {
     next();
 };
 
-// Validation middleware
+
 const propertyValidation = [
     body("title")
         .trim()
@@ -87,14 +87,14 @@ const propertyValidation = [
         .withMessage("Available rooms cannot be negative"),
 ];
 
-// Public routes
+
 router.get("/", getAllProperties);
 router.get("/campuses", getAllCampuses);
 router.get("/colleges/search", searchCollegesAPI);
 router.get("/near-college", getPropertiesNearCollege);
-router.get("/:id", optionalAuth, getPropertyById); // Optional auth to let landlords see their own unverified properties
+router.get("/:id", optionalAuth, getPropertyById); 
 
-// Landlord protected routes
+
 router.get("/landlord/my-properties", protect, authorize("landlord"), getLandlordProperties);
 router.get("/landlord/stats", protect, authorize("landlord"), getLandlordStats);
 router.post("/", protect, authorize("landlord"), upload.array('images', 5), parseFormData, propertyValidation, createProperty);
@@ -102,7 +102,7 @@ router.put("/:id", protect, authorize("landlord"), upload.array('images', 5), pa
 router.delete("/:id", protect, authorize("landlord"), deleteProperty);
 router.patch("/:id/toggle-active", protect, authorize("landlord"), togglePropertyStatus);
 
-// Admin routes (restricted to alkardorhd@gmail.com)
+
 router.get("/admin/all", protect, isAdmin, getAllPropertiesAdmin);
 router.put("/admin/:id/approve", protect, isAdmin, approveProperty);
 router.delete("/admin/:id/decline", protect, isAdmin, declineProperty);

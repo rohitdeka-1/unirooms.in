@@ -7,9 +7,6 @@ import { sendNewPropertyNotification } from "../Services/email.service.js";
 import cloudinary from "../Config/cloudinary.config.js";
 import streamifier from 'streamifier';
 
-// @desc    Get all properties with filters
-// @route   GET /api/properties
-// @access  Public
 export const getAllProperties = async (req, res) => {
     try {
         const {
@@ -24,8 +21,7 @@ export const getAllProperties = async (req, res) => {
             order = "desc",
         } = req.query;
 
-        // Build filter object
-        const filter = { isActive: true, isVerified: true }; // Only show verified properties publicly
+        const filter = { isActive: true, isVerified: true };
 
         if (city) filter.city = { $regex: city, $options: "i" };
         if (roomType) filter.roomType = roomType;
@@ -38,7 +34,6 @@ export const getAllProperties = async (req, res) => {
             filter.$text = { $search: search };
         }
 
-        // Build sort object
         const sortObj = {};
         sortObj[sortBy] = order === "asc" ? 1 : -1;
 
@@ -74,9 +69,6 @@ export const getAllProperties = async (req, res) => {
     }
 };
 
-// @desc    Get single property by ID
-// @route   GET /api/properties/:id
-// @access  Public
 export const getPropertyById = async (req, res) => {
     try {
         const property = await Property.findById(req.params.id)
@@ -89,7 +81,6 @@ export const getPropertyById = async (req, res) => {
             });
         }
 
-        // Only show verified properties to public (unless it's the landlord viewing their own)
         if (!property.isVerified && (!req.user || req.user.id !== property.landlordId.toString())) {
             return res.status(404).json({
                 success: false,
@@ -97,7 +88,6 @@ export const getPropertyById = async (req, res) => {
             });
         }
 
-        // Increment view count
         await property.incrementViews();
 
         res.status(200).json({
@@ -114,9 +104,6 @@ export const getPropertyById = async (req, res) => {
     }
 };
 
-// @desc    Get landlord's properties
-// @route   GET /api/properties/landlord/my-properties
-// @access  Private (Landlord)
 export const getLandlordProperties = async (req, res) => {
     try {
         const properties = await Property.find({ landlordId: req.user.id })
@@ -136,12 +123,8 @@ export const getLandlordProperties = async (req, res) => {
     }
 };
 
-// @desc    Create new property (requires payment)
-// @route   POST /api/properties
-// @access  Private (Landlord)
 export const createProperty = async (req, res) => {
     try {
-        // Validation check
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({
@@ -151,7 +134,6 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        // Check if user is landlord
         if (req.user.role !== "landlord") {
             return res.status(403).json({
                 success: false,
@@ -161,7 +143,6 @@ export const createProperty = async (req, res) => {
 
         const { paymentId } = req.body;
 
-        // Verify payment for this property listing
         const payment = await Payment.findById(paymentId);
 
         if (!payment) {
@@ -187,7 +168,6 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        // Check if payment already used for a property
         const existingProperty = await Property.findOne({ paymentId });
         if (existingProperty) {
             return res.status(400).json({
@@ -196,7 +176,6 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        // Validate campus name is provided
         if (!req.body.campusName) {
             return res.status(400).json({
                 success: false,
@@ -204,10 +183,8 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        // Handle image uploads to Cloudinary
         let uploadedImages = [];
         if (req.files && req.files.length > 0) {
-            // Limit to 5 images
             const filesToUpload = req.files.slice(0, 5);
             
             const uploadPromises = filesToUpload.map(file => {
@@ -243,7 +220,6 @@ export const createProperty = async (req, res) => {
             }
         }
 
-        // Create property
         const propertyData = {
             ...req.body,
             landlordId: req.user.id,
@@ -253,7 +229,6 @@ export const createProperty = async (req, res) => {
 
         const property = await Property.create(propertyData);
 
-        // Send notification email to admin
         try {
             const landlord = await User.findById(req.user.id);
             await sendNewPropertyNotification({
@@ -266,7 +241,6 @@ export const createProperty = async (req, res) => {
             });
         } catch (emailError) {
             console.error("Failed to send admin notification:", emailError);
-            // Don't fail the property creation if email fails
         }
 
         res.status(201).json({
@@ -284,12 +258,8 @@ export const createProperty = async (req, res) => {
     }
 };
 
-// @desc    Get all available campuses (for dropdown selection)
-// @route   GET /api/properties/campuses
-// @access  Public
 export const getAllCampuses = async (req, res) => {
     try {
-        // Return list of all campuses for selection
         const campuses = popularColleges.map(college => ({
             name: college.shortName || college.name,
             fullName: college.name,
@@ -312,9 +282,6 @@ export const getAllCampuses = async (req, res) => {
     }
 };
 
-// @desc    Update property
-// @route   PUT /api/properties/:id
-// @access  Private (Landlord - own properties only)
 export const updateProperty = async (req, res) => {
     try {
         const property = await Property.findById(req.params.id);
@@ -326,7 +293,7 @@ export const updateProperty = async (req, res) => {
             });
         }
 
-        // Check ownership
+        
         if (property.landlordId.toString() !== req.user.id) {
             return res.status(403).json({
                 success: false,
@@ -334,10 +301,8 @@ export const updateProperty = async (req, res) => {
             });
         }
 
-        // Handle new image uploads to Cloudinary
         let newImages = [];
         if (req.files && req.files.length > 0) {
-            // Calculate how many images we can add
             const existingImagesCount = property.images?.length || 0;
             const availableSlots = 5 - existingImagesCount;
             const filesToUpload = req.files.slice(0, availableSlots);
@@ -377,11 +342,9 @@ export const updateProperty = async (req, res) => {
             }
         }
 
-        // Don't allow updating landlordId or paymentId
         delete req.body.landlordId;
         delete req.body.paymentId;
 
-        // Merge new images with existing ones
         const updateData = {
             ...req.body,
         };
@@ -411,9 +374,6 @@ export const updateProperty = async (req, res) => {
     }
 };
 
-// @desc    Delete property
-// @route   DELETE /api/properties/:id
-// @access  Private (Landlord - own properties only)
 export const deleteProperty = async (req, res) => {
     try {
         const property = await Property.findById(req.params.id);
@@ -425,7 +385,6 @@ export const deleteProperty = async (req, res) => {
             });
         }
 
-        // Check ownership
         if (property.landlordId.toString() !== req.user.id) {
             return res.status(403).json({
                 success: false,
@@ -449,9 +408,6 @@ export const deleteProperty = async (req, res) => {
     }
 };
 
-// @desc    Toggle property active status
-// @route   PATCH /api/properties/:id/toggle-active
-// @access  Private (Landlord - own properties only)
 export const togglePropertyStatus = async (req, res) => {
     try {
         const property = await Property.findById(req.params.id);
@@ -463,7 +419,6 @@ export const togglePropertyStatus = async (req, res) => {
             });
         }
 
-        // Check ownership
         if (property.landlordId.toString() !== req.user.id) {
             return res.status(403).json({
                 success: false,
@@ -489,9 +444,6 @@ export const togglePropertyStatus = async (req, res) => {
     }
 };
 
-// @desc    Get landlord dashboard stats
-// @route   GET /api/properties/landlord/stats
-// @access  Private (Landlord)
 export const getLandlordStats = async (req, res) => {
     try {
         const properties = await Property.find({ landlordId: req.user.id });
@@ -519,9 +471,6 @@ export const getLandlordStats = async (req, res) => {
     }
 };
 
-// @desc    Search colleges by name
-// @route   GET /api/properties/colleges/search
-// @access  Public
 export const searchCollegesAPI = async (req, res) => {
     try {
         const { query } = req.query;
@@ -549,9 +498,6 @@ export const searchCollegesAPI = async (req, res) => {
     }
 };
 
-// @desc    Get properties near a college
-// @route   GET /api/properties/near-college
-// @access  Public
 export const getPropertiesNearCollege = async (req, res) => {
     try {
         const {
@@ -574,7 +520,6 @@ export const getPropertiesNearCollege = async (req, res) => {
             });
         }
 
-        // Find college to verify it exists
         const college = getCollegeByName(collegeName);
 
         if (!college) {
@@ -584,10 +529,8 @@ export const getPropertiesNearCollege = async (req, res) => {
             });
         }
 
-        // Build filter object
         const filter = {
             isActive: true,
-            // Match properties where nearbyColleges array contains this campus name
             "nearbyColleges.name": {
                 $regex: new RegExp(`^${college.name}$|^${college.shortName}$`, 'i')
             }
@@ -605,10 +548,8 @@ export const getPropertiesNearCollege = async (req, res) => {
             filter.amenities = { $all: amenitiesArray };
         }
 
-        // Count total matching properties
         const total = await Property.countDocuments(filter);
 
-        // Find properties with pagination
         const skip = (Number(page) - 1) * Number(limit);
         const properties = await Property.find(filter)
             .populate("landlordId", "name email phone profileImage")
@@ -617,7 +558,6 @@ export const getPropertiesNearCollege = async (req, res) => {
             .limit(Number(limit))
             .lean();
 
-        // Format response
         const formattedProperties = properties.map((property) => ({
             ...property,
             landlord: property.landlordId,
@@ -651,9 +591,8 @@ export const getPropertiesNearCollege = async (req, res) => {
     }
 };
 
-// Helper function to calculate distance between two coordinates (Haversine formula)
 function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radius of the Earth in kilometers
+    const R = 6371;
     const dLat = toRadians(lat2 - lat1);
     const dLon = toRadians(lon2 - lon1);
 
@@ -674,12 +613,9 @@ function toRadians(degrees) {
     return degrees * (Math.PI / 180);
 }
 
-// @desc    Get all properties (Admin only)
-// @route   GET /api/properties/admin/all
-// @access  Private (Admin)
 export const getAllPropertiesAdmin = async (req, res) => {
     try {
-        const { status } = req.query; // 'pending', 'verified', 'all'
+        const { status } = req.query;
         
         let filter = {};
         if (status === 'pending') {
@@ -706,9 +642,6 @@ export const getAllPropertiesAdmin = async (req, res) => {
     }
 };
 
-// @desc    Approve property (Admin only)
-// @route   PUT /api/properties/admin/:id/approve
-// @access  Private (Admin)
 export const approveProperty = async (req, res) => {
     try {
         const property = await Property.findById(req.params.id);
@@ -738,9 +671,6 @@ export const approveProperty = async (req, res) => {
     }
 };
 
-// @desc    Decline/Delete property (Admin only)
-// @route   DELETE /api/properties/admin/:id/decline
-// @access  Private (Admin)
 export const declineProperty = async (req, res) => {
     try {
         const { reason } = req.body;
@@ -753,11 +683,7 @@ export const declineProperty = async (req, res) => {
             });
         }
 
-        // Delete the property
         await Property.findByIdAndDelete(req.params.id);
-
-        // Optionally send email to landlord about rejection
-        // You can implement this later if needed
 
         res.status(200).json({
             success: true,
