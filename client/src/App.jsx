@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
 import Footer from './components/Footer';
@@ -48,6 +49,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <Toaster position="top-center" reverseOrder={false} />
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />

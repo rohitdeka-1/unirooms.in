@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI, paymentAPI } from '../utils/api';
 import PaymentModal from '../components/PaymentModal';
@@ -78,7 +79,7 @@ const AddProperty = () => {
                 const property = response.data.properties.find(p => p._id === propertyId);
                 
                 if (!property) {
-                    alert('Property not found or you do not have permission to edit it');
+                    toast.error('Property not found or you do not have permission to edit it');
                     navigate('/landlord/dashboard');
                     return;
                 }
@@ -115,7 +116,7 @@ const AddProperty = () => {
                 setPaymentId(property.paymentId);
             } catch (error) {
                 console.error('Error fetching property:', error);
-                alert('Failed to load property data');
+                toast.error('Failed to load property data');
                 navigate('/landlord/dashboard');
             } finally {
                 setLoadingProperty(false);
@@ -196,7 +197,7 @@ const AddProperty = () => {
 
         // Check if adding these files would exceed the limit
         if (formData.imageFiles.length + files.length > maxImages) {
-            alert(`You can only upload up to ${maxImages} images`);
+            toast.error(`You can only upload up to ${maxImages} images`);
             return;
         }
 
@@ -290,17 +291,17 @@ const AddProperty = () => {
             if (isEditMode) {
                 // Update existing property
                 await propertyAPI.updateProperty(propertyId, formDataToSend);
-                alert('Property updated successfully!');
+                toast.success('Property updated successfully!');
             } else {
                 // Create new property
                 await propertyAPI.createProperty(formDataToSend);
-                alert('Property created successfully!');
+                toast.success('Property created successfully!');
             }
             
             navigate('/landlord/dashboard');
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} property:`, error);
-            alert(error.message || `Failed to ${isEditMode ? 'update' : 'create'} property`);
+            toast.error(error.message || `Failed to ${isEditMode ? 'update' : 'create'} property`);
         } finally {
             setLoading(false);
         }
@@ -382,7 +383,7 @@ const AddProperty = () => {
             newErrors.amenities = 'Please select at least one amenity';
         }
 
-        // If there are errors, set them and show alert
+        // If there are errors, set them and show toast
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             // Scroll to first error
@@ -392,7 +393,9 @@ const AddProperty = () => {
             if (errorElement) {
                 errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            alert('Please fix the validation errors in the form');
+            // Show first error in toast
+            const firstError = newErrors[firstErrorField];
+            toast.error(firstError || 'Please fix the validation errors in the form');
             return;
         }
 
@@ -628,9 +631,22 @@ const AddProperty = () => {
                                             name="price"
                                             value={formData.price}
                                             onChange={handleChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'e' || e.key === 'E' || e.key === '-' || e.key === '+') {
+                                                    e.preventDefault();
+                                                }
+                                            }}
+                                            onPaste={(e) => {
+                                                const pastedText = e.clipboardData.getData('text');
+                                                if (!/^\d+$/.test(pastedText)) {
+                                                    e.preventDefault();
+                                                    toast.error('Only numbers are allowed');
+                                                }
+                                            }}
                                             required
                                             min={500}
                                             max={100000}
+                                            step="1"
                                             className={`w-full pl-8 pr-4 py-3.5 bg-neutral-50 border-2 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800 ${
                                                 errors.price ? 'border-red-500 bg-red-50' : 'border-neutral-200'
                                             }`}
@@ -656,7 +672,20 @@ const AddProperty = () => {
                                             name="securityDeposit"
                                             value={formData.securityDeposit}
                                             onChange={handleChange}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'e' || e.key === 'E' || e.key === '-' || e.key === '+') {
+                                                    e.preventDefault();
+                                                }
+                                            }}
+                                            onPaste={(e) => {
+                                                const pastedText = e.clipboardData.getData('text');
+                                                if (!/^\d+$/.test(pastedText)) {
+                                                    e.preventDefault();
+                                                    toast.error('Only numbers are allowed');
+                                                }
+                                            }}
                                             min={0}
+                                            step="1"
                                             className="w-full pl-8 pr-4 py-3.5 bg-neutral-50 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800"
                                             placeholder="5000"
                                         />
@@ -703,8 +732,21 @@ const AddProperty = () => {
                                         name="totalRooms"
                                         value={formData.totalRooms}
                                         onChange={handleChange}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'e' || e.key === 'E' || e.key === '-' || e.key === '+' || e.key === '.') {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                        onPaste={(e) => {
+                                            const pastedText = e.clipboardData.getData('text');
+                                            if (!/^\d+$/.test(pastedText)) {
+                                                e.preventDefault();
+                                                toast.error('Only whole numbers are allowed');
+                                            }
+                                        }}
                                         required
                                         min={1}
+                                        step="1"
                                         className="w-full px-4 py-3.5 bg-neutral-50 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800"
                                         placeholder="10"
                                     />
@@ -718,8 +760,21 @@ const AddProperty = () => {
                                     name="availableRooms"
                                     value={formData.availableRooms}
                                     onChange={handleChange}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'e' || e.key === 'E' || e.key === '-' || e.key === '+' || e.key === '.') {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    onPaste={(e) => {
+                                        const pastedText = e.clipboardData.getData('text');
+                                        if (!/^\d+$/.test(pastedText)) {
+                                            e.preventDefault();
+                                            toast.error('Only whole numbers are allowed');
+                                        }
+                                    }}
                                     required
                                     min={0}
+                                    step="1"
                                     className="w-full px-4 py-3.5 bg-neutral-50 border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-100 transition-all outline-none text-neutral-800"
                                     placeholder="5"
                                 />
