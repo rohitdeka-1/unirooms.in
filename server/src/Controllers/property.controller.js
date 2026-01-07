@@ -168,27 +168,19 @@ export const createProperty = async (req, res) => {
             return sum + (payment.propertiesCount || 1);
         }, 0);
 
-        // Count total properties ever created (including deleted ones)
-        const totalPropertiesCreated = await Property.countDocuments({
+        // Count ONLY current properties in database (deleted properties are gone)
+        const currentPropertiesCount = await Property.countDocuments({
             landlordId: req.user.id,
         });
 
-        const remainingCredits = totalPaidCredits - totalPropertiesCreated;
-
-        if (remainingCredits <= 0) {
-            const activePropertiesCount = await Property.countDocuments({
-                landlordId: req.user.id,
-                isActive: true,
-            });
-            
+        if (currentPropertiesCount >= totalPaidCredits) {
             return res.status(400).json({
                 success: false,
-                message: `You have used all your listing credits. You have paid for ${totalPaidCredits} listings and created ${totalPropertiesCreated} properties (${activePropertiesCount} currently active). Please make a payment to list more properties.`,
+                message: `You have reached your listing limit. You have paid for ${totalPaidCredits} listings and currently have ${currentPropertiesCount} properties. Please make a payment to list more properties.`,
                 requiresPayment: true,
                 totalPaidCredits: totalPaidCredits,
-                totalUsedCredits: totalPropertiesCreated,
-                activeProperties: activePropertiesCount,
-                remainingCredits: 0,
+                currentProperties: currentPropertiesCount,
+                remainingCredits: totalPaidCredits - currentPropertiesCount,
             });
         }
 
