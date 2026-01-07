@@ -8,6 +8,10 @@ import { apiLimiter } from "./Middlewares/security.middleware.js";
 
 const app = express();
 
+// Trust proxy - REQUIRED for Heroku, Railway, Render, etc.
+// This allows Express to trust the X-Forwarded-For header from the reverse proxy
+app.set('trust proxy', 1);
+
 // 1. Security Headers - FIRST
 app.use(helmet({
     contentSecurityPolicy: {
