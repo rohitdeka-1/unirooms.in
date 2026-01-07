@@ -55,6 +55,8 @@ export const createPaymentOrder = async (req, res) => {
 
         
         const response = await cashfree.PGCreateOrder(request);
+        
+        console.log("Cashfree Response:", JSON.stringify(response.data, null, 2));
 
         
         const payment = await Payment.create({
