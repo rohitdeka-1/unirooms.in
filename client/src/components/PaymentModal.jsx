@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { paymentAPI } from '../utils/api';
 
-const PaymentModal = ({ onClose, onSuccess }) => {
+const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState('confirm'); // confirm, processing, success, error
     const [paymentSessionId, setPaymentSessionId] = useState(null);
@@ -28,7 +28,7 @@ const PaymentModal = ({ onClose, onSuccess }) => {
             setStep('processing');
 
             // Create payment order
-            const orderRes = await paymentAPI.createOrder();
+            const orderRes = await paymentAPI.createOrder({ phone: propertyPhone });
             const { payment_session_id, order_id, paymentId: pId } = orderRes.data;
 
             setPaymentSessionId(payment_session_id);

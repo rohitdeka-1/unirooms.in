@@ -144,8 +144,9 @@ export const propertyAPI = {
 };
 
 export const paymentAPI = {
-    createOrder: () => apiCall('/payments/create-order', {
+    createOrder: (data) => apiCall('/payments/create-order', {
         method: 'POST',
+        body: JSON.stringify(data || {}),
     }),
 
     verifyPayment: (data) => apiCall('/payments/verify', {

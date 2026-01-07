@@ -24,11 +24,12 @@ export const createPaymentOrder = async (req, res) => {
         }
 
         const user = await User.findById(req.user.id);
+        const { phone } = req.body;
         
-        if (!user.phone) {
+        if (!phone) {
             return res.status(400).json({
                 success: false,
-                message: "Please update your phone number in profile before making a payment",
+                message: "Please provide a phone number for this property listing",
             });
         }
 
@@ -44,7 +45,7 @@ export const createPaymentOrder = async (req, res) => {
                 customer_id: user._id.toString(),
                 customer_name: user.name,
                 customer_email: user.email,
-                customer_phone: user.phone,
+                customer_phone: phone,
             },
             order_meta: {
                 return_url: `${config.FRONTEND_URL}/landlord/payment-callback?order_id={order_id}`,

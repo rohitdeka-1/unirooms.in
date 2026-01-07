@@ -1205,6 +1205,7 @@ const AddProperty = () => {
                 <PaymentModal
                     onClose={() => setShowPaymentModal(false)}
                     onSuccess={handlePaymentSuccess}
+                    propertyPhone={formData.phone}
                 />
             )}
         </div>
