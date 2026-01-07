@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 const RefundPolicy = () => {
     return (
-        <div className="min-h-screen bg-neutral-50 pt-24 pb-24 md:pb-12">
+        <div className="min-h-screen bg-neutral-50 pt-24 pb-24 md:pb-12 mt-7">
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <motion.div

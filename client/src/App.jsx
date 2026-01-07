@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Browse from './pages/Browse';
 import Saved from './pages/Saved';
@@ -24,6 +25,8 @@ import RefundPolicy from './pages/RefundPolicy';
 import Pricing from './pages/Pricing';
 import ListPropertyRedirect from './pages/ListPropertyRedirect';
 import AdminProperties from './pages/AdminProperties';
+import Developer from './pages/Developer';
+import NotFound from './pages/NotFound';
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -49,16 +52,16 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/browse" element={<Browse />} />
-            <Route path="/saved" element={<Saved />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/saved" element={<ProtectedRoute><Saved /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/verify-email/:token" element={<VerifyEmail />} />
             <Route path="/verify-email-pending" element={<VerifyEmailPending />} />
             <Route path="/property/:id" element={<PropertyDetail />} />
-            <Route path="/landlord/dashboard" element={<LandlordDashboard />} />
-            <Route path="/landlord/add-property" element={<AddProperty />} />
-            <Route path="/landlord/edit-property/:id" element={<AddProperty />} />
+            <Route path="/landlord/dashboard" element={<ProtectedRoute requireLandlord={true}><LandlordDashboard /></ProtectedRoute>} />
+            <Route path="/landlord/add-property" element={<ProtectedRoute requireLandlord={true}><AddProperty /></ProtectedRoute>} />
+            <Route path="/landlord/edit-property/:id" element={<ProtectedRoute requireLandlord={true}><AddProperty /></ProtectedRoute>} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/safety" element={<Safety />} />
@@ -67,7 +70,9 @@ function App() {
             <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/list-property" element={<ListPropertyRedirect />} />
-            <Route path="/admin/properties" element={<AdminProperties />} />
+            <Route path="/admin/properties" element={<ProtectedRoute requireLandlord={true}><AdminProperties /></ProtectedRoute>} />
+            <Route path="/developer" element={<Developer />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>
       </Router>

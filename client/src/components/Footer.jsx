@@ -137,6 +137,16 @@ const Footer = () => {
                             <span>Made with ❤️ in India</span>
                             <span>•</span>
                             <a href="https://unirooms.in" className="hover:text-white transition-colors">unirooms.in</a>
+                            <span>•</span>
+                            <Link 
+                                to="/developer" 
+                                className="flex items-center space-x-1 hover:text-white transition-colors"
+                            >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                                </svg>
+                                <span>Developer</span>
+                            </Link>
                         </div>
                     </div>
                 </div>
