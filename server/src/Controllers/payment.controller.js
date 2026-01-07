@@ -68,17 +68,22 @@ export const createPaymentOrder = async (req, res) => {
             cashfreeOrderId: orderId,
         });
 
+        const responseData = {
+            orderId: payment.cashfreeOrderId,
+            amount: payment.amount,
+            currency: payment.currency,
+            paymentId: payment._id,
+            payment_session_id: response.data.payment_session_id,
+            order_id: response.data.order_id,
+            cf_order_id: response.data.cf_order_id,
+        };
+
+        console.log("Sending to frontend:", JSON.stringify(responseData, null, 2));
+
         res.status(201).json({
             success: true,
             message: "Payment order created successfully",
-            data: {
-                orderId: payment.cashfreeOrderId,
-                amount: payment.amount,
-                currency: payment.currency,
-                paymentId: payment._id,
-                payment_session_id: response.data.payment_session_id,
-                order_id: response.data.order_id,
-            },
+            data: responseData,
         });
     } catch (error) {
         console.error("Create Payment Order Error:", error.response?.data || error.message);
