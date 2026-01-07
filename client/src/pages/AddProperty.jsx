@@ -292,16 +292,24 @@ const AddProperty = () => {
                 // Update existing property
                 await propertyAPI.updateProperty(propertyId, formDataToSend);
                 toast.success('Property updated successfully!');
+                navigate('/landlord/dashboard');
             } else {
                 // Create new property
                 await propertyAPI.createProperty(formDataToSend);
                 toast.success('Property created successfully!');
+                navigate('/landlord/dashboard');
             }
-
-            navigate('/landlord/dashboard');
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} property:`, error);
-            toast.error(error.message || `Failed to ${isEditMode ? 'update' : 'create'} property`);
+            
+            // Check if error is due to missing payment
+            if (error.message && error.message.includes('listing limit')) {
+                toast.error('Payment required to list property');
+                // Open payment modal
+                setShowPaymentModal(true);
+            } else {
+                toast.error(error.message || `Failed to ${isEditMode ? 'update' : 'create'} property`);
+            }
         } finally {
             setLoading(false);
         }

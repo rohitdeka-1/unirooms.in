@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { propertyAPI } from '../utils/api';
+import { propertyAPI, paymentAPI } from '../utils/api';
 import { getOptimizedImageUrl } from '../utils/imageOptimizer';
 
 const LandlordDashboard = () => {
@@ -10,6 +10,7 @@ const LandlordDashboard = () => {
     const navigate = useNavigate();
     const [properties, setProperties] = useState([]);
     const [stats, setStats] = useState(null);
+    const [credits, setCredits] = useState({ total: 0, used: 0, remaining: 0 });
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('properties');
 
@@ -24,12 +25,26 @@ const LandlordDashboard = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [propertiesRes, statsRes] = await Promise.all([
+            const [propertiesRes, statsRes, paymentsRes] = await Promise.all([
                 propertyAPI.getMyProperties(),
                 propertyAPI.getStats(),
+                paymentAPI.getMyPayments(),
             ]);
             setProperties(propertiesRes.data.properties);
             setStats(statsRes.data.stats);
+            
+            // Calculate credits
+            const payments = paymentsRes.data.payments || [];
+            const totalPaidCredits = payments
+                .filter(p => p.status === 'success' && p.purpose === 'property_listing')
+                .reduce((sum, p) => sum + (p.propertiesCount || 1), 0);
+            const usedCredits = propertiesRes.data.properties.length;
+            
+            setCredits({
+                total: totalPaidCredits,
+                used: usedCredits,
+                remaining: totalPaidCredits - usedCredits
+            });
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -115,6 +130,49 @@ const LandlordDashboard = () => {
                             <p className="text-neutral-500 text-sm mt-1">{stat.label}</p>
                         </div>
                     ))}
+                </motion.div>
+
+                {/* Credits Card */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="card mb-8"
+                >
+                    <div className="p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-lg font-semibold text-neutral-800 mb-1">Listing Credits</h3>
+                                <p className="text-sm text-neutral-600">Manage your property listing credits</p>
+                            </div>
+                            <div className="flex items-center gap-6">
+                                <div className="text-center">
+                                    <p className="text-3xl font-bold text-primary-600">{credits.total}</p>
+                                    <p className="text-xs text-neutral-500 mt-1">Total Paid</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-3xl font-bold text-orange-600">{credits.used}</p>
+                                    <p className="text-xs text-neutral-500 mt-1">Used</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-3xl font-bold text-green-600">{credits.remaining}</p>
+                                    <p className="text-xs text-neutral-500 mt-1">Remaining</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {credits.remaining <= 0 && (
+                            <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg flex items-start gap-3">
+                                <svg className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                                <div>
+                                    <p className="text-sm font-medium text-orange-800">No credits remaining</p>
+                                    <p className="text-sm text-orange-600 mt-1">Purchase more credits to list additional properties. Each credit costs ₹99.</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </motion.div>
 
                 {/* Properties List */}
