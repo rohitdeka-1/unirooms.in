@@ -36,7 +36,7 @@ const PaymentModal = ({ onClose, onSuccess }) => {
 
             // Initialize Cashfree
             const cashfree = window.Cashfree({
-                mode: import.meta.env.VITE_CASHFREE_MODE || "sandbox", // "sandbox" or "production"
+                mode: import.meta.env.VITE_CASHFREE_MODE || "production", // "sandbox" or "production"
             });
 
             // Configure checkout options
