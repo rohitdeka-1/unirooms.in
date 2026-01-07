@@ -304,7 +304,7 @@ const AddProperty = () => {
             
             // Check if error is due to missing payment/credits
             if (!isEditMode && (error.message.includes('listing limit') || error.message.includes('listing credit'))) {
-                toast.error('No credits remaining. Please complete payment.');
+                toast.error('Complete payment to proceed');
                 // Open payment modal for user to purchase credits
                 setShowPaymentModal(true);
                 return; // Don't set loading to false yet, modal will handle it
