@@ -5,10 +5,10 @@ import chalk from "chalk";
 
 if (config.SENDGRID_API_KEY) {
   sgMail.setApiKey(config.SENDGRID_API_KEY);
-  console.log(chalk.magenta("✅ SendGrid email service is ready"));
-  console.log(chalk.cyan(`📧 Sending from: ${config.EMAIL_FROM || config.GMAIL_USER}`));
+  console.log(chalk.magenta("SendGrid email service is ready"));
+  console.log(chalk.cyan(`Sending from: ${config.EMAIL_FROM || config.GMAIL_USER}`));
 } else {
-  console.error(chalk.red("❌ SENDGRID_API_KEY not configured"));
+  console.error(chalk.red("SENDGRID_API_KEY not configured"));
 }
 
 
@@ -24,9 +24,9 @@ export const sendEmailSendGrid = async (to, subject, html) => {
       html,
     };
 
-    console.log(`📤 Sending email via SendGrid to: ${to}`);
+    console.log(`Sending email via SendGrid to: ${to}`);
     const result = await sgMail.send(msg);
-    console.log(`✅ Email sent via SendGrid: ${result[0].statusCode}`);
+    console.log(`Email sent via SendGrid: ${result[0].statusCode}`);
     
     return { 
       success: true, 
@@ -34,7 +34,7 @@ export const sendEmailSendGrid = async (to, subject, html) => {
       statusCode: result[0].statusCode
     };
   } catch (error) {
-    console.error("❌ SendGrid error:", error.message);
+    console.error(" SendGrid error:", error.message);
     if (error.response) {
       console.error("SendGrid response:", error.response.body);
     }

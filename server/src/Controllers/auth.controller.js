@@ -94,8 +94,8 @@ export const registerStudent = async (req, res) => {
                 await existingUser.save();
 
                 sendVerificationEmail(email, name, verificationToken)
-                    .then(() => console.log("✅ Verification email sent to:", email))
-                    .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
+                    .then(() => console.log(" Verification email sent to:", email))
+                    .catch((err) => console.error(" Failed to send verification email to", email, ":", err.message));
 
                 return res.status(201).json({
                     success: true,
@@ -131,8 +131,8 @@ export const registerStudent = async (req, res) => {
         await user.save();
 
         sendVerificationEmail(email, name, verificationToken)
-            .then(() => console.log("✅ Verification email sent to:", email))
-            .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
+            .then(() => console.log(" Verification email sent to:", email))
+            .catch((err) => console.error(" Failed to send verification email to", email, ":", err.message));
 
         
         res.status(201).json({
@@ -197,8 +197,8 @@ export const registerLandlord = async (req, res) => {
                 await existingUser.save();
 
                 sendVerificationEmail(email, name, verificationToken)
-                    .then(() => console.log("✅ Verification email sent to:", email))
-                    .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
+                    .then(() => console.log(" Verification email sent to:", email))
+                    .catch((err) => console.error(" Failed to send verification email to", email, ":", err.message));
 
                 return res.status(201).json({
                     success: true,
@@ -238,8 +238,8 @@ export const registerLandlord = async (req, res) => {
         await user.save();
 
         sendVerificationEmail(email, name, verificationToken)
-            .then(() => console.log("✅ Verification email sent to:", email))
-            .catch((err) => console.error("❌ Failed to send verification email to", email, ":", err.message));
+            .then(() => console.log(" Verification email sent to:", email))
+            .catch((err) => console.error(" Failed to send verification email to", email, ":", err.message));
 
         
         res.status(201).json({
@@ -333,8 +333,8 @@ export const login = async (req, res) => {
 
         
         sendLoginNotificationEmail(user.email, user.name, loginInfo)
-            .then(() => console.log("✅ Login notification sent to:", user.email))
-            .catch((err) => console.error("❌ Failed to send login notification to", user.email, ":", err.message));
+            .then(() => console.log(" Login notification sent to:", user.email))
+            .catch((err) => console.error(" Failed to send login notification to", user.email, ":", err.message));
         
         sendTokenResponse(user, 200, res, "Login successful");
     } catch (error) {
@@ -400,8 +400,8 @@ export const googleSignup = async (req, res) => {
 
         
         sendWelcomeEmail(user.email, user.name, user.role)
-            .then(() => console.log("✅ Welcome email sent to:", user.email))
-            .catch((err) => console.error("❌ Failed to send welcome email to", user.email, ":", err.message));
+            .then(() => console.log(" Welcome email sent to:", user.email))
+            .catch((err) => console.error(" Failed to send welcome email to", user.email, ":", err.message));
 
         sendTokenResponse(
             user,
@@ -476,8 +476,8 @@ export const googleLogin = async (req, res) => {
         };
 
         sendLoginNotificationEmail(user.email, user.name, loginInfo)
-            .then(() => console.log("✅ Login notification sent to:", user.email))
-            .catch((err) => console.error("❌ Failed to send login notification to", user.email, ":", err.message));
+            .then(() => console.log(" Login notification sent to:", user.email))
+            .catch((err) => console.error(" Failed to send login notification to", user.email, ":", err.message));
 
         sendTokenResponse(user, 200, res, "Login successful");
     } catch (error) {

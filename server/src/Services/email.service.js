@@ -24,10 +24,10 @@ const transporter = nodemailer.createTransport({
 
 transporter.verify((error, success) => {
   if (error) {
-    console.error("❌ Email service connection failed:", error.message);
+    console.error("Email service connection failed:", error.message);
   } else {
-    console.log("✅ Email service is ready to send emails");
-    console.log(`📧 Sending from: ${config.GMAIL_USER}`);
+    console.log("Email service is ready to send emails");
+    console.log(`Sending from: ${config.GMAIL_USER}`);
   }
 });
 
@@ -246,7 +246,7 @@ export const sendNewPropertyNotification = async (propertyDetails) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🏠 New Property Listing</h1>
+              <h1> New Property Listing</h1>
               <p>A new property has been submitted for review</p>
             </div>
             <div class="content">

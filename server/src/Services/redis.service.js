@@ -16,13 +16,13 @@ if (isRedisConfigured) {
   redis
     .ping()
     .then(() => {
-      console.log(chalk.magenta("✅ Redis connected successfully"));
+      console.log(chalk.magenta("Redis connected successfully"));
     })
     .catch((error) => {
-      console.error(chalk.red("❌ Redis connection failed:"), error.message);
+      console.error(chalk.red("Redis connection failed:"), error.message);
     });
 } else {
-  console.warn(chalk.yellow("⚠️  Redis not configured - refresh token storage disabled"));
+  console.warn(chalk.yellow("Redis not configured - refresh token storage disabled"));
   console.warn(chalk.yellow("   Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN to enable Redis"));
 }
 
@@ -31,17 +31,17 @@ if (isRedisConfigured) {
 
 export const storeRefreshToken = async (userId, refreshToken, expiresIn = 7 * 24 * 60 * 60) => {
   if (!redis) {
-    console.warn(chalk.yellow("⚠️  Redis not available - skipping refresh token storage"));
+    console.warn(chalk.yellow("Redis not available - skipping refresh token storage"));
     return false;
   }
   
   try {
     const key = `refresh_token:${userId}`;
     await redis.set(key, refreshToken, { ex: expiresIn });
-    console.log(chalk.green(`✅ Refresh token stored for user: ${userId}`));
+    console.log(chalk.green(`Refresh token stored for user: ${userId}`));
     return true;
   } catch (error) {
-    console.error(chalk.red("❌ Error storing refresh token:"), error.message);
+    console.error(chalk.red("Error storing refresh token:"), error.message);
     
     return false;
   }
