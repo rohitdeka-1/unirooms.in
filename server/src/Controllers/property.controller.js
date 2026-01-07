@@ -109,9 +109,25 @@ export const getLandlordProperties = async (req, res) => {
         const properties = await Property.find({ landlordId: req.user.id })
             .sort({ createdAt: -1 });
 
+        const totalSuccessfulPayments = await Payment.countDocuments({
+            userId: req.user.id,
+            status: "success",
+            purpose: "property_listing",
+        });
+
+        const activePropertiesCount = properties.length;
+        const availableCredits = totalSuccessfulPayments - activePropertiesCount;
+
         res.status(200).json({
             success: true,
-            data: { properties },
+            data: { 
+                properties,
+                credits: {
+                    total: totalSuccessfulPayments,
+                    used: activePropertiesCount,
+                    available: availableCredits,
+                }
+            },
         });
     } catch (error) {
         console.error("Get Landlord Properties Error:", error);
@@ -141,38 +157,23 @@ export const createProperty = async (req, res) => {
             });
         }
 
-        const { paymentId } = req.body;
+        const totalSuccessfulPayments = await Payment.countDocuments({
+            userId: req.user.id,
+            status: "success",
+            purpose: "property_listing",
+        });
 
-        const payment = await Payment.findById(paymentId);
+        const activePropertiesCount = await Property.countDocuments({
+            landlordId: req.user.id,
+        });
 
-        if (!payment) {
+        if (activePropertiesCount >= totalSuccessfulPayments) {
             return res.status(400).json({
                 success: false,
-                message: "Payment not found. Please complete payment first.",
+                message: `You have reached your listing limit. You have ${totalSuccessfulPayments} listing credits and ${activePropertiesCount} active properties. Please make a payment to list more properties.`,
                 requiresPayment: true,
-            });
-        }
-
-        if (payment.status !== "success") {
-            return res.status(400).json({
-                success: false,
-                message: "Payment not confirmed. Please complete payment.",
-                requiresPayment: true,
-            });
-        }
-
-        if (payment.userId.toString() !== req.user.id) {
-            return res.status(403).json({
-                success: false,
-                message: "Payment verification failed",
-            });
-        }
-
-        const existingProperty = await Property.findOne({ paymentId });
-        if (existingProperty) {
-            return res.status(400).json({
-                success: false,
-                message: "This payment has already been used for a property listing",
+                availableCredits: totalSuccessfulPayments,
+                usedCredits: activePropertiesCount,
             });
         }
 
@@ -223,7 +224,6 @@ export const createProperty = async (req, res) => {
         const propertyData = {
             ...req.body,
             landlordId: req.user.id,
-            paymentId,
             images: uploadedImages.length > 0 ? uploadedImages : []
         };
 

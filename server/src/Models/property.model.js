@@ -7,11 +7,6 @@ const propertySchema = new mongoose.Schema(
       ref: "User",
       required: [true, "Landlord ID is required"],
     },
-    paymentId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Payment",
-      required: [true, "Payment ID is required"],
-    },
     title: {
       type: String,
       required: [true, "Property title is required"],
