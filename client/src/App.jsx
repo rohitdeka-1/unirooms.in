@@ -70,7 +70,7 @@ function App() {
             <Route path="/refund-policy" element={<RefundPolicy />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/list-property" element={<ListPropertyRedirect />} />
-            <Route path="/admin/properties" element={<ProtectedRoute requireLandlord={true}><AdminProperties /></ProtectedRoute>} />
+            <Route path="/admin/properties" element={<AdminProperties />} />
             <Route path="/developer" element={<Developer />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

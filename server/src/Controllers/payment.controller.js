@@ -1,5 +1,6 @@
 import Payment from "../Models/payment.model.js";
 import User from "../Models/user.model.js";
+import Property from "../Models/property.model.js";
 import crypto from "crypto";
 import config from "../Config/env.config.js";
 import { Cashfree, CFEnvironment } from "cashfree-pg";
@@ -22,6 +23,31 @@ export const createPaymentOrder = async (req, res) => {
             });
         }
 
+        const { propertyId } = req.body;
+
+        if (!propertyId) {
+            return res.status(400).json({
+                success: false,
+                message: "Property ID is required",
+            });
+        }
+
+        const property = await Property.findById(propertyId);
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: "Property not found",
+            });
+        }
+
+        if (property.landlordId.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: "You can only create payment for your own properties",
+            });
+        }
+
         const user = await User.findById(req.user.id);
         const amount = 99; 
         const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -35,7 +61,7 @@ export const createPaymentOrder = async (req, res) => {
                 customer_id: user._id.toString(),
                 customer_name: user.name,
                 customer_email: user.email,
-                customer_phone: user.phone,
+                customer_phone: property.phone,
             },
             order_meta: {
                 return_url: `${config.FRONTEND_URL}/landlord/payment-callback?order_id={order_id}`,
@@ -50,6 +76,7 @@ export const createPaymentOrder = async (req, res) => {
         
         const payment = await Payment.create({
             userId: req.user.id,
+            propertyId: property._id,
             amount,
             currency: "INR",
             status: "pending",
