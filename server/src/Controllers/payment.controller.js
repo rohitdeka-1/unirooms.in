@@ -161,10 +161,16 @@ export const handleWebhook = async (req, res) => {
         const signature = req.headers["x-webhook-signature"];
         const timestamp = req.headers["x-webhook-timestamp"];
         
+        if (!data || !data.order || !data.order.order_id) {
+            console.log("Webhook test or invalid payload received");
+            return res.status(200).json({ success: true, message: "Webhook endpoint is active" });
+        }
+
         const payment = await Payment.findOne({ cashfreeOrderId: data.order.order_id });
 
         if (!payment) {
-            return res.status(404).json({ success: false, message: "Payment not found" });
+            console.log(`Payment not found for order: ${data.order.order_id}`);
+            return res.status(200).json({ success: true, message: "Order not found, but webhook acknowledged" });
         }
 
         switch (type) {
@@ -190,7 +196,7 @@ export const handleWebhook = async (req, res) => {
         res.status(200).json({ success: true });
     } catch (error) {
         console.error("Webhook Error:", error);
-        res.status(500).json({ success: false, error: error.message });
+        res.status(200).json({ success: true, message: "Webhook received" });
     }
 };
 
