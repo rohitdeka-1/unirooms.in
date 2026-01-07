@@ -79,11 +79,11 @@ export const createPaymentOrder = async (req, res) => {
             },
         });
     } catch (error) {
-        console.error("Create Payment Order Error:", error);
+        console.error("Create Payment Order Error:", error.response?.data || error.message);
         res.status(500).json({
             success: false,
             message: "Error creating payment order",
-            error: error.message,
+            error: error.response?.data?.message || error.message,
         });
     }
 };
