@@ -4,10 +4,11 @@ import { paymentAPI } from '../utils/api';
 
 const PaymentModal = ({ onClose, onSuccess }) => {
     const [loading, setLoading] = useState(false);
-    const [step, setStep] = useState('confirm'); // confirm, processing, success
+    const [step, setStep] = useState('confirm'); // confirm, processing, success, error
     const [paymentSessionId, setPaymentSessionId] = useState(null);
     const [orderId, setOrderId] = useState(null);
     const [paymentId, setPaymentId] = useState(null);
+    const [errorMessage, setErrorMessage] = useState('');
 
     // Load Cashfree SDK
     useEffect(() => {
@@ -49,8 +50,8 @@ const PaymentModal = ({ onClose, onSuccess }) => {
             cashfree.checkout(checkoutOptions).then((result) => {
                 if (result.error) {
                     console.error("Payment error:", result.error);
-                    alert(result.error.message || 'Payment failed. Please try again.');
-                    setStep('confirm');
+                    setErrorMessage(result.error.message || 'Payment failed. Please try again.');
+                    setStep('error');
                     setLoading(false);
                 } else if (result.redirect) {
                     console.log("Payment redirect");
@@ -82,8 +83,8 @@ const PaymentModal = ({ onClose, onSuccess }) => {
 
         } catch (error) {
             console.error('Verification error:', error);
-            alert('Payment verification failed. Please contact support.');
-            setStep('confirm');
+            setErrorMessage('Payment verification failed. Please contact support.');
+            setStep('error');
         } finally {
             setLoading(false);
         }
@@ -178,6 +179,41 @@ const PaymentModal = ({ onClose, onSuccess }) => {
                             <p className="text-neutral-600">
                                 Creating your property listing...
                             </p>
+                        </div>
+                    )}
+
+                    {step === 'error' && (
+                        <div className="text-center py-8">
+                            <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-semibold text-neutral-800 mb-2">
+                                Payment Failed
+                            </h3>
+                            <p className="text-neutral-600 mb-6">
+                                {errorMessage}
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="btn-secondary flex-1"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setStep('confirm');
+                                        setErrorMessage('');
+                                    }}
+                                    className="btn-primary flex-1"
+                                >
+                                    Try Again
+                                </button>
+                            </div>
                         </div>
                     )}
                 </motion.div>
