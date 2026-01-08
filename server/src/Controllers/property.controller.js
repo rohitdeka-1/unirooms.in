@@ -680,7 +680,6 @@ export const approveProperty = async (req, res) => {
 
 export const declineProperty = async (req, res) => {
     try {
-        const { reason } = req.body;
         const property = await Property.findById(req.params.id).populate("landlordId", "name email");
 
         if (!property) {

@@ -97,14 +97,14 @@ router.get("/:id", optionalAuth, getPropertyById);
 
 router.get("/landlord/my-properties", protect, authorize("landlord"), getLandlordProperties);
 router.get("/landlord/stats", protect, authorize("landlord"), getLandlordStats);
-router.post("/", protect, authorize("landlord"), upload.array('images', 5), parseFormData, propertyValidation, createProperty);
-router.put("/:id", protect, authorize("landlord"), upload.array('images', 5), parseFormData, updateProperty);
-router.delete("/:id", protect, authorize("landlord"), deleteProperty);
-router.patch("/:id/toggle-active", protect, authorize("landlord"), togglePropertyStatus);
-
 
 router.get("/admin/all", protect, isAdmin, getAllPropertiesAdmin);
 router.put("/admin/:id/approve", protect, isAdmin, approveProperty);
 router.delete("/admin/:id/decline", protect, isAdmin, declineProperty);
+
+router.post("/", protect, authorize("landlord"), upload.array('images', 5), parseFormData, propertyValidation, createProperty);
+router.put("/:id", protect, authorize("landlord"), upload.array('images', 5), parseFormData, updateProperty);
+router.delete("/:id", protect, authorize("landlord"), deleteProperty);
+router.patch("/:id/toggle-active", protect, authorize("landlord"), togglePropertyStatus);
 
 export default router;
