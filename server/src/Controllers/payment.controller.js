@@ -49,7 +49,7 @@ export const createPaymentOrder = async (req, res) => {
             },
             order_meta: {
                 return_url: `${config.FRONTEND_URL}/landlord/payment-callback?order_id={order_id}`,
-                notify_url: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/v1/payments/webhook`,
+                notify_url: `${process.env.BACKEND_URL}/api/v1/payments/webhook`,
             },
             order_note: "Property Listing Credit Purchase",
             order_tags: {

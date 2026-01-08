@@ -11,7 +11,7 @@ import { getRandomDescription } from '../utils/pgDescriptions';
 const AddProperty = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const { id: propertyId } = useParams(); // Get property ID from URL params
+    const { id: propertyId } = useParams();  
     const isEditMode = Boolean(propertyId);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [paymentId, setPaymentId] = useState(null);
@@ -27,7 +27,7 @@ const AddProperty = () => {
         price: '',
         securityDeposit: '',
         location: {
-            coordinates: ['', ''], // [longitude, latitude]
+            coordinates: ['', ''],  
         },
         address: {
             street: '',
