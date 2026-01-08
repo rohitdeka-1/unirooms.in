@@ -75,6 +75,7 @@ const AdminProperties = () => {
             return;
         }
         try {
+            setError("");
             const token = localStorage.getItem("accessToken");
             await axios.delete(
                 `${import.meta.env.VITE_API_URL}/properties/admin/${propertyId}/decline`,
@@ -84,11 +85,14 @@ const AdminProperties = () => {
                     },
                 }
             );
+            
+            setProperties(prevProperties => prevProperties.filter(p => p._id !== propertyId));
+            
             setSuccessMessage("Property declined and removed successfully!");
             setTimeout(() => setSuccessMessage(""), 3000);
-            fetchProperties();
         } catch (err) {
             setError(err.response?.data?.message || "Failed to decline property");
+            setTimeout(() => setError(""), 3000);
         }
     };
     return (
