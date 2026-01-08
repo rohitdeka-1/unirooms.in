@@ -5,12 +5,9 @@ import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
 import { propertyAPI } from '../utils/api';
 import { updateMetaTags, pageSEO, generateFAQStructuredData, addStructuredData } from '../utils/seo';
-
 const Home = () => {
     const [featuredProperties, setFeaturedProperties] = useState([]);
     const [loading, setLoading] = useState(true);
-    
-    // FAQ data for structured data
     const faqs = [
         {
             question: 'How do I find PG near my college?',
@@ -45,17 +42,11 @@ const Home = () => {
             answer: 'Cancellation policies vary by property. Always read the rental agreement carefully and discuss cancellation terms with the owner before booking. Most owners require 30 days notice.'
         }
     ];
-    
-    // SEO Meta Tags & Structured Data
     useEffect(() => {
         updateMetaTags(pageSEO.home);
-        
-        // Add FAQ structured data
         const faqSchema = generateFAQStructuredData(faqs);
         addStructuredData(faqSchema);
     }, []);
-    
-    // Fetch real properties from API
     useEffect(() => {
         const fetchProperties = async () => {
             try {
@@ -73,27 +64,24 @@ const Home = () => {
         };
         fetchProperties();
     }, []);
-
     const stats = [
         { value: '5', label: 'Verified PGs' },
         { value: '10', label: 'Happy Students' },
         { value: '5', label: 'College Areas' },
         { value: '4.8', label: 'Avg Rating' },
     ];
-
     return (
         <div className="min-h-screen bg-neutral-50 overflow-x-hidden">
-            {/* Hero Section - Clean Airbnb Style */}
+            {}
             <section className="relative min-h-[90vh] flex items-center pt-24 pb-16 overflow-hidden bg-white">
-                {/* Subtle Background Pattern */}
+                {}
                 <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100/50 rounded-full blur-3xl" />
                     <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-100/30 rounded-full blur-3xl" />
                 </div>
-
                 <div className="relative z-10 container mx-auto px-4">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        {/* Left Content */}
+                        {}
                         <motion.div
                             initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -103,21 +91,17 @@ const Home = () => {
                                 <span className="w-2 h-2 bg-primary-500 rounded-full mr-2 animate-pulse" />
                                 Trusted by Students
                             </span>
-
                             <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-neutral-900 mb-4 md:mb-6 leading-tight">
                                 Find Your Perfect
                                 <span className="text-primary-600"> PG </span>
                                 <span className="block sm:inline">Near University</span>
                             </h1>
-
                             <p className="text-base md:text-lg text-neutral-600 mb-6 md:mb-8">
                                 Discover verified, affordable PG accommodations within walking distance of your university. Your comfort, our priority.
                             </p>
-
-                            {/* Search Bar */}
+                            {}
                             <SearchBar variant="hero" />
-
-                            {/* Stats */}
+                            {}
                             <div className="grid grid-cols-4 gap-4 md:gap-8 mt-8 md:mt-10">
                                 {stats.map((stat, index) => (
                                     <div key={index} className="text-left">
@@ -127,8 +111,7 @@ const Home = () => {
                                 ))}
                             </div>
                         </motion.div>
-
-                        {/* Right - Hero Image Grid */}
+                        {}
                         <motion.div
                             initial={{ opacity: 0, x: 30 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -176,8 +159,7 @@ const Home = () => {
                                 </div>
                             </div>
                         </motion.div>
-
-                        {/* Mobile Image Showcase - Only visible on mobile/tablet */}
+                        {}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -207,8 +189,7 @@ const Home = () => {
                     </div>
                 </div>
             </section>
-
-            {/* Featured PGs */}
+            {}
             <section className="py-20 bg-neutral-50">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
@@ -231,7 +212,6 @@ const Home = () => {
                             </svg>
                         </Link>
                     </div>
-
                     {loading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -271,9 +251,7 @@ const Home = () => {
                     )}
                 </div>
             </section>
-
-
-            {/* Why Choose Us */}
+            {}
             <section className="py-20 bg-white">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
@@ -282,7 +260,6 @@ const Home = () => {
                             Why Choose Unirooms?
                         </h2>
                     </div>
-
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
                             {
@@ -333,8 +310,7 @@ const Home = () => {
                     </div>
                 </div>
             </section>
-
-            {/* CTA Section */}
+            {}
             <section className="py-20 bg-gradient-to-r from-primary-600 to-primary-700 relative overflow-hidden">
                 <div className="absolute inset-0">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
@@ -357,8 +333,7 @@ const Home = () => {
                     </div>
                 </div>
             </section>
-
-            {/* FAQ Section - SEO Boost */}
+            {}
             <section className="py-20 bg-neutral-50">
                 <div className="container mx-auto px-4 max-w-4xl">
                     <div className="text-center mb-12">
@@ -392,11 +367,9 @@ const Home = () => {
                     </div>
                 </div>
             </section>
-
-            {/* Bottom padding for mobile nav */}
+            {}
             <div className="h-20 md:h-0" />
         </div>
     );
 };
-
 export default Home;

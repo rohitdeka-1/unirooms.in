@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI, paymentAPI } from '../utils/api';
 import { getOptimizedImageUrl } from '../utils/imageOptimizer';
-
 const LandlordDashboard = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -13,7 +12,6 @@ const LandlordDashboard = () => {
     const [credits, setCredits] = useState({ total: 0, used: 0, remaining: 0 });
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('properties');
-
     useEffect(() => {
         if (user?.role !== 'landlord') {
             navigate('/');
@@ -21,7 +19,6 @@ const LandlordDashboard = () => {
         }
         fetchData();
     }, [user, navigate]);
-
     const fetchData = async () => {
         try {
             setLoading(true);
@@ -32,14 +29,11 @@ const LandlordDashboard = () => {
             ]);
             setProperties(propertiesRes.data.properties);
             setStats(statsRes.data.stats);
-            
-            // Calculate credits
             const payments = paymentsRes.data.payments || [];
             const totalPaidCredits = payments
                 .filter(p => p.status === 'success' && p.purpose === 'property_listing')
                 .reduce((sum, p) => sum + (p.propertiesCount || 1), 0);
             const usedCredits = propertiesRes.data.properties.length;
-            
             setCredits({
                 total: totalPaidCredits,
                 used: usedCredits,
@@ -51,7 +45,6 @@ const LandlordDashboard = () => {
             setLoading(false);
         }
     };
-
     const handleToggleStatus = async (propertyId) => {
         try {
             await propertyAPI.toggleStatus(propertyId);
@@ -61,10 +54,8 @@ const LandlordDashboard = () => {
             alert(error.message);
         }
     };
-
     const handleDeleteProperty = async (propertyId) => {
         if (!confirm('Are you sure you want to delete this property?')) return;
-        
         try {
             await propertyAPI.deleteProperty(propertyId);
             fetchData();
@@ -73,7 +64,6 @@ const LandlordDashboard = () => {
             alert(error.message);
         }
     };
-
     if (loading) {
         return (
             <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12 flex items-center justify-center">
@@ -81,11 +71,10 @@ const LandlordDashboard = () => {
             </div>
         );
     }
-
     return (
         <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
             <div className="container mx-auto px-4">
-                {/* Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -106,8 +95,7 @@ const LandlordDashboard = () => {
                         </Link>
                     </div>
                 </motion.div>
-
-                {/* Stats Cards */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -131,8 +119,7 @@ const LandlordDashboard = () => {
                         </div>
                     ))}
                 </motion.div>
-
-                {/* Credits Card */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -160,7 +147,6 @@ const LandlordDashboard = () => {
                                 </div>
                             </div>
                         </div>
-                        
                         {credits.remaining <= 0 && (
                             <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg flex items-start gap-3">
                                 <svg className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -174,8 +160,7 @@ const LandlordDashboard = () => {
                         )}
                     </div>
                 </motion.div>
-
-                {/* Properties List */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -185,7 +170,6 @@ const LandlordDashboard = () => {
                     <div className="p-6 border-b border-neutral-200">
                         <h2 className="text-xl font-display font-bold text-neutral-800">Your Properties</h2>
                     </div>
-
                     {properties.length === 0 ? (
                         <div className="p-12 text-center">
                             <div className="w-24 h-24 mx-auto mb-6 bg-neutral-100 rounded-full flex items-center justify-center">
@@ -207,7 +191,7 @@ const LandlordDashboard = () => {
                             {properties.map((property) => (
                                 <div key={property._id} className="p-6 hover:bg-neutral-50 transition-colors">
                                     <div className="flex flex-col md:flex-row md:items-center gap-4">
-                                        {/* Property Image */}
+                                        {}
                                         <div className="flex-shrink-0">
                                             <div className="w-24 h-24 bg-neutral-200 rounded-xl overflow-hidden">
                                                 {property.images?.[0]?.url ? (
@@ -227,8 +211,7 @@ const LandlordDashboard = () => {
                                                 )}
                                             </div>
                                         </div>
-
-                                        {/* Property Info */}
+                                        {}
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between gap-4">
                                                 <div>
@@ -255,8 +238,7 @@ const LandlordDashboard = () => {
                                                 <span>🛏️ {property.availableRooms}/{property.totalRooms} available</span>
                                             </div>
                                         </div>
-
-                                        {/* Actions */}
+                                        {}
                                         <div className="flex md:flex-col gap-2">
                                             <Link
                                                 to={`/landlord/edit-property/${property._id}`}
@@ -287,5 +269,4 @@ const LandlordDashboard = () => {
         </div>
     );
 };
-
 export default LandlordDashboard;

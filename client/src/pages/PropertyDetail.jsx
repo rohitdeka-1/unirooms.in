@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import { propertyAPI } from '../utils/api';
 import { getOptimizedImageUrl } from '../utils/imageOptimizer';
 import { updateMetaTags, generatePropertyStructuredData, addStructuredData } from '../utils/seo';
-
 const PropertyDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -15,8 +14,6 @@ const PropertyDetail = () => {
     const [property, setProperty] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // Fetch property data
     useEffect(() => {
         const fetchProperty = async () => {
             try {
@@ -32,18 +29,14 @@ const PropertyDetail = () => {
                 setLoading(false);
             }
         };
-
         if (id) {
             fetchProperty();
         }
     }, [id]);
-
-    // Update SEO when property loads
     useEffect(() => {
         if (property) {
             const propertyTitle = `${property.title || 'PG Accommodation'} | ${property.nearbyCollege || property.city || 'Near College'} | Unirooms`;
             const propertyDescription = `${property.description || `Find ${property.roomType || 'PG accommodation'} near ${property.nearbyCollege || property.city}.`} ₹${property.rent || property.price}/month. ${property.amenities?.join(', ') || 'Great amenities'}. Book now!`;
-            
             updateMetaTags({
                 title: propertyTitle,
                 description: propertyDescription,
@@ -52,19 +45,15 @@ const PropertyDetail = () => {
                 url: `https://unirooms.in/property/${id}`,
                 type: 'product'
             });
-
-            // Add structured data for property
             const structuredData = generatePropertyStructuredData(property);
             addStructuredData(structuredData);
         }
     }, [property, id]);
-
     const handleContactClick = () => {
         if (!isAuthenticated) {
             setShowLoginModal(true);
         }
     };
-
     if (loading) {
         return (
             <div className="min-h-screen bg-dark-50 pt-24 pb-24 flex items-center justify-center">
@@ -78,7 +67,6 @@ const PropertyDetail = () => {
             </div>
         );
     }
-
     if (error || !property) {
         return (
             <div className="min-h-screen bg-dark-50 pt-24 pb-24 flex items-center justify-center">
@@ -95,8 +83,6 @@ const PropertyDetail = () => {
             </div>
         );
     }
-
-    // Format property data for display
     const propertyTitle = property.title || property.name || 'Property';
     const propertyLocation = property.address 
         ? `${property.address.locality}, ${property.city}`
@@ -104,8 +90,6 @@ const PropertyDetail = () => {
     const propertyImages = property.images?.length > 0 
         ? property.images.map(img => getOptimizedImageUrl(img.url || img, 'large'))
         : [getOptimizedImageUrl('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800', 'large')];
-    
-    // Map amenities to display format
     const amenitiesMap = {
         wifi: 'High-Speed WiFi',
         ac: 'AC Rooms',
@@ -128,23 +112,20 @@ const PropertyDetail = () => {
         water: 'Water 24/7',
         electricity: 'Electricity'
     };
-
     const facilities = property.amenities?.map(amenity => ({
         name: amenitiesMap[amenity] || amenity,
         icon: amenity
     })) || [];
-
     const landlord = {
         name: property.landlordId?.name || 'Property Owner',
         phone: property.phone || 'Not available',
         email: property.landlordId?.email || '',
         verified: property.isVerified || false,
     };
-
     return (
         <div className="min-h-screen bg-dark-50 pt-24 pb-24 md:pb-12">
             <div className="container mx-auto px-4">
-                {/* Breadcrumb */}
+                {}
                 <nav className="flex items-center space-x-2 text-sm mb-6">
                     <Link to="/" className="text-dark-500 hover:text-primary-600">Home</Link>
                     <span className="text-dark-300">/</span>
@@ -152,11 +133,10 @@ const PropertyDetail = () => {
                     <span className="text-dark-300">/</span>
                     <span className="text-dark-700">{property.name}</span>
                 </nav>
-
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Main Content */}
+                    {}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Image Gallery */}
+                        {}
                         <div className="card overflow-hidden">
                             <div className="relative h-80 md:h-[450px] bg-neutral-900">
                                 <motion.img
@@ -169,8 +149,7 @@ const PropertyDetail = () => {
                                     decoding="async"
                                     className="w-full h-full object-contain"
                                 />
-
-                                {/* Navigation Arrows */}
+                                {}
                                 <button
                                     onClick={() => setCurrentImage((prev) => (prev > 0 ? prev - 1 : propertyImages.length - 1))}
                                     className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition"
@@ -187,16 +166,14 @@ const PropertyDetail = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                     </svg>
                                 </button>
-
-                                {/* Favorite */}
+                                {}
                                 <button className="absolute top-4 right-4 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg transition">
                                     <svg className="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                                     </svg>
                                 </button>
                             </div>
-
-                            {/* Thumbnails */}
+                            {}
                             <div className="flex gap-2 p-4 bg-dark-50 overflow-x-auto">
                                 {propertyImages.map((img, index) => (
                                     <button
@@ -217,8 +194,7 @@ const PropertyDetail = () => {
                                 ))}
                             </div>
                         </div>
-
-                        {/* Property Info */}
+                        {}
                         <div className="card p-6">
                             <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                                 <div>
@@ -261,7 +237,7 @@ const PropertyDetail = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    {/* Campus Badge */}
+                                    {}
                                     {property.campusName && (
                                         <div className="px-3 py-1.5 bg-primary-50 rounded-lg border border-primary-200">
                                             <div className="flex items-center space-x-1.5">
@@ -272,7 +248,7 @@ const PropertyDetail = () => {
                                             </div>
                                         </div>
                                     )}
-                                    {/* Rating Badge */}
+                                    {}
                                     <div className="px-4 py-2 bg-amber-50 rounded-xl">
                                         <div className="flex items-center space-x-2">
                                             <svg className="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
@@ -285,14 +261,12 @@ const PropertyDetail = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* About */}
+                        {}
                         <div className="card p-6">
                             <h2 className="text-xl font-display font-bold text-dark-900 mb-4">About This PG</h2>
                             <p className="text-dark-600 leading-relaxed">{property.description || 'No description available.'}</p>
                         </div>
-
-                        {/* Facilities */}
+                        {}
                         <div className="card p-6">
                             <h2 className="text-xl font-display font-bold text-dark-900 mb-6">Amenities & Facilities</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -309,11 +283,10 @@ const PropertyDetail = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Sidebar */}
+                    {}
                     <div className="lg:col-span-1">
                         <div className="card p-6 sticky top-28">
-                            {/* Price */}
+                            {}
                             <div className="mb-6 pb-6 border-b border-dark-100">
                                 <p className="text-dark-500 text-sm mb-1">Monthly Rent</p>
                                 <div className="flex items-baseline">
@@ -324,8 +297,7 @@ const PropertyDetail = () => {
                                     <p className="text-sm text-dark-500 mt-2">Security Deposit: ₹{property.securityDeposit.toLocaleString()}</p>
                                 )}
                             </div>
-
-                            {/* Contact */}
+                            {}
                             <div className="mb-6">
                                 <h3 className="font-display font-bold text-dark-900 mb-4 flex items-center">
                                     Landlord Contact
@@ -333,7 +305,6 @@ const PropertyDetail = () => {
                                         <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">Verified</span>
                                     )}
                                 </h3>
-
                                 {isAuthenticated ? (
                                     <div className="space-y-3">
                                         <div className="flex items-center space-x-3 p-3 bg-dark-50 rounded-xl">
@@ -368,7 +339,6 @@ const PropertyDetail = () => {
                                     </div>
                                 )}
                             </div>
-
                             {isAuthenticated ? (
                                 <a 
                                     href={property.location?.coordinates 
@@ -401,8 +371,7 @@ const PropertyDetail = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Login Modal */}
+            {}
             <AnimatePresence>
                 {showLoginModal && (
                     <motion.div
@@ -443,5 +412,4 @@ const PropertyDetail = () => {
         </div>
     );
 };
-
 export default PropertyDetail;

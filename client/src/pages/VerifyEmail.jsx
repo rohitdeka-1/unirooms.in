@@ -1,47 +1,36 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
 const VerifyEmail = () => {
     const { token } = useParams();
     const navigate = useNavigate();
     const [status, setStatus] = useState('verifying');  
     const [message, setMessage] = useState('');
     const hasVerified = useRef(false);
-
     useEffect(() => {
         const verifyEmail = async () => {
              if (hasVerified.current) {
                 return;
             }
-
             if (!token) {
                 setStatus('error');
                 setMessage('Invalid verification link.');
                 return;
             }
-
             hasVerified.current = true;
-
             try {
                 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://unirooms-api-2026-be019c91a062.herokuapp.com/api/v1';
                 const response = await fetch(`${API_BASE_URL}/auth/verify-email/${token}`);
                 const data = await response.json();
-
                 if (response.ok) {
                     setStatus('success');
-                    
                      if (data.data?.alreadyVerified) {
                         setMessage('Your email is already verified! You can login now.');
-                        // Redirect to login for already verified users
                         setTimeout(() => {
                             navigate('/login');
                         }, 3000);
                     } else {
-                        // First-time verification - auto login
                         setMessage(data.message || 'Email verified successfully! Redirecting to home...');
-                        
-                        // Store tokens in localStorage
                         if (data.data?.accessToken) {
                             localStorage.setItem('accessToken', data.data.accessToken);
                         }
@@ -51,17 +40,13 @@ const VerifyEmail = () => {
                         if (data.data?.user) {
                             localStorage.setItem('user', JSON.stringify(data.data.user));
                         }
-                        
-                        // Redirect to home page after 2 seconds
                         setTimeout(() => {
                             navigate('/');
-                            window.location.reload(); // Reload to update auth context
+                            window.location.reload(); 
                         }, 2000);
                     }
                 } else {
                     setStatus('error');
-                    
-                    // Handle specific error cases
                     if (data.data?.expired) {
                         setMessage('Your verification link has expired. Please sign up again or request a new verification email.');
                     } else {
@@ -74,10 +59,8 @@ const VerifyEmail = () => {
                 setMessage('Unable to verify email. Please check your internet connection and try again.');
             }
         };
-
         verifyEmail();
     }, [token, navigate]);
-
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-accent-50 px-4">
             <motion.div
@@ -90,7 +73,6 @@ const VerifyEmail = () => {
                         <img src="/logo.png" alt="Unirooms" className="w-12 h-12 rounded-xl" />
                         <span className="text-2xl font-display font-bold text-neutral-800">Unirooms</span>
                     </Link>
-
                     {status === 'verifying' && (
                         <div>
                             <div className="w-16 h-16 mx-auto mb-6">
@@ -107,7 +89,6 @@ const VerifyEmail = () => {
                             </p>
                         </div>
                     )}
-
                     {status === 'success' && (
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
@@ -135,7 +116,6 @@ const VerifyEmail = () => {
                             </Link>
                         </motion.div>
                     )}
-
                     {status === 'error' && (
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
@@ -177,5 +157,4 @@ const VerifyEmail = () => {
         </div>
     );
 };
-
 export default VerifyEmail;

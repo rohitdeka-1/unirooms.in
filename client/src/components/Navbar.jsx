@@ -2,45 +2,37 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-
 const Navbar = () => {
     const { isAuthenticated, user, logout } = useAuth();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const dropdownRef = useRef(null);
-
     const isActive = (path) => location.pathname === path;
-
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setMobileMenuOpen(false);
             }
         };
-
         if (mobileMenuOpen) {
             document.addEventListener('mousedown', handleClickOutside);
         }
-
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [mobileMenuOpen]);
-
     return (
         <nav className="fixed top-0 left-0 right-0 z-50">
             <div className="mx-4 mt-4">
                 <div className="glass rounded-2xl shadow-soft">
                     <div className="container mx-auto px-6">
                         <div className="flex items-center justify-between h-16">
-                            {/* Logo */}
+                            {}
                             <Link to="/" className="flex items-center space-x-2 group" aria-label="Unirooms Home">
                                 <img src="/logo.png" alt="Unirooms Logo" className="w-10 h-10 rounded-xl" loading="eager" />
                                 <span className="text-xl font-display font-bold text-neutral-800">Unirooms</span>
                             </Link>
-
-                            {/* Desktop Menu */}
+                            {}
                             <div className="hidden md:flex items-center space-x-1">
                                 {[
                                     { path: '/', label: 'Home' },
@@ -65,8 +57,7 @@ const Navbar = () => {
                                         )}
                                     </Link>
                                 ))}
-                                
-                                {/* Dashboard link for landlords only */}
+                                {}
                                 {isAuthenticated && user?.role === 'landlord' && (
                                     <Link
                                         to="/landlord/dashboard"
@@ -85,8 +76,7 @@ const Navbar = () => {
                                         )}
                                     </Link>
                                 )}
-                                
-                                {/* Admin link for alkardorhd@gmail.com only */}
+                                {}
                                 {isAuthenticated && user?.email === 'alkardorhd@gmail.com' && (
                                     <Link
                                         to="/admin/properties"
@@ -106,8 +96,7 @@ const Navbar = () => {
                                     </Link>
                                 )}
                             </div>
-
-                            {/* Auth Section */}
+                            {}
                             <div className="hidden md:flex items-center space-x-3">
                                 {isAuthenticated ? (
                                     <div className="flex items-center space-x-4">
@@ -157,8 +146,7 @@ const Navbar = () => {
                                     </>
                                 )}
                             </div>
-
-                            {/* Mobile Menu - Profile Dropdown Button */}
+                            {}
                             <div className="md:hidden relative" ref={dropdownRef}>
                                 {isAuthenticated ? (
                                     <button
@@ -213,8 +201,7 @@ const Navbar = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Mobile Dropdown Menu */}
+            {}
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <motion.div
@@ -225,7 +212,7 @@ const Navbar = () => {
                         className="md:hidden absolute right-4 top-20 w-72 z-50"
                     >
                         <div className="glass rounded-2xl shadow-lg border border-neutral-200 overflow-hidden">
-                            {/* User Profile Section (if authenticated) */}
+                            {}
                             {isAuthenticated && (
                                 <div className="p-4 bg-gradient-to-br from-primary-50 to-primary-100/50 border-b border-primary-200">
                                     <div className="flex items-center space-x-3">
@@ -257,8 +244,7 @@ const Navbar = () => {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Navigation Links */}
+                            {}
                             <div className="p-2">
                                 {[
                                     { path: '/', label: 'Home', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -280,8 +266,7 @@ const Navbar = () => {
                                         <span>{item.label}</span>
                                     </Link>
                                 ))}
-                                
-                                {/* Dashboard link for landlords only */}
+                                {}
                                 {isAuthenticated && user?.role === 'landlord' && (
                                     <Link
                                         to="/landlord/dashboard"
@@ -297,8 +282,7 @@ const Navbar = () => {
                                         <span>Dashboard</span>
                                     </Link>
                                 )}
-                                
-                                {/* Admin link for alkardorhd@gmail.com only */}
+                                {}
                                 {isAuthenticated && user?.email === 'alkardorhd@gmail.com' && (
                                     <Link
                                         to="/admin/properties"
@@ -314,8 +298,7 @@ const Navbar = () => {
                                         <span>Admin Panel</span>
                                     </Link>
                                 )}
-
-                                {/* Profile & Auth Section */}
+                                {}
                                 {isAuthenticated ? (
                                     <>
                                         <div className="my-2 border-t border-neutral-200"></div>
@@ -379,5 +362,4 @@ const Navbar = () => {
         </nav>
     );
 };
-
 export default Navbar;

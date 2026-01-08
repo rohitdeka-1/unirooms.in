@@ -1,49 +1,37 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { paymentAPI } from '../utils/api';
-
 const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
     const [loading, setLoading] = useState(false);
-    const [step, setStep] = useState('confirm'); // confirm, processing, success, error
+    const [step, setStep] = useState('confirm'); 
     const [paymentSessionId, setPaymentSessionId] = useState(null);
     const [orderId, setOrderId] = useState(null);
     const [paymentId, setPaymentId] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
-
-    // Load Cashfree SDK
     useEffect(() => {
         const script = document.createElement('script');
         script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
         script.async = true;
         document.body.appendChild(script);
-
         return () => {
             document.body.removeChild(script);
         };
     }, []);
-
     const handlePayment = async () => {
         try {
             setLoading(true);
             setStep('processing');
-
-            // Create payment order
             const orderRes = await paymentAPI.createOrder({ phone: propertyPhone });
             const { payment_session_id, order_id, paymentId: pId } = orderRes.data;
-
             setPaymentSessionId(payment_session_id);
             setOrderId(order_id);
             setPaymentId(pId);
-
-            // Initialize Cashfree
             const cashfree = window.Cashfree({
-                mode: import.meta.env.VITE_CASHFREE_MODE || "production", // "sandbox" or "production"
+                mode: import.meta.env.VITE_CASHFREE_MODE || "production", 
             });
-
-            // Configure checkout options
             const checkoutOptions = {
                 paymentSessionId: payment_session_id,
-                redirectTarget: "_modal", // Opens in modal
+                redirectTarget: "_modal", 
                 appearance: {
                     theme: 'light'
                 },
@@ -53,8 +41,6 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
                     fontFamily: 'Inter, system-ui, sans-serif'
                 }
             };
-
-            // Open Cashfree checkout
             cashfree.checkout(checkoutOptions).then((result) => {
                 if (result.error) {
                     console.error("Payment error:", result.error);
@@ -64,11 +50,9 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
                 } else if (result.redirect) {
                     console.log("Payment redirect");
                 } else if (result.paymentDetails) {
-                    // Payment successful
                     handlePaymentSuccess(order_id, pId);
                 }
             });
-
         } catch (error) {
             console.error('Payment error:', error);
             setErrorMessage(error.message || 'Payment failed. Please try again.');
@@ -76,19 +60,13 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
             setLoading(false);
         }
     };
-
     const handlePaymentSuccess = async (orderId, pId) => {
         try {
-            // Verify payment with backend
             await paymentAPI.verifyPayment({ orderId });
-            
             setStep('success');
-            
-            // Wait a moment then call success callback
             setTimeout(() => {
                 onSuccess(pId);
             }, 1500);
-
         } catch (error) {
             console.error('Verification error:', error);
             setErrorMessage('Payment verification failed. Please contact support.');
@@ -97,7 +75,6 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
             setLoading(false);
         }
     };
-
     return (
         <AnimatePresence>
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
@@ -122,7 +99,6 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
                                     One-time payment to list your property
                                 </p>
                             </div>
-
                             <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 mb-6">
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-neutral-700 font-medium">Property Listing Fee</span>
@@ -132,13 +108,11 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
                                     Your property will be listed for 6 months
                                 </p>
                             </div>
-
                             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
                                 <p className="text-sm text-blue-800">
                                     <strong>Secure Payment:</strong> Powered by Cashfree - Accept UPI, Cards, Net Banking & Wallets
                                 </p>
                             </div>
-
                             <div className="flex gap-3">
                                 <button
                                     type="button"
@@ -159,7 +133,6 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
                             </div>
                         </>
                     )}
-
                     {step === 'processing' && (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 mx-auto mb-4">
@@ -173,7 +146,6 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
                             </p>
                         </div>
                     )}
-
                     {step === 'success' && (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
@@ -189,7 +161,6 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
                             </p>
                         </div>
                     )}
-
                     {step === 'error' && (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
@@ -229,5 +200,4 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
         </AnimatePresence>
     );
 };
-
 export default PaymentModal;

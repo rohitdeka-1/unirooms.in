@@ -28,12 +28,10 @@ import ListPropertyRedirect from './pages/ListPropertyRedirect';
 import AdminProperties from './pages/AdminProperties';
 import Developer from './pages/Developer';
 import NotFound from './pages/NotFound';
-
 const Layout = ({ children }) => {
   const location = useLocation();
   const hideNavRoutes = ['/login', '/signup', '/forgot-password', '/verify-email', '/verify-email-pending'];
   const shouldHideNav = hideNavRoutes.includes(location.pathname) || location.pathname.startsWith('/verify-email/');
-
   return (
     <>
       <ScrollToTop />
@@ -44,7 +42,6 @@ const Layout = ({ children }) => {
     </>
   );
 };
-
 function App() {
   return (
     <AuthProvider>
@@ -81,5 +78,4 @@ function App() {
     </AuthProvider>
   );
 }
-
 export default App;

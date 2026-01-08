@@ -1,37 +1,20 @@
-// Generic PG property descriptions
 export const pgDescriptions = [
     "Comfortable and well-maintained PG accommodation with modern amenities. Spacious rooms with proper ventilation and natural lighting. Located in a peaceful neighborhood with easy access to public transport. Ideal for students and working professionals seeking a homely atmosphere.",
-    
     "Premium PG facility offering a safe and secure living environment. Features include 24/7 security, power backup, and high-speed WiFi. Conveniently located near major educational institutions and shopping centers. Regular housekeeping services ensure cleanliness and hygiene.",
-    
     "Affordable PG accommodation with all essential facilities. Rooms are well-furnished with study tables, wardrobes, and comfortable beds. Common areas include a TV lounge and dining space. Walking distance from bus stops and local markets for your convenience.",
-    
     "Modern PG with contemporary interiors and excellent ventilation. Each room is equipped with attached bathrooms and essential furniture. The property includes a common kitchen, laundry facilities, and parking space. Perfect for those who value comfort and convenience.",
-    
     "Spacious PG accommodation in a prime location with easy connectivity. Features include regular water supply, electricity backup, and CCTV surveillance. Friendly and supportive environment with flexible house rules. Suitable for students and working professionals alike.",
-    
     "Cozy PG facility offering a home away from home experience. Well-lit rooms with proper bedding and storage solutions. Common amenities include WiFi, washing machine, and refrigerator. Close proximity to colleges, hospitals, and entertainment zones.",
-    
     "Fully-furnished PG with modern amenities and great connectivity. Rooms feature individual study spaces, comfortable mattresses, and ample storage. The property ensures 24/7 water supply, power backup, and professional housekeeping. Ideal for those seeking quality accommodation.",
-    
     "Safe and secure PG accommodation with CCTV monitoring and security guards. Rooms are bright and airy with balcony access. Common facilities include a recreation room, dining area, and parking. Located in a well-connected area with nearby amenities.",
-    
     "Budget-friendly PG offering clean and comfortable living spaces. Each room is designed to provide privacy and comfort. Shared facilities include a modular kitchen, common fridge, and washing machine. Great location with easy access to public transport and markets.",
-    
     "Deluxe PG accommodation with premium facilities and services. Spacious rooms with attached bathrooms and modern fittings. The property includes a gym, reading room, and entertainment area. Perfect for professionals and students looking for upscale living.",
-    
     "Well-maintained PG in a peaceful residential area. Rooms are equipped with all basic furniture and bedding. Regular cleaning services and maintenance ensure a hygienic environment. Convenient location near educational institutions, hospitals, and shopping complexes.",
-    
     "Contemporary PG facility with modern architecture and amenities. Features include high-speed internet, inverter backup, and water purifier. Common areas are spacious and well-decorated. Excellent connectivity to major landmarks and commercial hubs.",
-    
     "Comfortable PG accommodation with homely atmosphere and caring management. Rooms offer adequate space with proper lighting and ventilation. Shared amenities include a dining hall, lounge area, and bike parking. Located in a safe neighborhood with good infrastructure.",
-    
     "Premium PG with luxurious facilities and excellent maintenance. Rooms feature AC, attached bathrooms, and contemporary furniture. Additional amenities include a community kitchen, TV room, and study area. Ideal for those seeking comfort and quality living.",
-    
     "Affordable yet comfortable PG in a convenient location. Well-furnished rooms with essential amenities and proper security. The property ensures cleanliness with regular housekeeping. Easy access to public transport, markets, and educational institutions makes it highly desirable."
 ];
-
-// Function to get a random description
 export const getRandomDescription = () => {
     const randomIndex = Math.floor(Math.random() * pgDescriptions.length);
     return pgDescriptions[randomIndex];

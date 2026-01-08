@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../utils/api';
-
 const Profile = () => {
     const { isAuthenticated, user, logout, refreshUser } = useAuth();
     const navigate = useNavigate();
@@ -16,7 +15,6 @@ const Profile = () => {
         phone: '',
         college: ''
     });
-
     useEffect(() => {
         if (user) {
             setFormData({
@@ -27,45 +25,36 @@ const Profile = () => {
             });
         }
     }, [user]);
-
     const tabs = [
         { id: 'overview', label: 'Overview', icon: 'grid' },
         { id: 'settings', label: 'Settings', icon: 'cog' },
     ];
-
     const handleLogout = async () => {
         await logout();
         navigate('/');
     };
-
     const handleInputChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
         });
     };
-
     const handleSaveProfile = async () => {
         setLoading(true);
         try {
-            // Validate phone number if provided
             if (formData.phone && !/^[6-9]\d{9}$/.test(formData.phone)) {
                 alert('Please enter a valid 10-digit Indian phone number');
                 setLoading(false);
                 return;
             }
-
             await authAPI.updateProfile({
                 name: formData.name,
                 phone: formData.phone || undefined,
                 college: formData.college || undefined,
             });
-
-            // Refresh user data in context
             if (refreshUser) {
                 await refreshUser();
             }
-
             setIsEditing(false);
         } catch (error) {
             console.error('Error updating profile:', error);
@@ -74,14 +63,11 @@ const Profile = () => {
             setLoading(false);
         }
     };
-
     const formatDate = (dateString) => {
         if (!dateString) return 'Recently';
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
     };
-
-    // If not authenticated, show login prompt
     if (!isAuthenticated) {
         return (
             <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
@@ -92,20 +78,18 @@ const Profile = () => {
                         className="max-w-md mx-auto text-center"
                     >
                         <div className="card p-12">
-                            {/* Icon */}
+                            {}
                             <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center">
                                 <svg className="w-12 h-12 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                             </div>
-
                             <h1 className="text-2xl font-display font-bold text-neutral-800 mb-3">
                                 Your Profile
                             </h1>
                             <p className="text-neutral-500 mb-8">
                                 Sign in to access your profile, view saved properties, and manage your account settings.
                             </p>
-
                             <div className="space-y-3">
                                 <Link to="/login" className="block btn-primary w-full">
                                     Sign In
@@ -114,7 +98,6 @@ const Profile = () => {
                                     Create Account
                                 </Link>
                             </div>
-
                             <p className="text-neutral-400 text-sm mt-6">
                                 Join 10,000+ students who found their perfect PG
                             </p>
@@ -124,11 +107,10 @@ const Profile = () => {
             </div>
         );
     }
-
     return (
         <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
             <div className="container mx-auto px-4">
-                {/* Profile Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -136,7 +118,7 @@ const Profile = () => {
                 >
                     <div className="card p-6 md:p-8">
                         <div className="flex flex-col md:flex-row md:items-center gap-6">
-                            {/* Avatar */}
+                            {}
                             <div className="flex-shrink-0">
                                 {user?.profileImage ? (
                                     <img
@@ -159,8 +141,7 @@ const Profile = () => {
                                     </span>
                                 </div>
                             </div>
-
-                            {/* User Info */}
+                            {}
                             <div className="flex-1">
                                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                                     <div>
@@ -182,8 +163,7 @@ const Profile = () => {
                                             )}
                                         </div>
                                     </div>
-
-                                    {/* Actions */}
+                                    {}
                                     <div className="flex items-center space-x-3">
                                         {user?.role === 'landlord' && (
                                             <Link to="/landlord/dashboard" className="btn-secondary text-sm">
@@ -197,13 +177,11 @@ const Profile = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Stats - Removed dummy stats */}
+                        {}
                     </div>
                 </motion.div>
-
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Sidebar / Tabs */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -232,9 +210,7 @@ const Profile = () => {
                                         <span>{tab.label}</span>
                                     </button>
                                 ))}
-
                                 <div className="border-t border-neutral-100 my-4" />
-
                                 <Link
                                     to="/saved"
                                     className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all text-neutral-600 hover:bg-neutral-100 text-left"
@@ -244,7 +220,6 @@ const Profile = () => {
                                     </svg>
                                     <span>Saved Properties</span>
                                 </Link>
-
                                 <button
                                     onClick={handleLogout}
                                     className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all text-red-500 hover:bg-red-50 text-left"
@@ -257,8 +232,7 @@ const Profile = () => {
                             </nav>
                         </div>
                     </motion.div>
-
-                    {/* Main Content */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -267,7 +241,7 @@ const Profile = () => {
                     >
                         {activeTab === 'overview' && (
                             <div className="space-y-6">
-                                {/* Quick Actions */}
+                                {}
                                 <div className="card p-6">
                                     <h2 className="text-lg font-display font-bold text-neutral-800 mb-4">
                                         Quick Actions
@@ -297,8 +271,7 @@ const Profile = () => {
                                         </Link>
                                     </div>
                                 </div>
-
-                                {/* Account Info */}
+                                {}
                                 <div className="card p-6">
                                     <h2 className="text-lg font-display font-bold text-neutral-800 mb-4">
                                         Account Information
@@ -322,7 +295,6 @@ const Profile = () => {
                                                 </span>
                                             )}
                                         </div>
-                                        
                                         <div className="flex items-start space-x-3 p-4 bg-neutral-50 rounded-xl">
                                             <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
                                                 <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -338,7 +310,6 @@ const Profile = () => {
                                 </div>
                             </div>
                         )}
-
                         {activeTab === 'settings' && (
                             <div className="card p-6">
                                 <div className="flex items-center justify-between mb-6">
@@ -358,7 +329,7 @@ const Profile = () => {
                                     )}
                                 </div>
                                 <div className="space-y-6">
-                                    {/* Personal Information */}
+                                    {}
                                     <div>
                                         <h3 className="text-sm font-semibold text-neutral-700 mb-4">Personal Information</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -417,7 +388,6 @@ const Profile = () => {
                                             </div>
                                         </div>
                                     </div>
-
                                     {isEditing && (
                                         <div className="border-t border-neutral-100 pt-6 flex space-x-3">
                                             <button 
@@ -452,5 +422,4 @@ const Profile = () => {
         </div>
     );
 };
-
 export default Profile;

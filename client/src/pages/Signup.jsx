@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
-
 const Signup = () => {
     const navigate = useNavigate();
     const { register, googleSignup } = useAuth();
@@ -18,24 +17,18 @@ const Signup = () => {
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setSuccess('');
         setLoading(true);
-
         try {
             const response = await register(formData);
-
-            // Check if email verification is required
             if (response.data.requiresEmailVerification) {
-                // Navigate to verification pending page with email
                 navigate('/verify-email-pending', {
                     state: { email: formData.email }
                 });
             } else {
-                // Redirect based on user role
                 if (formData.role === 'landlord') {
                     navigate('/landlord/dashboard');
                 } else {
@@ -48,22 +41,17 @@ const Signup = () => {
             setLoading(false);
         }
     };
-
     const handleGoogleSuccess = async (credentialResponse) => {
         setGoogleLoading(true);
         setError('');
         try {
-            // credentialResponse.credential is the ID token
             const response = await googleSignup(credentialResponse.credential, formData.role);
-
-            // Redirect based on user role
             if (formData.role === 'landlord') {
                 navigate('/landlord/dashboard');
             } else {
                 navigate('/');
             }
         } catch (err) {
-            // Check if user already exists
             if (err.message?.includes('already registered')) {
                 setError('This email is already registered. Please log in instead.');
             } else {
@@ -73,19 +61,16 @@ const Signup = () => {
             setGoogleLoading(false);
         }
     };
-
     const handleGoogleError = () => {
         setError('Google sign up failed. Please try again.');
     };
-
     return (
         <div className="min-h-screen flex relative overflow-hidden">
-            {/* Left Side - Branding */}
+            {}
             <div className="hidden lg:flex flex-1 relative bg-gradient-to-br from-primary-600 via-primary-700 to-accent-700">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1920')] bg-cover bg-center mix-blend-overlay opacity-20" />
                 <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-accent-500/30 rounded-full blur-3xl" />
                 <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-primary-400/30 rounded-full blur-3xl" />
-
                 <div className="relative z-10 flex flex-col justify-center p-16">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -98,7 +83,6 @@ const Signup = () => {
                         <p className="text-white/80 text-lg max-w-md">
                             Join thousands of students and landlords on India's most trusted PG platform - Unirooms.
                         </p>
-
                         <div className="mt-12 space-y-4">
                             {['Verified PG listings', 'Direct landlord contact', 'Secure & trusted'].map((item, i) => (
                                 <div key={i} className="flex items-center space-x-3">
@@ -114,8 +98,7 @@ const Signup = () => {
                     </motion.div>
                 </div>
             </div>
-
-            {/* Right Side - Form */}
+            {}
             <div className="w-full lg:flex-1 flex items-center justify-center px-4 sm:px-6 py-12 lg:px-8 relative z-10 bg-white">
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
@@ -127,7 +110,6 @@ const Signup = () => {
                             <img src="/logo.png" alt="Unirooms" className="w-10 h-10 rounded-xl" />
                             <span className="text-xl font-display font-bold text-neutral-800">Unirooms</span>
                         </Link>
-
                         <h1 className="text-3xl font-display font-bold text-dark-900 mb-2">
                             Create your account
                         </h1>
@@ -135,7 +117,6 @@ const Signup = () => {
                             Join Unirooms today and find your perfect accommodation.
                         </p>
                     </div>
-
                     {error && (
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
@@ -145,7 +126,6 @@ const Signup = () => {
                             {error}
                         </motion.div>
                     )}
-
                     {success && (
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
@@ -168,8 +148,7 @@ const Signup = () => {
                             </div>
                         </motion.div>
                     )}
-
-                    {/* Step 1: Role Selection - Prominent */}
+                    {}
                     <div className="mb-6 p-6 bg-gradient-to-r from-primary-50 to-accent-50 rounded-xl border-2 border-primary-200">
                         <label className="block text-base font-semibold text-neutral-800 mb-4">
                             <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary-600 text-white text-sm font-bold mr-2">1</span>
@@ -199,9 +178,8 @@ const Signup = () => {
                             ))}
                         </div>
                     </div>
-
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Google Sign Up Button - Disabled until role selected */}
+                        {}
                         <div className="mb-2">
                             <label className="block text-sm font-medium text-neutral-700 mb-3 flex items-center">
                                 <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-600 text-white text-xs font-bold mr-2">2</span>
@@ -239,8 +217,7 @@ const Signup = () => {
                                 </p>
                             )}
                         </div>
-
-                        {/* Divider */}
+                        {}
                         <div className="relative py-2">
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-neutral-200"></div>
@@ -249,7 +226,6 @@ const Signup = () => {
                                 <span className="px-4 bg-white text-neutral-400">or fill in the form</span>
                             </div>
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium text-dark-700 mb-2">Full Name</label>
                             <input
@@ -261,7 +237,6 @@ const Signup = () => {
                                 placeholder="John Doe"
                             />
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium text-dark-700 mb-2">Email Address</label>
                             <input
@@ -273,7 +248,6 @@ const Signup = () => {
                                 placeholder="you@example.com"
                             />
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium text-dark-700 mb-2">Phone Number</label>
                             <input
@@ -286,7 +260,6 @@ const Signup = () => {
                                 placeholder="9876543210"
                             />
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium text-dark-700 mb-2">Password</label>
                             <input
@@ -302,7 +275,6 @@ const Signup = () => {
                                 Must be at least 4 characters with one uppercase, one lowercase, and one number
                             </p>
                         </div>
-
                         <button
                             type="submit"
                             disabled={loading}
@@ -310,14 +282,12 @@ const Signup = () => {
                         >
                             {loading ? 'Creating account...' : 'Create account'}
                         </button>
-
                         <p className="text-xs text-center text-dark-400">
                             By signing up, you agree to our{' '}
                             <Link to="/terms" className="text-primary-600 hover:underline">Terms</Link> and{' '}
                             <Link to="/privacy" className="text-primary-600 hover:underline">Privacy Policy</Link>
                         </p>
                     </form>
-
                     <p className="mt-6 text-center text-dark-500">
                         Already have an account?{' '}
                         <Link to="/login" className="font-semibold text-primary-600 hover:text-primary-700">
@@ -329,5 +299,4 @@ const Signup = () => {
         </div>
     );
 };
-
 export default Signup;

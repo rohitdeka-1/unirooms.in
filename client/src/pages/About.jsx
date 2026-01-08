@@ -2,16 +2,14 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { updateMetaTags, pageSEO } from '../utils/seo';
-
 const About = () => {
     useEffect(() => {
         updateMetaTags(pageSEO.about);
     }, []);
-
     return (
         <div className="min-h-screen bg-neutral-50 pt-24 mt-7 pb-24 md:pb-12">
             <div className="container mx-auto px-4">
-                {/* Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -24,10 +22,9 @@ const About = () => {
                         Connecting students with trusted accommodation near their universities
                     </p>
                 </motion.div>
-
-                {/* Main Content */}
+                {}
                 <div className="max-w-4xl mx-auto space-y-8">
-                    {/* Our Story */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -44,8 +41,7 @@ const About = () => {
                             As a trusted platform, we connect students directly with property owners in their preferred areas, making the search process seamless and stress-free. We're not just a listing platform; we're your companion in finding the perfect home away from home.
                         </p>
                     </motion.div>
-
-                    {/* What We Do */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -93,8 +89,7 @@ const About = () => {
                             </li>
                         </ul>
                     </motion.div>
-
-                    {/* How It Works */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -134,8 +129,7 @@ const About = () => {
                             </div>
                         </div>
                     </motion.div>
-
-                    {/* Our Role */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -166,8 +160,7 @@ const About = () => {
                             We encourage all users to verify property details, visit locations in person, and read all agreements carefully before making any commitments.
                         </p>
                     </motion.div>
-
-                    {/* CTA */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -186,5 +179,4 @@ const About = () => {
         </div>
     );
 };
-
 export default About;

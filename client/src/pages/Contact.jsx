@@ -1,31 +1,26 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { updateMetaTags, pageSEO } from '../utils/seo';
-
 const Contact = () => {
     useEffect(() => {
         updateMetaTags(pageSEO.contact);
     }, []);
-
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         subject: '',
         message: ''
     });
-
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Handle form submission
         console.log('Form submitted:', formData);
         alert('Thank you for your message! We will get back to you soon.');
         setFormData({ name: '', email: '', subject: '', message: '' });
     };
-
     return (
         <div className="min-h-screen bg-neutral-50 pt-24 pb-24 md:pb-12 mt-7">
             <div className="container mx-auto px-4">
-                {/* Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -38,9 +33,8 @@ const Contact = () => {
                         Have questions? We're here to help. Reach out to us through any of the channels below.
                     </p>
                 </motion.div>
-
                 <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
-                    {/* Contact Information */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -51,8 +45,7 @@ const Contact = () => {
                             <h2 className="text-2xl font-display font-bold text-neutral-800 mb-6">
                                 Get in Touch
                             </h2>
-                            
-                            {/* Email */}
+                            {}
                             <div className="flex items-start space-x-4 mb-6">
                                 <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,8 +60,7 @@ const Contact = () => {
                                     <p className="text-sm text-neutral-500 mt-1">We'll respond within 24 hours</p>
                                 </div>
                             </div>
-
-                            {/* Phone */}
+                            {}
                             <div className="flex items-start space-x-4 mb-6">
                                 <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,8 +75,7 @@ const Contact = () => {
                                     <p className="text-sm text-neutral-500 mt-1">Mon-Sat, 9:00 AM - 6:00 PM IST</p>
                                 </div>
                             </div>
-
-                            {/* Address */}
+                            {}
                             <div className="flex items-start space-x-4">
                                 <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,8 +92,7 @@ const Contact = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* FAQ Quick Links */}
+                        {}
                         <div className="card p-8">
                             <h3 className="font-semibold text-neutral-800 mb-4">Quick Links</h3>
                             <div className="space-y-2">
@@ -121,8 +111,7 @@ const Contact = () => {
                             </div>
                         </div>
                     </motion.div>
-
-                    {/* Contact Form */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -195,5 +184,4 @@ const Contact = () => {
         </div>
     );
 };
-
 export default Contact;

@@ -13,7 +13,6 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-
 const AdminProperties = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -22,20 +21,16 @@ const AdminProperties = () => {
     const [filter, setFilter] = useState("pending");
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
-
-    // Check if user is admin
     useEffect(() => {
         if (!user || user.email !== 'alkardorhd@gmail.com') {
             navigate('/', { replace: true });
         }
     }, [user, navigate]);
-
     useEffect(() => {
         if (user?.email === 'alkardorhd@gmail.com') {
             fetchProperties();
         }
     }, [filter, user]);
-
     const fetchProperties = async () => {
         try {
             setLoading(true);
@@ -56,7 +51,6 @@ const AdminProperties = () => {
             setLoading(false);
         }
     };
-
     const handleApprove = async (propertyId) => {
         try {
             const token = localStorage.getItem("accessToken");
@@ -76,7 +70,6 @@ const AdminProperties = () => {
             setError(err.response?.data?.message || "Failed to approve property");
         }
     };
-
     const handleDecline = async (propertyId) => {
         if (!window.confirm("Are you sure you want to decline and delete this property?")) {
             return;
@@ -98,11 +91,10 @@ const AdminProperties = () => {
             setError(err.response?.data?.message || "Failed to decline property");
         }
     };
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 pt-20 mt-10 pb-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -115,8 +107,7 @@ const AdminProperties = () => {
                         Review and manage property listings
                     </p>
                 </motion.div>
-
-                {/* Filter Tabs */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -152,8 +143,7 @@ const AdminProperties = () => {
                         All Properties
                     </button>
                 </motion.div>
-
-                {/* Messages */}
+                {}
                 {successMessage && (
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
@@ -163,7 +153,6 @@ const AdminProperties = () => {
                         {successMessage}
                     </motion.div>
                 )}
-
                 {error && (
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
@@ -173,15 +162,13 @@ const AdminProperties = () => {
                         {error}
                     </motion.div>
                 )}
-
-                {/* Loading State */}
+                {}
                 {loading && (
                     <div className="flex justify-center items-center py-20">
                         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
                     </div>
                 )}
-
-                {/* Properties List */}
+                {}
                 {!loading && properties.length === 0 && (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -191,7 +178,6 @@ const AdminProperties = () => {
                         <p className="text-gray-500 text-lg">No properties found</p>
                     </motion.div>
                 )}
-
                 {!loading && properties.length > 0 && (
                     <div className="space-y-6">
                         {properties.map((property, index) => (
@@ -228,10 +214,8 @@ const AdminProperties = () => {
                                             {property.isVerified ? "Verified" : "Pending"}
                                         </span>
                                     </div>
-
                                     <p className="text-gray-700 mb-4">{property.description}</p>
-
-                                    {/* Landlord Info */}
+                                    {}
                                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
                                         <h4 className="font-semibold text-gray-900 mb-2">
                                             Landlord Information
@@ -254,8 +238,7 @@ const AdminProperties = () => {
                                             </p>
                                         </div>
                                     </div>
-
-                                    {/* Property Details */}
+                                    {}
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                         <div className="bg-blue-50 p-3 rounded-lg">
                                             <p className="text-xs text-gray-600 mb-1">Room Type</p>
@@ -284,8 +267,7 @@ const AdminProperties = () => {
                                             </p>
                                         </div>
                                     </div>
-
-                                    {/* Action Buttons */}
+                                    {}
                                     {!property.isVerified && (
                                         <div className="flex gap-3">
                                             <button
@@ -304,7 +286,6 @@ const AdminProperties = () => {
                                             </button>
                                         </div>
                                     )}
-
                                     {property.isVerified && (
                                         <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
                                             <p className="text-green-700 font-medium">
@@ -321,5 +302,4 @@ const AdminProperties = () => {
         </div>
     );
 };
-
 export default AdminProperties;

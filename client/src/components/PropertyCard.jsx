@@ -4,14 +4,11 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { savedPropertyAPI } from '../utils/api';
 import { getOptimizedImageUrl, getBlurPlaceholder } from '../utils/imageOptimizer';
-
 const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [isSaved, setIsSaved] = useState(initialSaved);
     const [isLoading, setIsLoading] = useState(false);
     const { isAuthenticated, user } = useAuth();
-    
-    // Handle both backend (_id) and mock data (id) formats
     const propertyId = property._id || property.id;
     const propertyTitle = property.title || property.name;
     const propertyImageOriginal = property.images?.[0]?.url || property.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400';
@@ -19,14 +16,11 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
     const propertyLocation = property.address 
         ? `${property.address.locality}, ${property.city}`
         : property.location || 'Location not specified';
-    
-    // Check if property is saved when component mounts
     useEffect(() => {
         if (isAuthenticated && propertyId && !initialSaved) {
             checkSavedStatus();
         }
     }, [isAuthenticated, propertyId]);
-
     const checkSavedStatus = async () => {
         try {
             const response = await savedPropertyAPI.checkIfSaved(propertyId);
@@ -35,16 +29,13 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
             console.error('Error checking saved status:', error);
         }
     };
-
     const handleSaveToggle = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-
         if (!isAuthenticated) {
             window.location.href = '/login';
             return;
         }
-
         setIsLoading(true);
         try {
             if (isSaved) {
@@ -61,10 +52,8 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
             setIsLoading(false);
         }
     };
-    
-    // Format property type (e.g., "single" -> "Single Room", "Boys PG" -> "Boys PG")
     const formatPropertyType = () => {
-        if (property.type) return property.type; // For mock data
+        if (property.type) return property.type; 
         if (property.roomType) {
             const typeMap = {
                 'single': 'Single Room',
@@ -78,7 +67,6 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
         }
         return 'PG';
     };
-
     return (
         <motion.div
             whileHover={{ y: -6 }}
@@ -86,7 +74,7 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
             className="group card overflow-hidden w-full h-full max-w-sm mx-auto"
         >
             <Link to={`/property/${propertyId}`} className="block h-full">
-                {/* Image Container */}
+                {}
                 <div className="relative h-56 sm:h-60 overflow-hidden rounded-t-2xl bg-neutral-100">
                     {!imageLoaded && (
                         <div className="absolute inset-0 bg-gradient-to-br from-neutral-200 via-neutral-100 to-neutral-200 animate-pulse" />
@@ -101,11 +89,9 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
                             imageLoaded ? 'opacity-100' : 'opacity-0'
                         }`}
                     />
-
-                    {/* Overlay Gradient */}
+                    {}
                     <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                    {/* Favorite Button */}
+                    {}
                     <button 
                         onClick={handleSaveToggle}
                         disabled={isLoading}
@@ -122,23 +108,20 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                     </button>
-
-                    {/* Type Badge */}
+                    {}
                     <div className="absolute bottom-4 left-4">
                         <span className="px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full text-xs font-bold text-neutral-700 shadow-lg">
                             {formatPropertyType()}
                         </span>
                     </div>
                 </div>
-
-                {/* Content */}
+                {}
                 <div className="p-5">
-                    {/* Title */}
+                    {}
                     <h3 className="font-display font-bold text-lg text-neutral-800 mb-2 group-hover:text-primary-600 transition-colors line-clamp-1">
                         {propertyTitle}
                     </h3>
-
-                    {/* Location */}
+                    {}
                     <p className="text-neutral-500 text-sm mb-3 flex items-center">
                         <svg className="w-4 h-4 mr-1.5 text-neutral-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -146,8 +129,7 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
                         </svg>
                         <span className="line-clamp-1">{propertyLocation}</span>
                     </p>
-
-                    {/* Campus Badge */}
+                    {}
                     {property.campusName && (
                         <div className="mb-4">
                             <span className="inline-flex items-center px-3 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-xs font-semibold">
@@ -158,8 +140,7 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
                             </span>
                         </div>
                     )}
-
-                    {/* Distance Badge (if available - deprecated but kept for backward compatibility) */}
+                    {}
                     {property.distanceInKm !== undefined && (
                         <div className="mb-4">
                             <span className="inline-flex items-center px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-semibold">
@@ -170,18 +151,16 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
                             </span>
                         </div>
                     )}
-
-                    {/* Rating & Price */}
+                    {}
                     <div className="flex items-center justify-between pt-3 border-t border-neutral-100">
-                        {/* Rating */}
+                        {}
                         <div className="flex items-center space-x-2 px-3 py-2 bg-amber-50 rounded-lg">
                             <svg className="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
                             <span className="font-bold text-neutral-700 text-sm">{property.rating || '4.5'}</span>
                         </div>
-
-                        {/* Price */}
+                        {}
                         <div className="text-right">
                             <div>
                                 <span className="text-2xl font-display font-bold text-primary-600">₹{property.price?.toLocaleString()}</span>
@@ -194,5 +173,4 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
         </motion.div>
     );
 };
-
 export default PropertyCard;

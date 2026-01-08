@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-
 const Developer = () => {
     const techStack = {
         frontend: [
@@ -31,11 +30,10 @@ const Developer = () => {
             'Redis'
         ]
     };
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50 mt-7">
             <div className="container mx-auto px-4 py-12 md:py-20">
-                {/* Back Button */}
+                {}
                 <Link 
                     to="/" 
                     className="inline-flex items-center text-neutral-600 hover:text-primary-600 mb-8 transition-colors"
@@ -45,18 +43,16 @@ const Developer = () => {
                     </svg>
                     Back to Home
                 </Link>
-
-                {/* Main Content */}
+                {}
                 <div className="max-w-4xl mx-auto">
-                    {/* Header Card */}
+                    {}
                     <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 mb-8">
                         <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-                            {/* Profile Image Placeholder */}
+                            {}
                             <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-4xl font-bold shadow-lg">
                                 RD
                             </div>
-
-                            {/* Info */}
+                            {}
                             <div className="flex-1 text-center md:text-left">
                                 <h1 className="text-4xl font-display font-bold text-neutral-900 mb-2">
                                     Rohit Deka
@@ -69,8 +65,7 @@ const Developer = () => {
                                     currently pursuing my studies at <span className="font-semibold text-neutral-800">VIT Bhopal</span>. 
                                     I specialize in building modern, scalable web applications with a focus on user experience and clean code.
                                 </p>
-
-                                {/* Contact Links */}
+                                {}
                                 <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                                     <a
                                         href="mailto:rohitdeka124@gmail.com"
@@ -107,8 +102,7 @@ const Developer = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Tech Stack Section */}
+                    {}
                     <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
                         <h2 className="text-3xl font-display font-bold text-neutral-900 mb-8 flex items-center">
                             <svg className="w-8 h-8 mr-3 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,9 +110,8 @@ const Developer = () => {
                             </svg>
                             Tech Stack
                         </h2>
-
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {/* Frontend */}
+                            {}
                             <div>
                                 <h3 className="text-lg font-semibold text-neutral-800 mb-4 flex items-center">
                                     <span className="w-2 h-2 bg-primary-500 rounded-full mr-2"></span>
@@ -135,8 +128,7 @@ const Developer = () => {
                                     ))}
                                 </div>
                             </div>
-
-                            {/* Backend */}
+                            {}
                             <div>
                                 <h3 className="text-lg font-semibold text-neutral-800 mb-4 flex items-center">
                                     <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
@@ -153,8 +145,7 @@ const Developer = () => {
                                     ))}
                                 </div>
                             </div>
-
-                            {/* Tools */}
+                            {}
                             <div>
                                 <h3 className="text-lg font-semibold text-neutral-800 mb-4 flex items-center">
                                     <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
@@ -171,8 +162,7 @@ const Developer = () => {
                                     ))}
                                 </div>
                             </div>
-
-                            {/* Services */}
+                            {}
                             <div>
                                 <h3 className="text-lg font-semibold text-neutral-800 mb-4 flex items-center">
                                     <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
@@ -191,8 +181,7 @@ const Developer = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* About Project */}
+                    {}
                     <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 mt-8">
                         <h2 className="text-3xl font-display font-bold text-neutral-900 mb-6">
                             About Unirooms
@@ -212,5 +201,4 @@ const Developer = () => {
         </div>
     );
 };
-
 export default Developer;

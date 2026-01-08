@@ -1,31 +1,24 @@
 import { useState, useCallback, useRef } from 'react';
 import { GoogleMap, LoadScript, Marker, Autocomplete } from '@react-google-maps/api';
-
 const libraries = ['places'];
-
 const LocationPicker = ({ onLocationSelect, initialLocation }) => {
     const [selectedLocation, setSelectedLocation] = useState(
-        initialLocation || { lat: 28.6139, lng: 77.2090 } // Default: New Delhi
+        initialLocation || { lat: 28.6139, lng: 77.2090 } 
     );
     const [address, setAddress] = useState('');
-    const [mapType, setMapType] = useState('roadmap'); // 'roadmap' or 'satellite'
+    const [mapType, setMapType] = useState('roadmap'); 
     const [isLocating, setIsLocating] = useState(false);
     const [mapCenter, setMapCenter] = useState(selectedLocation);
     const [zoom, setZoom] = useState(15);
-    
     const autocompleteRef = useRef(null);
     const mapRef = useRef(null);
-
     const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-    // Geocode coordinates to get address
     const reverseGeocode = useCallback(async (lat, lng) => {
         try {
             const geocoder = new window.google.maps.Geocoder();
             const result = await geocoder.geocode({
                 location: { lat, lng }
             });
-
             if (result.results[0]) {
                 const addr = result.results[0].formatted_address;
                 setAddress(addr);
@@ -36,8 +29,6 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
         }
         return '';
     }, []);
-
-    // Handle map click
     const handleMapClick = useCallback(async (e) => {
         const newLocation = {
             lat: e.latLng.lat(),
@@ -45,9 +36,7 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
         };
         setSelectedLocation(newLocation);
         setMapCenter(newLocation);
-        
         const addr = await reverseGeocode(newLocation.lat, newLocation.lng);
-        
         if (onLocationSelect) {
             onLocationSelect({
                 coordinates: [newLocation.lng, newLocation.lat],
@@ -55,14 +44,11 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
             });
         }
     }, [onLocationSelect, reverseGeocode]);
-
-    // Auto-detect current location
     const handleAutoDetect = () => {
         if (!navigator.geolocation) {
             alert('Geolocation is not supported by your browser');
             return;
         }
-
         setIsLocating(true);
         navigator.geolocation.getCurrentPosition(
             async (position) => {
@@ -73,9 +59,7 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
                 setSelectedLocation(newLocation);
                 setMapCenter(newLocation);
                 setZoom(18);
-                
                 const addr = await reverseGeocode(newLocation.lat, newLocation.lng);
-                
                 if (onLocationSelect) {
                     onLocationSelect({
                         coordinates: [newLocation.lng, newLocation.lat],
@@ -96,12 +80,9 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
             }
         );
     };
-
-    // Handle place selection from autocomplete
     const onPlaceChanged = () => {
         if (autocompleteRef.current) {
             const place = autocompleteRef.current.getPlace();
-            
             if (place.geometry) {
                 const newLocation = {
                     lat: place.geometry.location.lat(),
@@ -112,7 +93,6 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
                 setZoom(18);
                 const addr = place.formatted_address || '';
                 setAddress(addr);
-                
                 if (onLocationSelect) {
                     onLocationSelect({
                         coordinates: [newLocation.lng, newLocation.lat],
@@ -122,24 +102,18 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
             }
         }
     };
-
     const onAutocompleteLoad = (autocomplete) => {
         autocompleteRef.current = autocomplete;
-        
-        // Restrict search to India
         autocomplete.setComponentRestrictions({ country: 'in' });
     };
-
     const onMapLoad = (map) => {
         mapRef.current = map;
     };
-
     const mapContainerStyle = {
         width: '100%',
         height: '500px',
         borderRadius: '1rem'
     };
-
     const mapOptions = {
         mapTypeId: mapType,
         mapTypeControl: false,
@@ -148,10 +122,9 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
         zoomControl: true,
         gestureHandling: 'greedy'
     };
-
     return (
         <div className="space-y-4">
-            {/* Auto-Detect Button - Most Prominent */}
+            {}
             <div className="flex items-center justify-center">
                 <button
                     type="button"
@@ -178,12 +151,11 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
                     )}
                 </button>
             </div>
-
-            {/* Search Bar and Map Type Toggle */}
+            {}
             <div className="space-y-3">
                 <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={libraries}>
                     <div className="flex flex-col md:flex-row gap-3">
-                        {/* Google Places Autocomplete */}
+                        {}
                         <div className="flex-1">
                             <Autocomplete
                                 onLoad={onAutocompleteLoad}
@@ -196,8 +168,7 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
                                 />
                             </Autocomplete>
                         </div>
-
-                        {/* Map Type Toggle */}
+                        {}
                         <div className="flex bg-neutral-100 rounded-xl p-1.5 gap-1">
                             <button
                                 type="button"
@@ -223,15 +194,13 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
                             </button>
                         </div>
                     </div>
-
                     <p className="text-sm text-neutral-600 flex items-center gap-2">
                         <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         Search for your property location or click on the map to select
                     </p>
-
-                    {/* Google Map */}
+                    {}
                     <div className="relative rounded-xl overflow-hidden shadow-lg border-2 border-neutral-200">
                         <GoogleMap
                             mapContainerStyle={mapContainerStyle}
@@ -246,8 +215,7 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
                     </div>
                 </LoadScript>
             </div>
-
-            {/* Selected Location Display */}
+            {}
             {address && (
                 <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4">
                     <div className="flex items-start gap-3">
@@ -266,8 +234,7 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
                     </div>
                 </div>
             )}
-
-            {/* Instructions */}
+            {}
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                 <div className="flex gap-3">
                     <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -287,5 +254,4 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
         </div>
     );
 };
-
 export default LocationPicker;

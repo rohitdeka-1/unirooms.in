@@ -1,5 +1,3 @@
-// SEO Utility Functions
-
 /**
  * Update page meta tags dynamically
  */
@@ -11,28 +9,20 @@ export const updateMetaTags = ({
   url = window.location.href,
   type = 'website' 
 }) => {
-  // Update title
   if (title) {
     document.title = title;
     updateMetaTag('property', 'og:title', title);
     updateMetaTag('name', 'twitter:title', title);
   }
-
-  // Update description
   if (description) {
     updateMetaTag('name', 'description', description);
     updateMetaTag('property', 'og:description', description);
     updateMetaTag('name', 'twitter:description', description);
   }
-
-  // Update keywords
   if (keywords) {
     updateMetaTag('name', 'keywords', keywords);
   }
-
-  // Update image
   if (image) {
-    // Ensure image is a string (could be an array from property.images)
     const imageUrl = Array.isArray(image) ? image[0] : image;
     const fullImageUrl = (typeof imageUrl === 'string' && imageUrl.startsWith('http')) 
       ? imageUrl 
@@ -40,13 +30,9 @@ export const updateMetaTags = ({
     updateMetaTag('property', 'og:image', fullImageUrl);
     updateMetaTag('name', 'twitter:image', fullImageUrl);
   }
-
-  // Update URL
   if (url) {
     updateMetaTag('property', 'og:url', url);
     updateMetaTag('name', 'twitter:url', url);
-    
-    // Update canonical URL
     let canonical = document.querySelector('link[rel="canonical"]');
     if (!canonical) {
       canonical = document.createElement('link');
@@ -55,28 +41,22 @@ export const updateMetaTags = ({
     }
     canonical.href = url;
   }
-
-  // Update type
   if (type) {
     updateMetaTag('property', 'og:type', type);
   }
 };
-
 /**
  * Helper function to update or create meta tags
  */
 const updateMetaTag = (attribute, key, content) => {
   let element = document.querySelector(`meta[${attribute}="${key}"]`);
-  
   if (!element) {
     element = document.createElement('meta');
     element.setAttribute(attribute, key);
     document.head.appendChild(element);
   }
-  
   element.setAttribute('content', content);
 };
-
 /**
  * Generate structured data for property listings
  */
@@ -118,7 +98,6 @@ export const generatePropertyStructuredData = (property) => {
     }
   };
 };
-
 /**
  * Generate breadcrumb structured data
  */
@@ -134,7 +113,6 @@ export const generateBreadcrumbStructuredData = (breadcrumbs) => {
     }))
   };
 };
-
 /**
  * Generate FAQ structured data
  */
@@ -152,7 +130,6 @@ export const generateFAQStructuredData = (faqs) => {
     }))
   };
 };
-
 /**
  * Add structured data to page
  */
@@ -160,16 +137,12 @@ export const addStructuredData = (data) => {
   const script = document.createElement('script');
   script.type = 'application/ld+json';
   script.text = JSON.stringify(data);
-  
-  // Remove existing structured data of same type
   const existing = document.querySelector(`script[type="application/ld+json"]`);
   if (existing && existing.text.includes(data['@type'])) {
     existing.remove();
   }
-  
   document.head.appendChild(script);
 };
-
 /**
  * SEO-friendly URL slug generator
  */
@@ -181,7 +154,6 @@ export const generateSlug = (text) => {
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
 };
-
 /**
  * Page-specific SEO configurations
  */
@@ -223,7 +195,6 @@ export const pageSEO = {
     url: 'https://unirooms.in/safety'
   }
 };
-
 export default {
   updateMetaTags,
   generatePropertyStructuredData,

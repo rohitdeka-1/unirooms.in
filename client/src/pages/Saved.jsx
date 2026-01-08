@@ -4,19 +4,16 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PropertyCard from '../components/PropertyCard';
 import { savedPropertyAPI } from '../utils/api';
-
 const Saved = () => {
     const { isAuthenticated } = useAuth();
     const [savedProperties, setSavedProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     useEffect(() => {
         if (isAuthenticated) {
             fetchSavedProperties();
         }
     }, [isAuthenticated]);
-
     const fetchSavedProperties = async () => {
         try {
             setLoading(true);
@@ -29,7 +26,6 @@ const Saved = () => {
             setLoading(false);
         }
     };
-
     const handleUnsave = async (propertyId) => {
         try {
             await savedPropertyAPI.unsaveProperty(propertyId);
@@ -38,8 +34,6 @@ const Saved = () => {
             console.error('Error unsaving property:', error);
         }
     };
-
-    // If not authenticated, show login prompt
     if (!isAuthenticated) {
         return (
             <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
@@ -50,20 +44,18 @@ const Saved = () => {
                         className="max-w-md mx-auto text-center"
                     >
                         <div className="card p-12">
-                            {/* Icon */}
+                            {}
                             <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center">
                                 <svg className="w-12 h-12 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                 </svg>
                             </div>
-
                             <h1 className="text-2xl font-display font-bold text-neutral-800 mb-3">
                                 Save Your Favorites
                             </h1>
                             <p className="text-neutral-500 mb-8">
                                 Sign in to save and manage your favorite PG accommodations. Keep track of places you love and compare them easily.
                             </p>
-
                             <div className="space-y-3">
                                 <Link to="/login" className="block btn-primary w-full">
                                     Sign In
@@ -72,7 +64,6 @@ const Saved = () => {
                                     Create Account
                                 </Link>
                             </div>
-
                             <p className="text-neutral-400 text-sm mt-6">
                                 Join 10,000+ students who found their perfect PG
                             </p>
@@ -82,7 +73,6 @@ const Saved = () => {
             </div>
         );
     }
-
     if (loading) {
         return (
             <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
@@ -94,17 +84,16 @@ const Saved = () => {
             </div>
         );
     }
-
     return (
         <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
             <div className="container mx-auto px-4">
-                {/* Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
                 >
-                    {/* Breadcrumb */}
+                    {}
                     <div className="flex items-center space-x-2 text-sm text-neutral-500 mb-4">
                         <Link to="/" className="hover:text-primary-600 transition-colors">
                             Home
@@ -114,7 +103,6 @@ const Saved = () => {
                         </svg>
                         <span className="text-neutral-700 font-medium">Saved Properties</span>
                     </div>
-
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
                             <h1 className="text-3xl md:text-4xl font-display font-bold text-neutral-800">
@@ -124,8 +112,7 @@ const Saved = () => {
                                 {savedProperties.length} properties saved
                             </p>
                         </div>
-
-                        {/* Quick Actions */}
+                        {}
                         <div className="flex items-center space-x-3">
                             <Link
                                 to="/browse"
@@ -139,8 +126,7 @@ const Saved = () => {
                         </div>
                     </div>
                 </motion.div>
-
-                {/* Property Grid */}
+                {}
                 {savedProperties.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         <AnimatePresence mode="popLayout">
@@ -184,8 +170,7 @@ const Saved = () => {
                         </Link>
                     </motion.div>
                 )}
-
-                {/* Tips Section */}
+                {}
                 {savedProperties.length > 0 && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -216,5 +201,4 @@ const Saved = () => {
         </div>
     );
 };
-
 export default Saved;

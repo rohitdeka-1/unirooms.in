@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom';
-
 const Footer = () => {
     const currentYear = new Date().getFullYear();
-
     const footerLinks = {
         company: [
             { name: 'About Us', path: '/about' },
@@ -25,13 +23,12 @@ const Footer = () => {
             { name: 'Landlord Dashboard', path: '/landlord/dashboard' },
         ],
     };
-
     return (
         <footer className="bg-neutral-900 text-white pb-20 md:pb-0">
-                {/* Main Footer */}
+                {}
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-                    {/* Brand */}
+                    {}
                     <div className="lg:col-span-1">
                         <Link to="/" className="flex items-center space-x-2 mb-4">
                             <img src="/logo.png" alt="Unirooms" className="w-10 h-10 rounded-xl" />
@@ -40,8 +37,7 @@ const Footer = () => {
                         <p className="text-neutral-400 text-sm mb-4">
                             Find your perfect PG accommodation near your university. Verified listings, trusted landlords.
                         </p>
-                        
-                        {/* Contact Info */}
+                        {}
                         <div className="space-y-2 mb-4">
                             <a href="mailto:unirooms.in@gmail.com" className="flex items-center space-x-2 text-neutral-400 hover:text-white text-sm transition-colors">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,8 +52,7 @@ const Footer = () => {
                                 <span>+91 8420514587</span>
                             </a>
                         </div>
-                        
-                        {/* Social Links */}
+                        {}
                         <div className="flex space-x-3">
                             <a href="https://twitter.com/unirooms" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-colors">
                                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
@@ -70,8 +65,7 @@ const Footer = () => {
                             </a>
                         </div>
                     </div>
-
-                    {/* Links */}
+                    {}
                     <div>
                         <h4 className="font-display font-semibold mb-4">Company</h4>
                         <ul className="space-y-2">
@@ -84,7 +78,6 @@ const Footer = () => {
                             ))}
                         </ul>
                     </div>
-
                     <div>
                         <h4 className="font-display font-semibold mb-4">Support</h4>
                         <ul className="space-y-2">
@@ -97,7 +90,6 @@ const Footer = () => {
                             ))}
                         </ul>
                     </div>
-
                     <div>
                         <h4 className="font-display font-semibold mb-4">Explore</h4>
                         <ul className="space-y-2">
@@ -110,7 +102,6 @@ const Footer = () => {
                             ))}
                         </ul>
                     </div>
-
                     <div>
                         <h4 className="font-display font-semibold mb-4">For Landlords</h4>
                         <ul className="space-y-2">
@@ -125,8 +116,7 @@ const Footer = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Bottom Bar */}
+            {}
             <div className="border-t border-neutral-800">
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -154,5 +144,4 @@ const Footer = () => {
         </footer>
     );
 };
-
 export default Footer;

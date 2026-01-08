@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { propertyAPI } from '../utils/api';
-
 const SearchBar = ({ onSearch, variant = 'default' }) => {
     const [location, setLocation] = useState('');
     const [collegeSuggestions, setCollegeSuggestions] = useState([]);
@@ -11,34 +10,24 @@ const SearchBar = ({ onSearch, variant = 'default' }) => {
     const navigate = useNavigate();
     const suggestionsRef = useRef(null);
     const searchTimeoutRef = useRef(null);
-
-    // Close suggestions when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
                 setShowSuggestions(false);
             }
         };
-
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
-
-    // Search colleges as user types
     useEffect(() => {
-        // Clear previous timeout
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
         }
-
-        // Don't search if query is too short
         if (location.trim().length < 2) {
             setCollegeSuggestions([]);
             setShowSuggestions(false);
             return;
         }
-
-        // Debounce the search
         searchTimeoutRef.current = setTimeout(async () => {
             try {
                 setIsSearchingCollege(true);
@@ -54,14 +43,12 @@ const SearchBar = ({ onSearch, variant = 'default' }) => {
                 setIsSearchingCollege(false);
             }
         }, 300);
-
         return () => {
             if (searchTimeoutRef.current) {
                 clearTimeout(searchTimeoutRef.current);
             }
         };
     }, [location]);
-
     const handleSearch = (e) => {
         e.preventDefault();
         if (onSearch) {
@@ -71,34 +58,22 @@ const SearchBar = ({ onSearch, variant = 'default' }) => {
         }
         setShowSuggestions(false);
     };
-
     const handleCollegeSelect = (college) => {
         const searchTerm = college.shortName || college.name;
         setShowSuggestions(false);
-        
-        // Clear any pending search timeouts
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
         }
-        
-        // Navigate to browse page with campus filter
         navigate(`/browse?campus=${encodeURIComponent(searchTerm)}`);
     };
-
     const handlePopularClick = (place) => {
         setShowSuggestions(false);
-        
-        // Clear any pending search timeouts
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
         }
-        
-        // Trigger search for popular colleges
         navigate(`/browse?campus=${encodeURIComponent(place)}`);
     };
-
     const isHero = variant === 'hero';
-
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -124,8 +99,7 @@ const SearchBar = ({ onSearch, variant = 'default' }) => {
                         />
                     </div>
                 </div>
-
-                {/* College Suggestions Dropdown */}
+                {}
                 {showSuggestions && collegeSuggestions.length > 0 && (
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
@@ -169,8 +143,7 @@ const SearchBar = ({ onSearch, variant = 'default' }) => {
                     </motion.div>
                 )}
             </form>
-
-            {/* Popular Searches */}
+            {}
             {isHero && (
                 <motion.div
                     initial={{ opacity: 0 }}
@@ -194,5 +167,4 @@ const SearchBar = ({ onSearch, variant = 'default' }) => {
         </motion.div>
     );
 };
-
 export default SearchBar;

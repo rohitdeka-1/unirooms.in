@@ -1,12 +1,10 @@
 import { motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { updateMetaTags, pageSEO } from '../utils/seo';
-
 const Safety = () => {
     useEffect(() => {
         updateMetaTags(pageSEO.safety);
     }, []);
-
     const safetyTips = [
         {
             icon: (
@@ -83,11 +81,10 @@ const Safety = () => {
             description: 'If something feels wrong or too good to be true, trust your instincts. Don\'t let anyone pressure you into making quick decisions. Take your time to evaluate all options.'
         }
     ];
-
     return (
         <div className="min-h-screen bg-neutral-50 pt-24 pb-24 md:pb-12">
             <div className="container mx-auto px-4">
-                {/* Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -105,8 +102,7 @@ const Safety = () => {
                         Your safety is our priority. Follow these guidelines to ensure a secure accommodation search experience.
                     </p>
                 </motion.div>
-
-                {/* Important Notice */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -132,8 +128,7 @@ const Safety = () => {
                         </div>
                     </div>
                 </motion.div>
-
-                {/* Safety Tips Grid */}
+                {}
                 <div className="max-w-6xl mx-auto">
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
@@ -169,8 +164,7 @@ const Safety = () => {
                         ))}
                     </div>
                 </div>
-
-                {/* Report Issues */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -196,5 +190,4 @@ const Safety = () => {
         </div>
     );
 };
-
 export default Safety;

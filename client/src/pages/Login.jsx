@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
-
 const Login = () => {
     const navigate = useNavigate();
     const { login, googleLogin } = useAuth();
@@ -11,16 +10,12 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
-
         try {
             const response = await login(formData);
-            
-            // Redirect based on user role
             if (response.data.user.role === 'landlord') {
                 navigate('/landlord/dashboard');
             } else {
@@ -32,15 +27,11 @@ const Login = () => {
             setLoading(false);
         }
     };
-
     const handleGoogleSuccess = async (credentialResponse) => {
         setGoogleLoading(true);
         setError('');
         try {
-            // credentialResponse.credential is the ID token
             const response = await googleLogin(credentialResponse.credential);
-            
-            // Redirect based on user role
             if (response.data.user.role === 'landlord') {
                 navigate('/landlord/dashboard');
             } else {
@@ -52,14 +43,12 @@ const Login = () => {
             setGoogleLoading(false);
         }
     };
-
     const handleGoogleError = () => {
         setError('Google login failed. Please try again.');
     };
-
     return (
         <div className="min-h-screen flex relative overflow-hidden">
-            {/* Left Side - Form */}
+            {}
             <div className="w-full lg:flex-1 flex items-center justify-center px-4 sm:px-6 py-12 lg:px-8 relative z-10 bg-white">
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
@@ -71,7 +60,6 @@ const Login = () => {
                             <img src="/logo.png" alt="Unirooms" className="w-10 h-10 rounded-xl" />
                             <span className="text-xl font-display font-bold text-neutral-800">Unirooms</span>
                         </Link>
-
                         <h1 className="text-3xl font-display font-bold text-neutral-900 mb-2">
                             Welcome back
                         </h1>
@@ -79,7 +67,6 @@ const Login = () => {
                             Sign in to access landlord contacts and save your favorites.
                         </p>
                     </div>
-
                     {error && (
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
@@ -89,8 +76,7 @@ const Login = () => {
                             {error}
                         </motion.div>
                     )}
-
-                    {/* Google Sign In Button */}
+                    {}
                     <div className="mb-6">
                         {googleLoading ? (
                             <div className="w-full flex items-center justify-center py-3.5 px-4 bg-neutral-100 border-2 border-neutral-200 rounded-xl">
@@ -113,8 +99,7 @@ const Login = () => {
                             </div>
                         )}
                     </div>
-
-                    {/* Divider */}
+                    {}
                     <div className="relative mb-6">
                         <div className="absolute inset-0 flex items-center">
                             <div className="w-full border-t border-neutral-200"></div>
@@ -123,7 +108,6 @@ const Login = () => {
                             <span className="px-4 bg-white text-neutral-400">or continue with email</span>
                         </div>
                     </div>
-
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
                             <label className="block text-sm font-medium text-neutral-700 mb-2">Email Address</label>
@@ -136,7 +120,6 @@ const Login = () => {
                                 placeholder="you@example.com"
                             />
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium text-neutral-700 mb-2">Password</label>
                             <input
@@ -148,7 +131,6 @@ const Login = () => {
                                 placeholder="••••••••"
                             />
                         </div>
-
                         <div className="flex items-center justify-between">
                             <label className="flex items-center">
                                 <input type="checkbox" className="w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500" />
@@ -158,7 +140,6 @@ const Login = () => {
                                 Forgot password?
                             </Link>
                         </div>
-
                         <button
                             type="submit"
                             disabled={loading}
@@ -177,7 +158,6 @@ const Login = () => {
                             )}
                         </button>
                     </form>
-
                     <p className="mt-8 text-center text-neutral-500">
                         Don't have an account?{' '}
                         <Link to="/signup" className="font-semibold text-primary-600 hover:text-primary-700">
@@ -186,13 +166,11 @@ const Login = () => {
                     </p>
                 </motion.div>
             </div>
-
-            {/* Right Side - Image/Branding */}
+            {}
             <div className="hidden lg:flex flex-1 relative bg-gradient-to-br from-primary-600 to-primary-700">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1920')] bg-cover bg-center mix-blend-overlay opacity-15" />
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-400/20 rounded-full blur-3xl" />
                 <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl" />
-
                 <div className="relative z-10 flex flex-col justify-center p-16">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -205,7 +183,6 @@ const Login = () => {
                         <p className="text-white/80 text-lg max-w-md">
                             Access verified PG listings, connect with landlords, and find the perfect accommodation near your university.
                         </p>
-
                         <div className="mt-12 flex items-center space-x-4">
                             <div className="flex -space-x-3">
                                 {[1, 2, 3, 4].map((i) => (
@@ -222,5 +199,4 @@ const Login = () => {
         </div>
     );
 };
-
 export default Login;

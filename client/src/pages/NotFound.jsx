@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
 const NotFound = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50 flex items-center justify-center px-4">
@@ -19,7 +18,6 @@ const NotFound = () => {
                         Oops! The page you're looking for doesn't exist. It might have been moved or deleted.
                     </p>
                 </div>
-
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link
                         to="/"
@@ -40,7 +38,6 @@ const NotFound = () => {
                         Browse Properties
                     </Link>
                 </div>
-
                 <div className="mt-12">
                     <img 
                         src="https://illustrations.popsy.co/amber/error-404.svg" 
@@ -52,5 +49,4 @@ const NotFound = () => {
         </div>
     );
 };
-
 export default NotFound;

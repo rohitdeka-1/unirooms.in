@@ -1,10 +1,9 @@
 import { motion } from 'framer-motion';
-
 const RefundPolicy = () => {
     return (
         <div className="min-h-screen bg-neutral-50 pt-24 pb-24 md:pb-12 mt-7">
             <div className="container mx-auto px-4">
-                {/* Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -17,10 +16,9 @@ const RefundPolicy = () => {
                         Last updated: January 5, 2026
                     </p>
                 </motion.div>
-
-                {/* Content */}
+                {}
                 <div className="max-w-4xl mx-auto space-y-8">
-                    {/* Important Notice */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -41,7 +39,6 @@ const RefundPolicy = () => {
                             </div>
                         </div>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -58,7 +55,6 @@ const RefundPolicy = () => {
                             <strong>For Landlords:</strong> Unirooms charges a one-time platform listing fee of <strong>₹99 (Rupees Ninety-Nine only)</strong> to list your property on our platform. This fee helps us maintain the platform, verify properties, and connect you with genuine students looking for accommodation. This fee is separate from any rental payments, deposits, or other fees you receive from tenants.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -88,7 +84,6 @@ const RefundPolicy = () => {
                             <li>Guarantee property availability, quality, or conditions</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -111,7 +106,6 @@ const RefundPolicy = () => {
                             <li>Our service is complete once the property is live on the platform</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -143,7 +137,6 @@ const RefundPolicy = () => {
                             <li>Acting as your property manager or agent</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -170,7 +163,6 @@ const RefundPolicy = () => {
                             <strong>We strongly recommend:</strong> Students should discuss and clearly understand the landlord's refund policy before making any payments to them.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -201,7 +193,6 @@ const RefundPolicy = () => {
                             <li>Any issues arising from your interaction with the landlord</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -228,7 +219,6 @@ const RefundPolicy = () => {
                             We will review your request within 3-5 business days. If approved, refunds will be processed to the original payment method within 7-10 business days.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -242,7 +232,6 @@ const RefundPolicy = () => {
                             All payments are processed through secure third-party payment gateways. We do not store your complete payment card details. For payment-related issues (failed transactions, payment errors, etc.), please contact our support team immediately.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -256,7 +245,6 @@ const RefundPolicy = () => {
                             If you have any disputes regarding refunds or payments, please contact us first. We are committed to resolving all issues fairly and promptly. For any unresolved disputes, the jurisdiction shall be as per the Terms of Service.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -270,7 +258,6 @@ const RefundPolicy = () => {
                             We reserve the right to modify this Refund Policy at any time. Any changes will be posted on this page with an updated revision date. Your continued use of the Platform after such changes constitutes acceptance of the updated policy.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -294,5 +281,4 @@ const RefundPolicy = () => {
         </div>
     );
 };
-
 export default RefundPolicy;

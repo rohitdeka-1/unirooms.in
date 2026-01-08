@@ -1,21 +1,17 @@
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-
 const VerifyEmailPending = () => {
     const location = useLocation();
     const email = location.state?.email;
     const openGmail = () => {
         window.open('https://mail.google.com', '_blank');
     };
-
     const openOutlook = () => {
         window.open('https://outlook.live.com', '_blank');
     };
-
     const openYahoo = () => {
         window.open('https://mail.yahoo.com', '_blank');
     };
-
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-accent-50 px-4">
             <motion.div
@@ -28,17 +24,14 @@ const VerifyEmailPending = () => {
                         <img src="/logo.png" alt="Unirooms" className="w-12 h-12 rounded-xl" />
                         <span className="text-2xl font-display font-bold text-neutral-800">Unirooms</span>
                     </Link>
-
                     <div className="w-20 h-20 mx-auto mb-6 bg-primary-100 rounded-full flex items-center justify-center">
                         <svg className="w-12 h-12 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                     </div>
-
                     <h2 className="text-3xl font-display font-bold text-neutral-800 mb-4">
                         Verify Your Email
                     </h2>
-                    
                     <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 mb-6">
                         <p className="text-primary-800 font-medium mb-2">
                             We've sent a verification email to:
@@ -47,11 +40,9 @@ const VerifyEmailPending = () => {
                             {email || 'your email address'}
                         </p>
                     </div>
-
                     <p className="text-neutral-600 mb-6">
                         Please check your inbox and click the verification link to activate your account.
                     </p>
-
                     <div className="space-y-3 mb-8">
                         <p className="text-sm font-semibold text-neutral-700 mb-3">
                             Quick access to your email:
@@ -65,7 +56,6 @@ const VerifyEmailPending = () => {
                             </svg>
                             <span className="font-medium text-neutral-700">Open Gmail</span>
                         </button>
-                        
                         <button
                             onClick={openOutlook}
                             className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-white border-2 border-neutral-200 rounded-xl hover:border-primary-500 hover:bg-primary-50 transition-all"
@@ -75,7 +65,6 @@ const VerifyEmailPending = () => {
                             </svg>
                             <span className="font-medium text-neutral-700">Open Outlook</span>
                         </button>
-
                         <button
                             onClick={openYahoo}
                             className="w-full flex items-center justify-center space-x-3 px-6 py-3 bg-white border-2 border-neutral-200 rounded-xl hover:border-primary-500 hover:bg-primary-50 transition-all"
@@ -86,7 +75,6 @@ const VerifyEmailPending = () => {
                             <span className="font-medium text-neutral-700">Open Yahoo Mail</span>
                         </button>
                     </div>
-
                     <div className="bg-neutral-50 rounded-xl p-4 mb-6">
                         <p className="text-sm text-neutral-600 mb-2">
                             <strong>Didn't receive the email?</strong>
@@ -98,7 +86,6 @@ const VerifyEmailPending = () => {
                             <li>• Try signing up again to resend the verification email</li>
                         </ul>
                     </div>
-
                     <Link
                         to="/login"
                         className="text-primary-600 hover:text-primary-700 font-medium text-sm"
@@ -110,5 +97,4 @@ const VerifyEmailPending = () => {
         </div>
     );
 };
-
 export default VerifyEmailPending;

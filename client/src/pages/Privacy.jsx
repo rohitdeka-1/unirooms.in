@@ -1,10 +1,9 @@
 import { motion } from 'framer-motion';
-
 const Privacy = () => {
     return (
         <div className="min-h-screen bg-neutral-50 pt-24 pb-24 md:pb-12 mt-7">
             <div className="container mx-auto px-4">
-                {/* Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -17,8 +16,7 @@ const Privacy = () => {
                         Last updated: January 5, 2026
                     </p>
                 </motion.div>
-
-                {/* Content */}
+                {}
                 <div className="max-w-4xl mx-auto space-y-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -36,7 +34,6 @@ const Privacy = () => {
                             Please read this Privacy Policy carefully. By using the Platform, you agree to the collection and use of information in accordance with this policy.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -69,7 +66,6 @@ const Privacy = () => {
                             <li>University/College information</li>
                             <li>Accommodation preferences</li>
                         </ul>
-
                         <h3 className="text-lg font-semibold text-neutral-800 mb-3 mt-6">
                             2.2 Automatically Collected Information
                         </h3>
@@ -85,7 +81,6 @@ const Privacy = () => {
                             <li>Operating system</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -111,7 +106,6 @@ const Privacy = () => {
                             <li>To send promotional communications (with your consent)</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -135,7 +129,6 @@ const Privacy = () => {
                             <strong>We do not sell your personal information to third parties.</strong>
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -159,7 +152,6 @@ const Privacy = () => {
                             However, no method of transmission over the internet or electronic storage is 100% secure. While we strive to protect your information, we cannot guarantee absolute security.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -176,7 +168,6 @@ const Privacy = () => {
                             You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Platform.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -201,7 +192,6 @@ const Privacy = () => {
                             To exercise these rights, please contact us at unirooms.in@gmail.com
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -215,7 +205,6 @@ const Privacy = () => {
                             We retain your personal information only for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required or permitted by law. When we no longer need your information, we will securely delete or anonymize it.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -229,7 +218,6 @@ const Privacy = () => {
                             Our Platform may contain links to third-party websites that are not operated by us. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services. We encourage you to review the privacy policy of every site you visit.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -243,7 +231,6 @@ const Privacy = () => {
                             Our Platform is not intended for use by children under the age of 18. We do not knowingly collect personal information from children under 18. If you become aware that a child has provided us with personal information, please contact us, and we will take steps to delete such information.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -257,7 +244,6 @@ const Privacy = () => {
                             We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date. You are advised to review this Privacy Policy periodically for any changes.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -280,5 +266,4 @@ const Privacy = () => {
         </div>
     );
 };
-
 export default Privacy;

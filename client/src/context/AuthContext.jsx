@@ -1,8 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI } from '../utils/api';
-
 const AuthContext = createContext();
-
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
@@ -10,16 +8,13 @@ export const useAuth = () => {
     }
     return context;
 };
-
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-
     useEffect(() => {
         checkAuth();
     }, []);
-
     const checkAuth = async () => {
         const token = localStorage.getItem('accessToken');
         if (token) {
@@ -34,7 +29,6 @@ export const AuthProvider = ({ children }) => {
         }
         setLoading(false);
     };
-
     const login = async (credentials) => {
         const response = await authAPI.login(credentials);
         localStorage.setItem('accessToken', response.data.accessToken);
@@ -43,27 +37,19 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         return response;
     };
-
     const register = async (userData) => {
         const response = await authAPI.register(userData);
-        
-        // Check if email verification is required
         if (response.data.requiresEmailVerification) {
-            // Don't set tokens or authenticate - user needs to verify email
             return response;
         }
-        
-        // For other cases (e.g., Google signup), set tokens
         if (response.data.accessToken) {
             localStorage.setItem('accessToken', response.data.accessToken);
             localStorage.setItem('refreshToken', response.data.refreshToken);
             setUser(response.data.user);
             setIsAuthenticated(true);
         }
-        
         return response;
     };
-
     const logout = async () => {
         try {
             await authAPI.logout();
@@ -75,7 +61,6 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setIsAuthenticated(false);
     };
-
     const googleLogin = async (credential) => {
         const response = await authAPI.googleLogin(credential);
         localStorage.setItem('accessToken', response.data.accessToken);
@@ -84,7 +69,6 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         return response;
     };
-
     const googleSignup = async (credential, role) => {
         const response = await authAPI.googleSignup(credential, role);
         localStorage.setItem('accessToken', response.data.accessToken);
@@ -93,7 +77,6 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         return response;
     };
-
     const refreshUser = async () => {
         try {
             const response = await authAPI.getCurrentUser();
@@ -104,7 +87,6 @@ export const AuthProvider = ({ children }) => {
             throw error;
         }
     };
-
     const value = {
         user,
         isAuthenticated,
@@ -116,6 +98,5 @@ export const AuthProvider = ({ children }) => {
         logout,
         refreshUser,
     };
-
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -1,10 +1,9 @@
 import { motion } from 'framer-motion';
-
 const Terms = () => {
     return (
         <div className="min-h-screen bg-neutral-50 pt-24 pb-24 md:pb-12 mt-7">
             <div className="container mx-auto px-4">
-                {/* Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -17,8 +16,7 @@ const Terms = () => {
                         Last updated: January 5, 2026
                     </p>
                 </motion.div>
-
-                {/* Content */}
+                {}
                 <div className="max-w-4xl mx-auto space-y-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -33,7 +31,6 @@ const Terms = () => {
                             By accessing and using Unirooms ("Platform", "Service", "we", "us", "our"), you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to these Terms of Service, please do not use our Platform.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -57,7 +54,6 @@ const Terms = () => {
                             <li>Provide any accommodation services directly</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -81,7 +77,6 @@ const Terms = () => {
                             <li>Covers platform maintenance, property verification, and connecting you with students</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -104,7 +99,6 @@ const Terms = () => {
                             <li>Not harass, abuse, or harm other users or Property Owners</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -131,7 +125,6 @@ const Terms = () => {
                             THE PLATFORM IS PROVIDED "AS IS" WITHOUT ANY WARRANTIES, EXPRESS OR IMPLIED. YOUR USE OF THE PLATFORM IS AT YOUR SOLE RISK.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -153,7 +146,6 @@ const Terms = () => {
                             <li>Legal matters arising from the rental relationship</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -174,7 +166,6 @@ const Terms = () => {
                             <li>Honor the terms and conditions agreed upon with Users</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -188,7 +179,6 @@ const Terms = () => {
                             All content on the Unirooms Platform, including text, graphics, logos, images, and software, is the property of Unirooms or its content suppliers and is protected by intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -208,7 +198,6 @@ const Terms = () => {
                             <li>Is fraudulent or abusive</li>
                         </ul>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -222,7 +211,6 @@ const Terms = () => {
                             We reserve the right to modify these Terms of Service at any time. We will notify users of any material changes by posting the new Terms on the Platform. Your continued use of the Platform after such modifications constitutes your acceptance of the updated Terms.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -236,7 +224,6 @@ const Terms = () => {
                             These Terms of Service shall be governed by and construed in accordance with the laws of India. Any disputes arising from these Terms shall be subject to the exclusive jurisdiction of the courts in India.
                         </p>
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -259,5 +246,4 @@ const Terms = () => {
         </div>
     );
 };
-
 export default Terms;

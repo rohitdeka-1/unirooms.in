@@ -5,11 +5,9 @@ import PropertyCard from '../components/PropertyCard';
 import SearchBar from '../components/SearchBar';
 import { propertyAPI } from '../utils/api';
 import { updateMetaTags, pageSEO } from '../utils/seo';
-
 const Browse = () => {
     const [searchParams] = useSearchParams();
     const initialSearch = searchParams.get('search') || '';
-    // Support both 'campus' and 'college' URL parameters for backward compatibility
     const campusParam = searchParams.get('campus') || searchParams.get('college') || '';
     const [searchQuery, setSearchQuery] = useState(initialSearch);
     const [selectedType, setSelectedType] = useState('all');
@@ -19,25 +17,18 @@ const Browse = () => {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
-    // SEO Meta Tags
     useEffect(() => {
         updateMetaTags(pageSEO.browse);
     }, []);
-
     useEffect(() => {
         const fetchProperties = async () => {
             setLoading(true);
             setError(null);
-
             try {
                 const params = {};
-
                 if (searchQuery) params.search = searchQuery;
                 if (selectedType !== 'all') params.roomType = selectedType.toLowerCase().replace(' pg', '');
-
                 const response = await propertyAPI.getAllProperties(params);
-
                 if (response.success) {
                     setProperties(response.data.properties || []);
                 }
@@ -49,12 +40,8 @@ const Browse = () => {
                 setLoading(false);
             }
         };
-
         fetchProperties();
     }, [selectedType, searchQuery]);
-
-
-
     const propertyTypes = [
         { value: 'all', label: 'All Types' },
         { value: 'Boys PG', label: 'Boys PG' },
@@ -62,19 +49,14 @@ const Browse = () => {
         { value: 'Co-Living', label: 'Co-Living' },
         { value: 'Hostel', label: 'Hostel' },
     ];
-
     const sortOptions = [
         { value: 'recommended', label: 'Recommended' },
         { value: 'price-low', label: 'Price: Low to High' },
         { value: 'price-high', label: 'Price: High to Low' },
         { value: 'rating', label: 'Highest Rated' },
     ];
-
-
-
     const filteredProperties = useMemo(() => {
         let result = [...properties];
-
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
             result = result.filter(
@@ -87,14 +69,12 @@ const Browse = () => {
                     p.campusName?.toLowerCase().includes(query)
             );
         }
-
         if (selectedType !== 'all') {
             result = result.filter((p) => p.type === selectedType || p.roomType === selectedType.toLowerCase().replace(' pg', ''));
         }
         if (minRating > 0) {
             result = result.filter((p) => (p.rating || 0) >= minRating);
         }
-
         switch (sortBy) {
             case 'price-low':
                 result.sort((a, b) => a.price - b.price);
@@ -108,10 +88,8 @@ const Browse = () => {
             default:
                 break;
         }
-
         return result;
     }, [properties, searchQuery, selectedType, minRating, sortBy]);
-
     const clearFilters = () => {
         setSelectedType('all');
         setMinRating(0);
@@ -119,22 +97,20 @@ const Browse = () => {
         setSearchQuery('');
         window.history.pushState({}, '', '/browse');
     };
-
     const hasActiveFilters =
         selectedType !== 'all' ||
         minRating > 0 ||
         searchQuery;
-
     return (
         <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
             <div className="container mx-auto px-4">
-                {/* Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
                 >
-                    {/* Breadcrumb */}
+                    {}
                     <div className="flex items-center space-x-2 text-sm text-neutral-500 mb-4">
                         <Link to="/" className="hover:text-primary-600 transition-colors">
                             Home
@@ -144,9 +120,6 @@ const Browse = () => {
                         </svg>
                         <span className="text-neutral-700 font-medium">Browse PGs</span>
                     </div>
-
-
-
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div>
                             <h1 className="text-3xl md:text-4xl font-display font-bold text-neutral-800">
@@ -156,8 +129,7 @@ const Browse = () => {
                                 {loading ? 'Loading...' : `${filteredProperties.length} properties available`}
                             </p>
                         </div>
-
-                        {/* Search Bar */}
+                        {}
                         <div className="lg:w-96">
                             <SearchBar
                                 onSearch={(query) => setSearchQuery(query)}
@@ -166,9 +138,8 @@ const Browse = () => {
                         </div>
                     </div>
                 </motion.div>
-
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Filters Sidebar - Desktop */}
+                    {}
                     <motion.aside
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -189,8 +160,7 @@ const Browse = () => {
                                     </button>
                                 )}
                             </div>
-
-                            {/* Property Type */}
+                            {}
                             <div className="mb-6">
                                 <h3 className="text-sm font-semibold text-neutral-700 mb-3">
                                     Property Type
@@ -229,8 +199,7 @@ const Browse = () => {
                                     ))}
                                 </div>
                             </div>
-
-                            {/* Rating Filter */}
+                            {}
                             <div className="mb-6">
                                 <h3 className="text-sm font-semibold text-neutral-700 mb-3">
                                     Minimum Rating
@@ -261,10 +230,9 @@ const Browse = () => {
                             </div>
                         </div>
                     </motion.aside>
-
-                    {/* Main Content */}
+                    {}
                     <div className="flex-1">
-                        {/* Sort & Mobile Filter Bar */}
+                        {}
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -272,7 +240,7 @@ const Browse = () => {
                             className="flex items-center justify-between mb-6 bg-white rounded-2xl p-4 shadow-card"
                         >
                             <div className="flex items-center space-x-3">
-                                {/* Mobile Filter Button */}
+                                {}
                                 <button
                                     onClick={() => setShowFilters(true)}
                                     className="lg:hidden flex items-center space-x-2 px-4 py-2 bg-neutral-100 rounded-xl text-neutral-700 hover:bg-neutral-200 transition-colors"
@@ -285,13 +253,11 @@ const Browse = () => {
                                         <span className="w-2 h-2 bg-primary-500 rounded-full" />
                                     )}
                                 </button>
-
                                 <span className="hidden md:inline text-neutral-500 text-sm">
                                     Showing {filteredProperties.length} results
                                 </span>
                             </div>
-
-                            {/* Sort Dropdown */}
+                            {}
                             <div className="flex items-center space-x-2">
                                 <span className="text-neutral-500 text-sm hidden sm:inline">Sort by:</span>
                                 <select
@@ -307,8 +273,7 @@ const Browse = () => {
                                 </select>
                             </div>
                         </motion.div>
-
-                        {/* Property Grid */}
+                        {}
                         {loading ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                                 {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -389,12 +354,11 @@ const Browse = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Mobile Filter Bottom Sheet */}
+            {}
             <AnimatePresence>
                 {showFilters && (
                     <>
-                        {/* Backdrop */}
+                        {}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -402,8 +366,7 @@ const Browse = () => {
                             onClick={() => setShowFilters(false)}
                             className="fixed inset-0 bg-black/50 z-50 lg:hidden"
                         />
-
-                        {/* Bottom Sheet */}
+                        {}
                         <motion.div
                             initial={{ y: '100%' }}
                             animate={{ y: 0 }}
@@ -412,9 +375,8 @@ const Browse = () => {
                             className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 lg:hidden max-h-[80vh] overflow-y-auto"
                         >
                             <div className="p-6">
-                                {/* Handle */}
+                                {}
                                 <div className="w-12 h-1.5 bg-neutral-200 rounded-full mx-auto mb-6" />
-
                                 <div className="flex items-center justify-between mb-6">
                                     <h2 className="text-xl font-display font-bold text-neutral-800">
                                         Filters
@@ -428,8 +390,7 @@ const Browse = () => {
                                         </svg>
                                     </button>
                                 </div>
-
-                                {/* Property Type */}
+                                {}
                                 <div className="mb-6">
                                     <h3 className="text-sm font-semibold text-neutral-700 mb-3">
                                         Property Type
@@ -449,10 +410,7 @@ const Browse = () => {
                                         ))}
                                     </div>
                                 </div>
-
-
-
-                                {/* Rating Filter */}
+                                {}
                                 <div className="mb-8">
                                     <h3 className="text-sm font-semibold text-neutral-700 mb-3">
                                         Minimum Rating
@@ -472,8 +430,7 @@ const Browse = () => {
                                         ))}
                                     </div>
                                 </div>
-
-                                {/* Action Buttons */}
+                                {}
                                 <div className="flex space-x-3">
                                     <button
                                         onClick={clearFilters}
@@ -496,5 +453,4 @@ const Browse = () => {
         </div>
     );
 };
-
 export default Browse;

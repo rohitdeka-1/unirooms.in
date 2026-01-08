@@ -2,16 +2,14 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { updateMetaTags, pageSEO } from '../utils/seo';
-
 const Pricing = () => {
     useEffect(() => {
         updateMetaTags(pageSEO.pricing);
     }, []);
-
     return (
         <div className="min-h-screen bg-neutral-50 pt-24 pb-24 md:pb-12 mt-7">
             <div className="container mx-auto px-4">
-                {/* Header */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -24,21 +22,19 @@ const Pricing = () => {
                         Students browse and contact landlords for <strong className="text-green-600">FREE</strong>. Landlords pay a one-time fee to list their properties.
                     </p>
                 </motion.div>
-
-                {/* Pricing Cards */}
+                {}
                 <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
-                    {/* For Students - FREE */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
                     >
                         <div className="card p-8 text-center border-2 border-green-500 relative overflow-hidden h-full">
-                            {/* Badge */}
+                            {}
                             <div className="absolute top-0 right-0 bg-green-600 text-white px-4 py-1 text-sm font-semibold rounded-bl-lg">
                                 For Students
                             </div>
-
                             <div className="mb-6 mt-4">
                                 <h2 className="text-2xl font-display font-bold text-neutral-800 mb-2">
                                     Browse & Connect
@@ -47,15 +43,13 @@ const Pricing = () => {
                                     Find your perfect PG
                                 </p>
                             </div>
-
                             <div className="mb-8">
                                 <div className="flex items-center justify-center mb-2">
                                     <span className="text-5xl font-display font-bold text-green-600">FREE</span>
                                 </div>
                                 <p className="text-neutral-500">Forever. No hidden charges.</p>
                             </div>
-
-                            {/* Features */}
+                            {}
                             <div className="space-y-4 mb-8 text-left">
                                 <div className="flex items-start space-x-3">
                                     <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,25 +88,22 @@ const Pricing = () => {
                                     <span className="text-neutral-700">No payment required ever</span>
                                 </div>
                             </div>
-
                             <Link to="/browse" className="btn-primary bg-green-600 hover:bg-green-700 w-full text-center block">
                                 Start Browsing
                             </Link>
                         </div>
                     </motion.div>
-
-                    {/* For Landlords - ₹99 */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
                     >
                         <div className="card p-8 text-center border-2 border-primary-500 relative overflow-hidden h-full">
-                            {/* Badge */}
+                            {}
                             <div className="absolute top-0 right-0 bg-primary-600 text-white px-4 py-1 text-sm font-semibold rounded-bl-lg">
                                 For Landlords
                             </div>
-
                             <div className="mb-6 mt-4">
                                 <h2 className="text-2xl font-display font-bold text-neutral-800 mb-2">
                                     Property Listing
@@ -121,15 +112,13 @@ const Pricing = () => {
                                     Reach thousands of students
                                 </p>
                             </div>
-
                             <div className="mb-8">
                                 <div className="flex items-center justify-center mb-2">
                                     <span className="text-5xl font-display font-bold text-neutral-800">₹99</span>
                                 </div>
                                 <p className="text-neutral-500">One-time fee per property</p>
                             </div>
-
-                            {/* Features */}
+                            {}
                             <div className="space-y-4 mb-8 text-left">
                                 <div className="flex items-start space-x-3">
                                     <svg className="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,15 +157,13 @@ const Pricing = () => {
                                     <span className="text-neutral-700">Direct communication with students</span>
                                 </div>
                             </div>
-
                             <Link to="/list-property" className="btn-primary w-full text-center block">
                                 List Your Property
                             </Link>
                         </div>
                     </motion.div>
                 </div>
-
-                {/* How It Works */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -186,8 +173,7 @@ const Pricing = () => {
                     <h2 className="text-2xl font-display font-bold text-neutral-800 mb-8 text-center">
                         How It Works
                     </h2>
-                    
-                    {/* For Students */}
+                    {}
                     <div className="mb-10">
                         <h3 className="text-xl font-semibold text-green-600 text-center mb-6">For Students (FREE)</h3>
                         <div className="grid md:grid-cols-3 gap-6">
@@ -220,10 +206,8 @@ const Pricing = () => {
                             </div>
                         </div>
                     </div>
-
                     <div className="border-t border-neutral-200 my-8"></div>
-
-                    {/* For Landlords */}
+                    {}
                     <div>
                         <h3 className="text-xl font-semibold text-primary-600 text-center mb-6">For Landlords (₹99 per listing)</h3>
                         <div className="grid md:grid-cols-3 gap-6">
@@ -257,8 +241,7 @@ const Pricing = () => {
                         </div>
                     </div>
                 </motion.div>
-
-                {/* FAQs */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -277,7 +260,6 @@ const Pricing = () => {
                                 Yes! Students can browse all properties, view complete details including landlord contact information, and reach out to landlords completely FREE. There are no hidden charges, no subscriptions, and no payment required at any step.
                             </p>
                         </div>
-
                         <div className="card p-6">
                             <h3 className="font-semibold text-neutral-800 mb-2">
                                 Why do landlords pay ₹99?
@@ -286,7 +268,6 @@ const Pricing = () => {
                                 The ₹99 is a one-time listing fee that helps us maintain the platform, verify properties, and connect landlords with genuine students. It's a small investment to reach thousands of students actively looking for accommodation.
                             </p>
                         </div>
-
                         <div className="card p-6">
                             <h3 className="font-semibold text-neutral-800 mb-2">
                                 Do I pay ₹99 for each property I list?
@@ -295,7 +276,6 @@ const Pricing = () => {
                                 Yes. The ₹99 fee is charged per property listing. Each property you want to list on Unirooms requires a one-time payment. Your listing remains active until the property is rented.
                             </p>
                         </div>
-
                         <div className="card p-6">
                             <h3 className="font-semibold text-neutral-800 mb-2">
                                 Is the ₹99 listing fee refundable?
@@ -304,7 +284,6 @@ const Pricing = () => {
                                 The listing fee is non-refundable once your property is published. However, refunds may be considered in exceptional cases like technical errors. Please review our <Link to="/refund-policy" className="text-primary-600 hover:text-primary-700">Refund Policy</Link> for complete details.
                             </p>
                         </div>
-
                         <div className="card p-6">
                             <h3 className="font-semibold text-neutral-800 mb-2">
                                 What payment methods do you accept?
@@ -313,7 +292,6 @@ const Pricing = () => {
                                 We accept all major payment methods including Credit/Debit Cards, UPI, Net Banking, and Digital Wallets through our secure payment gateway partners.
                             </p>
                         </div>
-
                         <div className="card p-6">
                             <h3 className="font-semibold text-neutral-800 mb-2">
                                 Is my payment secure?
@@ -324,8 +302,7 @@ const Pricing = () => {
                         </div>
                     </div>
                 </motion.div>
-
-                {/* CTA Section */}
+                {}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -353,5 +330,4 @@ const Pricing = () => {
         </div>
     );
 };
-
 export default Pricing;
