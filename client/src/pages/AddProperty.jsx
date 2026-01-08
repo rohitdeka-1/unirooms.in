@@ -307,7 +307,9 @@ const AddProperty = () => {
         if (!formData.totalRooms || formData.totalRooms < 1) {
             newErrors.totalRooms = 'Total rooms must be at least 1';
         }
-        if (!formData.availableRooms || formData.availableRooms < 0) {
+        if (formData.availableRooms === '' || formData.availableRooms === null || formData.availableRooms === undefined) {
+            newErrors.availableRooms = 'Available rooms is required';
+        } else if (Number(formData.availableRooms) < 0) {
             newErrors.availableRooms = 'Available rooms cannot be negative';
         }
         if (formData.availableRooms > formData.totalRooms) {
