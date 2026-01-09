@@ -39,13 +39,16 @@ export const getAllProperties = async (req, res) => {
 
         const skip = (Number(page) - 1) * Number(limit);
 
-        const properties = await Property.find(filter)
-            .populate("landlordId", "name email phone profileImage")
-            .sort(sortObj)
-            .skip(skip)
-            .limit(Number(limit));
-
-        const total = await Property.countDocuments(filter);
+        // Execute queries in parallel for faster response
+        const [properties, total] = await Promise.all([
+            Property.find(filter)
+                .populate("landlordId", "name email phone profileImage")
+                .sort(sortObj)
+                .skip(skip)
+                .limit(Number(limit))
+                .lean(), // Use lean() for faster queries
+            Property.countDocuments(filter)
+        ]);
 
         res.status(200).json({
             success: true,
@@ -106,14 +109,17 @@ export const getPropertyById = async (req, res) => {
 
 export const getLandlordProperties = async (req, res) => {
     try {
-        const properties = await Property.find({ landlordId: req.user.id })
-            .sort({ createdAt: -1 });
-
-        const totalSuccessfulPayments = await Payment.countDocuments({
-            userId: req.user.id,
-            status: "success",
-            purpose: "property_listing",
-        });
+        // Execute queries in parallel for faster response
+        const [properties, totalSuccessfulPayments] = await Promise.all([
+            Property.find({ landlordId: req.user.id })
+                .sort({ createdAt: -1 })
+                .lean(), // Use lean() for faster queries
+            Payment.countDocuments({
+                userId: req.user.id,
+                status: "success",
+                purpose: "property_listing",
+            })
+        ]);
 
         const activePropertiesCount = properties.length;
         const availableCredits = totalSuccessfulPayments - activePropertiesCount;
@@ -235,25 +241,30 @@ export const createProperty = async (req, res) => {
 
         const property = await Property.create(propertyData);
 
-        try {
-            const landlord = await User.findById(req.user.id);
-            await sendNewPropertyNotification({
-                title: property.title,
-                landlordName: landlord.name,
-                landlordEmail: landlord.email,
-                city: property.city,
-                price: property.price,
-                propertyId: property._id,
-            });
-        } catch (emailError) {
-            console.error("Failed to send admin notification:", emailError);
-        }
-
+        // Send response IMMEDIATELY
         res.status(201).json({
             success: true,
             message: "Property created successfully",
             data: { property },
         });
+
+        // Send email notification asynchronously AFTER response (fire-and-forget)
+        // Using setTimeout to ensure it doesn't block the response
+        setTimeout(async () => {
+            try {
+                const landlord = await User.findById(req.user.id).lean();
+                await sendNewPropertyNotification({
+                    title: property.title,
+                    landlordName: landlord.name,
+                    landlordEmail: landlord.email,
+                    city: property.city,
+                    price: property.price,
+                    propertyId: property._id,
+                });
+            } catch (emailError) {
+                console.error("Failed to send admin notification:", emailError);
+            }
+        }, 0);
     } catch (error) {
         console.error("Create Property Error:", error);
         res.status(500).json({
@@ -632,7 +643,8 @@ export const getAllPropertiesAdmin = async (req, res) => {
 
         const properties = await Property.find(filter)
             .populate("landlordId", "name email phone")
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .lean(); // Use lean() for faster queries
 
         res.status(200).json({
             success: true,
@@ -650,7 +662,12 @@ export const getAllPropertiesAdmin = async (req, res) => {
 
 export const approveProperty = async (req, res) => {
     try {
-        const property = await Property.findById(req.params.id);
+        // Use findByIdAndUpdate for faster operation
+        const property = await Property.findByIdAndUpdate(
+            req.params.id,
+            { isVerified: true },
+            { new: true, runValidators: false } // Skip validation for faster update
+        ).lean();
 
         if (!property) {
             return res.status(404).json({
@@ -659,9 +676,7 @@ export const approveProperty = async (req, res) => {
             });
         }
 
-        property.isVerified = true;
-        await property.save();
-
+        // Respond immediately
         res.status(200).json({
             success: true,
             message: "Property approved successfully",
@@ -688,7 +703,10 @@ export const declineProperty = async (req, res) => {
             });
         }
 
-        const property = await Property.findById(req.params.id).populate("landlordId", "name email");
+        // Get property with landlord info
+        const property = await Property.findById(req.params.id)
+            .populate("landlordId", "name email")
+            .lean();
 
         if (!property) {
             return res.status(404).json({
@@ -697,32 +715,40 @@ export const declineProperty = async (req, res) => {
             });
         }
 
-        // Update property status to declined and store the reason
-        property.isVerified = false;
-        property.isActive = false;
-        property.declineReason = reason;
-        property.declinedAt = new Date();
-        await property.save();
-
-        // Send decline notification email to landlord
-        if (property.landlordId && property.landlordId.email) {
-            try {
-                await sendPropertyDeclineEmail(
-                    property.landlordId.email,
-                    property.landlordId.name,
-                    property.title,
-                    reason
-                );
-            } catch (emailError) {
-                console.error("Error sending decline email:", emailError);
-                // Continue even if email fails
+        // Update property status quickly using updateOne
+        await Property.updateOne(
+            { _id: req.params.id },
+            {
+                $set: {
+                    isVerified: false,
+                    isActive: false,
+                    declineReason: reason,
+                    declinedAt: new Date()
+                }
             }
-        }
+        );
 
+        // Send response IMMEDIATELY
         res.status(200).json({
             success: true,
             message: "Property declined and landlord notified via email",
         });
+
+        // Send decline notification email asynchronously AFTER response (fire-and-forget)
+        if (property.landlordId && property.landlordId.email) {
+            setTimeout(async () => {
+                try {
+                    await sendPropertyDeclineEmail(
+                        property.landlordId.email,
+                        property.landlordId.name,
+                        property.title,
+                        reason
+                    );
+                } catch (emailError) {
+                    console.error("Error sending decline email:", emailError);
+                }
+            }, 0);
+        }
     } catch (error) {
         console.error("Decline Property Error:", error);
         res.status(500).json({

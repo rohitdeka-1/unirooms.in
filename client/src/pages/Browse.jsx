@@ -9,7 +9,9 @@ const Browse = () => {
     const [searchParams] = useSearchParams();
     const initialSearch = searchParams.get('search') || '';
     const campusParam = searchParams.get('campus') || searchParams.get('college') || '';
-    const [searchQuery, setSearchQuery] = useState(initialSearch);
+    
+    // Use campus parameter if available, otherwise use search parameter
+    const [searchQuery, setSearchQuery] = useState(campusParam || initialSearch);
     const [selectedType, setSelectedType] = useState('all');
     const [minRating, setMinRating] = useState(0);
     const [sortBy, setSortBy] = useState('recommended');
@@ -17,9 +19,22 @@ const Browse = () => {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
     useEffect(() => {
         updateMetaTags(pageSEO.browse);
     }, []);
+
+    // Update search query when URL parameters change
+    useEffect(() => {
+        const newCampusParam = searchParams.get('campus') || searchParams.get('college') || '';
+        const newSearchParam = searchParams.get('search') || '';
+        const newQuery = newCampusParam || newSearchParam;
+        
+        if (newQuery && newQuery !== searchQuery) {
+            setSearchQuery(newQuery);
+        }
+    }, [searchParams]);
+
     useEffect(() => {
         const fetchProperties = async () => {
             setLoading(true);
@@ -28,6 +43,7 @@ const Browse = () => {
                 const params = {};
                 if (searchQuery) params.search = searchQuery;
                 if (selectedType !== 'all') params.roomType = selectedType.toLowerCase().replace(' pg', '');
+                
                 const response = await propertyAPI.getAllProperties(params);
                 if (response.success) {
                     setProperties(response.data.properties || []);
@@ -40,6 +56,7 @@ const Browse = () => {
                 setLoading(false);
             }
         };
+
         fetchProperties();
     }, [selectedType, searchQuery]);
     const propertyTypes = [
