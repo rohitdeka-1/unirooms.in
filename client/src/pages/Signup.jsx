@@ -156,6 +156,22 @@ const Signup = () => {
                             </div>
                         </motion.div>
                     )}
+
+                    {/* Info banner for existing users */}
+                    <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <div className="flex items-start space-x-2">
+                            <svg className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p className="text-sm text-amber-800">
+                                <span className="font-semibold">Already have an account?</span> Please{' '}
+                                <Link to="/login" className="underline font-bold hover:text-amber-900">
+                                    login here
+                                </Link>{' '}
+                                instead.
+                            </p>
+                        </div>
+                    </div>
                     {}
                     <div className="mb-6 p-6 bg-gradient-to-r from-primary-50 to-accent-50 rounded-xl border-2 border-primary-200">
                         <label className="block text-base font-semibold text-neutral-800 mb-4">

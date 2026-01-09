@@ -11,6 +11,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
+    const [showSignupPrompt, setShowSignupPrompt] = useState(false);
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -42,8 +43,15 @@ const Login = () => {
                 navigate('/');
             }
         } catch (err) {
-            toast.error(err.message || 'Google login failed. Please try again or sign up first.');
-            setError(err.message || 'Google login failed. Please try again or sign up first.');
+            // Check if user needs to signup first
+            if (err.message?.includes('not found') || err.message?.includes('sign up')) {
+                setShowSignupPrompt(true);
+                setError('No account found with this Google account.');
+                toast.error('No account found. Please create an account first!');
+            } else {
+                toast.error(err.message || 'Google login failed. Please try again.');
+                setError(err.message || 'Google login failed. Please try again.');
+            }
         } finally {
             setGoogleLoading(false);
         }
@@ -82,6 +90,64 @@ const Login = () => {
                             {error}
                         </motion.div>
                     )}
+
+                    {/* Signup Prompt Modal */}
+                    {showSignupPrompt && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="mb-6 p-5 bg-gradient-to-r from-primary-50 to-accent-50 border-2 border-primary-300 rounded-xl shadow-lg"
+                        >
+                            <div className="flex items-start space-x-3">
+                                <div className="flex-shrink-0">
+                                    <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-base font-bold text-neutral-900 mb-2">
+                                        New to Unirooms? Create an account first!
+                                    </h3>
+                                    <p className="text-sm text-neutral-700 mb-3">
+                                        We couldn't find an account associated with your Google email. You need to sign up before logging in.
+                                    </p>
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                        <Link
+                                            to="/signup"
+                                            className="inline-flex items-center justify-center px-4 py-2.5 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors"
+                                        >
+                                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                            </svg>
+                                            Create Account
+                                        </Link>
+                                        <button
+                                            onClick={() => setShowSignupPrompt(false)}
+                                            className="inline-flex items-center justify-center px-4 py-2.5 bg-white border-2 border-neutral-300 text-neutral-700 font-semibold rounded-lg hover:bg-neutral-50 transition-colors"
+                                        >
+                                            Dismiss
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* Info banner for new users */}
+                    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-start space-x-2">
+                            <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p className="text-sm text-blue-800">
+                                <span className="font-semibold">New user?</span> You need to{' '}
+                                <Link to="/signup" className="underline font-bold hover:text-blue-900">
+                                    create an account
+                                </Link>{' '}
+                                before logging in.
+                            </p>
+                        </div>
+                    </div>
                     {}
                     <div className="mb-6">
                         {googleLoading ? (

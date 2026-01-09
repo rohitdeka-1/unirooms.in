@@ -529,8 +529,9 @@ export const googleLogin = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: "Account not found. Please sign up first.",
+                message: "No account found with this Google account. Please create an account first by clicking 'Sign Up' and then use Google to sign up.",
                 requiresSignup: true,
+                helpText: "New to Unirooms? Sign up first, then you can login with Google!",
             });
         }
 
