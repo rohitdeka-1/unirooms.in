@@ -10,7 +10,7 @@ import { getRandomDescription } from '../utils/pgDescriptions';
 const AddProperty = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const { id: propertyId } = useParams();  
+    const { id: propertyId } = useParams();
     const isEditMode = Boolean(propertyId);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [paymentId, setPaymentId] = useState(null);
@@ -26,7 +26,7 @@ const AddProperty = () => {
         price: '',
         securityDeposit: '',
         location: {
-            coordinates: ['', ''],  
+            coordinates: ['', ''],
         },
         address: {
             street: '',
@@ -37,14 +37,14 @@ const AddProperty = () => {
         city: '',
         state: '',
         phone: '',
-        campusName: '', 
+        campusName: '',
         roomType: 'single',
         gender: 'any',
         totalRooms: '',
         availableRooms: '',
         amenities: [],
         images: [],
-        imageFiles: [], 
+        imageFiles: [],
     });
     useEffect(() => {
         const fetchCampuses = async () => {
@@ -99,7 +99,7 @@ const AddProperty = () => {
                     availableRooms: property.availableRooms || '',
                     amenities: property.amenities || [],
                     images: property.images?.map(img => img.url) || [],
-                    imageFiles: [], 
+                    imageFiles: [],
                 });
                 setPaymentId(property.paymentId);
             } catch (error) {
@@ -256,7 +256,7 @@ const AddProperty = () => {
             if (!isEditMode && (error.message.includes('listing limit') || error.message.includes('listing credit'))) {
                 toast.error('Complete payment to proceed');
                 setShowPaymentModal(true);
-                return; 
+                return;
             } else {
                 toast.error(error.message || `Failed to ${isEditMode ? 'update' : 'create'} property`);
             }
@@ -352,7 +352,7 @@ const AddProperty = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50/20 pt-28 pb-24 md:pb-12">
             <div className="container mx-auto px-4 max-w-5xl">
-                {}
+                { }
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -370,7 +370,7 @@ const AddProperty = () => {
                     <p className="text-neutral-600 text-lg">
                         {isEditMode ? 'Update your property details' : 'Fill in the details to list your property for just ₹99'}
                     </p>
-                    {}
+                    { }
                     {!isEditMode && (
                         <div className="mt-8 flex items-center justify-center gap-2">
                             <div className="flex items-center gap-2">
@@ -397,7 +397,7 @@ const AddProperty = () => {
                     onSubmit={handleSubmit}
                     className="space-y-6"
                 >
-                    {}
+                    { }
                     {Object.keys(errors).length > 0 && (
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
@@ -424,7 +424,7 @@ const AddProperty = () => {
                             </div>
                         </motion.div>
                     )}
-                    {}
+                    { }
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -469,7 +469,7 @@ const AddProperty = () => {
                             />
                         </div>
                     </motion.div>
-                    {}
+                    { }
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -695,7 +695,7 @@ const AddProperty = () => {
                             </div>
                         </div>
                     </motion.div>
-                    {}
+                    { }
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -783,7 +783,7 @@ const AddProperty = () => {
                                     />
                                 </div>
                             </div>
-                            {}
+                            { }
                             <div className="mt-6">
                                 <label className="block text-sm font-semibold text-neutral-700 mb-2.5">
                                     <span className="flex items-center gap-2">
@@ -802,7 +802,7 @@ const AddProperty = () => {
                                         name="phone"
                                         value={formData.phone}
                                         onChange={(e) => {
-                                            const value = e.target.value.replace(/\D/g, ''); 
+                                            const value = e.target.value.replace(/\D/g, '');
                                             if (value.length <= 10) {
                                                 handleChange({ target: { name: 'phone', value } });
                                             }
@@ -832,7 +832,7 @@ const AddProperty = () => {
                                     )}
                                 </p>
                             </div>
-                            {}
+                            { }
                             <div className="mt-8">
                                 <label className="flex items-center gap-2 text-sm font-semibold text-neutral-700 mb-2.5">
                                     <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -853,7 +853,7 @@ const AddProperty = () => {
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
-                                        {}
+                                        { }
                                         <div className="relative">
                                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                                 <svg className="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -889,7 +889,7 @@ const AddProperty = () => {
                                                 </svg>
                                             </div>
                                         </div>
-                                        {}
+                                        { }
                                         {formData.campusName && (
                                             <motion.div
                                                 initial={{ opacity: 0, y: -10 }}
@@ -914,7 +914,7 @@ const AddProperty = () => {
                             </div>
                         </div>
                     </motion.div>
-                    {}
+                    { }
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -926,7 +926,7 @@ const AddProperty = () => {
                             <p className="text-sm text-neutral-600">Upload up to 5 images (Max 5MB each)</p>
                         </div>
                         <div className="space-y-4">
-                            {}
+                            { }
                             {formData.imageFiles.length < 5 && (
                                 <label className="block">
                                     <input
@@ -945,7 +945,7 @@ const AddProperty = () => {
                                     </div>
                                 </label>
                             )}
-                            {}
+                            { }
                             {formData.images.length > 0 && (
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                                     {formData.images.map((image, index) => (
@@ -991,7 +991,7 @@ const AddProperty = () => {
                             )}
                         </div>
                     </motion.div>
-                    {}
+                    { }
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -1036,7 +1036,7 @@ const AddProperty = () => {
                             </div>
                         )}
                     </motion.div>
-                    {}
+                    { }
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -1094,7 +1094,7 @@ const AddProperty = () => {
                     </motion.div>
                 </motion.form>
             </div>
-            {}
+            { }
             {showPaymentModal && (
                 <PaymentModal
                     onClose={() => setShowPaymentModal(false)}

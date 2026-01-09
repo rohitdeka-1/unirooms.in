@@ -10,22 +10,27 @@ export const optimizeCloudinaryImage = (url, options = {}) => {
     }
     const {
         width = 800,
-        quality = 'auto:eco',
-        format = 'webp',
+        quality = 'auto:good',
+        format = 'auto',
         crop = 'fill',
         gravity = 'auto',
     } = options;
     const parts = url.split('/upload/');
     if (parts.length !== 2) return url;
+    
+    // Use Cloudinary's automatic optimization features
     const transformations = [
         `w_${width}`,
         `q_${quality}`,
-        `f_${format}`,
+        `f_${format}`,  // auto format picks best (WebP, AVIF, etc.)
         `c_${crop}`,
         `g_${gravity}`,
-        'dpr_auto', 
+        'dpr_auto',
+        'fl_progressive',  // Progressive loading
+        'fl_lossy'  // Lossy compression for smaller files
     ].join(',');
     return `${parts[0]}/upload/${transformations}/${parts[1]}`;
+
 };
 /**
  * Gets optimized image URL for different sizes
@@ -36,12 +41,12 @@ export const optimizeCloudinaryImage = (url, options = {}) => {
 export const getOptimizedImageUrl = (url, size = 'medium') => {
     if (!url) return '';
     const sizePresets = {
-        thumb: { width: 200, quality: 'auto:eco', format: 'webp' },
-        small: { width: 400, quality: 'auto:good' },
-        medium: { width: 800, quality: 'auto:good' },
-        large: { width: 1200, quality: 'auto:best' },
-        card: { width: 500, quality: 'auto:good', crop: 'fill', gravity: 'auto' },
-        hero: { width: 1400, quality: 'auto:best', crop: 'fill' },
+        thumb: { width: 200, quality: 'auto:low', format: 'auto' },
+        small: { width: 400, quality: 'auto:good', format: 'auto' },
+        medium: { width: 800, quality: 'auto:good', format: 'auto' },
+        large: { width: 1200, quality: 'auto:good', format: 'auto' },
+        card: { width: 500, quality: 'auto:good', crop: 'fill', gravity: 'auto', format: 'auto' },
+        hero: { width: 1400, quality: 'auto:good', crop: 'fill', format: 'auto' },
     };
     const preset = sizePresets[size] || sizePresets.medium;
     if (url.includes('cloudinary.com')) {

@@ -23,7 +23,7 @@ export const createPaymentOrder = async (req, res) => {
             });
         }
 
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user.id).lean(); // Use lean() for faster query
         const { phone } = req.body;
         
         if (!phone) {
@@ -57,8 +57,14 @@ export const createPaymentOrder = async (req, res) => {
             }
         };
 
+        // Set a timeout for the Cashfree API call
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Payment gateway timeout')), 10000) // 10 second timeout
+        );
         
-        const response = await cashfree.PGCreateOrder(request);
+        const cashfreePromise = cashfree.PGCreateOrder(request);
+        
+        const response = await Promise.race([cashfreePromise, timeoutPromise]);
         
         if (process.env.NODE_ENV === 'development') {
             console.log('Payment order created for user:', req.user.id);
@@ -94,7 +100,9 @@ export const createPaymentOrder = async (req, res) => {
         console.error("Create Payment Order Error:", error.response?.data || error.message);
         res.status(500).json({
             success: false,
-            message: "Error creating payment order",
+            message: error.message === 'Payment gateway timeout' 
+                ? "Payment gateway is taking too long. Please try again."
+                : "Error creating payment order",
             error: error.response?.data?.message || error.message,
         });
     }
@@ -111,7 +119,7 @@ export const verifyPayment = async (req, res) => {
             });
         }
 
-        const payment = await Payment.findOne({ cashfreeOrderId: orderId });
+        const payment = await Payment.findOne({ cashfreeOrderId: orderId }).lean();
 
         if (!payment) {
             return res.status(404).json({
@@ -127,27 +135,39 @@ export const verifyPayment = async (req, res) => {
             });
         }
 
+        // Set a timeout for the Cashfree API call
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Payment verification timeout')), 8000) // 8 second timeout
+        );
         
-        const response = await cashfree.PGOrderFetchPayments(orderId);
+        const cashfreePromise = cashfree.PGOrderFetchPayments(orderId);
+        
+        const response = await Promise.race([cashfreePromise, timeoutPromise]);
 
         if (response.data && response.data.length > 0) {
             const paymentInfo = response.data[0];
             
             if (paymentInfo.payment_status === "SUCCESS") {
-                payment.status = "success";
-                payment.paymentMethod = paymentInfo.payment_group || "online";
-                payment.paymentDate = new Date();
-                payment.cashfreePaymentId = paymentInfo.cf_payment_id;
-                payment.transactionMessage = paymentInfo.payment_message || "Payment successful";
-                
-                await payment.save();
+                // Update payment without fetching it again
+                await Payment.updateOne(
+                    { cashfreeOrderId: orderId },
+                    {
+                        $set: {
+                            status: "success",
+                            paymentMethod: paymentInfo.payment_group || "online",
+                            paymentDate: new Date(),
+                            cashfreePaymentId: paymentInfo.cf_payment_id,
+                            transactionMessage: paymentInfo.payment_message || "Payment successful"
+                        }
+                    }
+                );
 
                 return res.status(200).json({
                     success: true,
                     message: "Payment verified successfully",
                     data: {
                         paymentId: payment._id,
-                        status: payment.status,
+                        status: "success",
                     },
                 });
             } else {
@@ -169,7 +189,9 @@ export const verifyPayment = async (req, res) => {
         console.error("Verify Payment Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error verifying payment",
+            message: error.message === 'Payment verification timeout'
+                ? "Payment verification is taking too long. Please try again."
+                : "Error verifying payment",
             error: error.message,
         });
     }

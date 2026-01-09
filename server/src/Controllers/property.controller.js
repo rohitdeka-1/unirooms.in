@@ -195,15 +195,14 @@ export const createProperty = async (req, res) => {
         if (req.files && req.files.length > 0) {
             const filesToUpload = req.files.slice(0, 5);
             
+            // Upload images without transformation - use Cloudinary URL optimization instead
             const uploadPromises = filesToUpload.map(file => {
                 return new Promise((resolve, reject) => {
                     const uploadStream = cloudinary.uploader.upload_stream(
                         {
                             folder: 'properties',
-                            transformation: [
-                                { width: 1200, height: 800, crop: 'limit' },
-                                { quality: 'auto:good' }
-                            ]
+                            // No transformation here - will be done via URL parameters on frontend
+                            resource_type: 'auto'
                         },
                         (error, result) => {
                             if (error) reject(error);
