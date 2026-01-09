@@ -173,10 +173,19 @@ export const registerStudent = async (req, res) => {
             });
         }
         
+        // Mongoose validation errors
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({
+                success: false,
+                message: messages.join('. '),
+            });
+        }
+        
         res.status(500).json({
             success: false,
-            message: "Error registering student. Please try again.",
-            error: error.message,
+            message: "Unable to complete registration. Please check your details and try again. If the problem persists, contact support.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -286,7 +295,7 @@ export const registerLandlord = async (req, res) => {
     } catch (error) {
         console.error("Register Landlord Error:", error);
         
-        
+        // Duplicate key error
         if (error.code === 11000) {
             const field = Object.keys(error.keyPattern)[0];
             return res.status(400).json({
@@ -295,10 +304,19 @@ export const registerLandlord = async (req, res) => {
             });
         }
         
+        // Mongoose validation errors
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({
+                success: false,
+                message: messages.join('. '),
+            });
+        }
+        
         res.status(500).json({
             success: false,
-            message: "Error registering landlord. Please try again.",
-            error: error.message,
+            message: "Unable to complete landlord registration. Please check your details and try again. If the problem persists, contact support.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -398,8 +416,8 @@ export const login = async (req, res) => {
         console.error("Login Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error logging in",
-            error: error.message,
+            message: "Unable to process login request. Please try again in a moment. If the problem persists, contact support.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -478,8 +496,8 @@ export const googleSignup = async (req, res) => {
         console.error("Google Signup Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error signing up with Google",
-            error: error.message,
+            message: "Unable to complete Google signup. Please try again or use email signup instead.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -549,8 +567,8 @@ export const googleLogin = async (req, res) => {
         console.error("Google Login Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error logging in with Google",
-            error: error.message,
+            message: "Unable to complete Google login. Please try again or use email login instead.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -625,8 +643,8 @@ export const getCurrentUser = async (req, res) => {
         console.error("Get Current User Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error fetching user data",
-            error: error.message,
+            message: "Unable to retrieve your account information. Please try logging in again.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -684,8 +702,8 @@ export const updateProfile = async (req, res) => {
         console.error("Update Profile Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error updating profile",
-            error: error.message,
+            message: "Unable to update your profile. Please check your information and try again.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -717,8 +735,8 @@ export const logout = async (req, res) => {
         console.error("Logout Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error logging out",
-            error: error.message,
+            message: "Unable to complete logout. Please clear your browser cache and try again.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -778,8 +796,8 @@ export const requestLoginOTP = async (req, res) => {
         console.error("Request OTP Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error sending OTP. Please try again.",
-            error: error.message,
+            message: "Unable to send OTP to your phone. Please check your phone number and try again.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -863,8 +881,8 @@ export const verifyLoginOTP = async (req, res) => {
         console.error("Verify OTP Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error verifying OTP",
-            error: error.message,
+            message: "Unable to verify OTP. Please ensure you entered the correct code and try again.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -937,8 +955,8 @@ export const refreshAccessToken = async (req, res) => {
         console.error("Refresh Token Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error refreshing token",
-            error: error.message,
+            message: "Session expired. Please log in again to continue.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -1032,8 +1050,8 @@ export const verifyEmail = async (req, res) => {
         console.error("Verify Email Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error verifying email. Please try again or contact support.",
-            error: error.message,
+            message: "Unable to verify your email. The verification link may be expired. Please request a new verification email.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -1086,8 +1104,8 @@ export const resendVerificationEmail = async (req, res) => {
         console.error("Resend Verification Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error sending verification email",
-            error: error.message,
+            message: "Unable to send verification email. Please check your email address and try again in a moment.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -1149,8 +1167,8 @@ export const forgotPassword = async (req, res) => {
         console.error("Forgot Password Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error sending password reset OTP. Please try again.",
-            error: error.message,
+            message: "Unable to process password reset request. Please try again in a moment.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -1220,8 +1238,8 @@ export const verifyResetOTP = async (req, res) => {
         console.error("Verify Reset OTP Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error verifying OTP",
-            error: error.message,
+            message: "Unable to verify reset code. Please ensure you entered the correct code and try again.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
@@ -1310,8 +1328,8 @@ export const resetPassword = async (req, res) => {
         console.error("Reset Password Error:", error);
         res.status(500).json({
             success: false,
-            message: "Error resetting password",
-            error: error.message,
+            message: "Unable to reset your password. Please ensure you completed all steps correctly and try again.",
+            ...(process.env.NODE_ENV === 'development' && { error: error.message }),
         });
     }
 };
