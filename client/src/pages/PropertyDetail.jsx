@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI } from '../utils/api';
-import { getOptimizedImageUrl } from '../utils/imageOptimizer';
 import { updateMetaTags, generatePropertyStructuredData, addStructuredData } from '../utils/seo';
 const PropertyDetail = () => {
     const { id } = useParams();
@@ -87,9 +86,10 @@ const PropertyDetail = () => {
     const propertyLocation = property.address 
         ? `${property.address.locality}, ${property.city}`
         : property.location || 'Location not specified';
+    // Use pre-optimized URLs from backend
     const propertyImages = property.images?.length > 0 
-        ? property.images.map(img => getOptimizedImageUrl(img.url || img, 'large'))
-        : [getOptimizedImageUrl('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800', 'large')];
+        ? property.images.map(img => img.sizes?.large || img.url || img)
+        : ['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800'];
     const amenitiesMap = {
         wifi: 'High-Speed WiFi',
         ac: 'AC Rooms',

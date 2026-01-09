@@ -7,6 +7,34 @@ import { sendNewPropertyNotification, sendPropertyDeclineEmail } from "../Servic
 import cloudinary from "../Config/cloudinary.config.js";
 import streamifier from 'streamifier';
 
+// Helper function to generate optimized Cloudinary URLs
+const getOptimizedCloudinaryUrl = (url, options = {}) => {
+    if (!url || !url.includes('cloudinary.com')) {
+        return url;
+    }
+    const {
+        width = 800,
+        quality = 'auto:good',
+        format = 'auto'
+    } = options;
+    
+    const parts = url.split('/upload/');
+    if (parts.length !== 2) return url;
+    
+    const transformations = [
+        `w_${width}`,
+        `q_${quality}`,
+        `f_${format}`,
+        'c_fill',
+        'g_auto',
+        'dpr_auto',
+        'fl_progressive',
+        'fl_lossy'
+    ].join(',');
+    
+    return `${parts[0]}/upload/${transformations}/${parts[1]}`;
+};
+
 export const getAllProperties = async (req, res) => {
     try {
         const {
@@ -201,21 +229,33 @@ export const createProperty = async (req, res) => {
         if (req.files && req.files.length > 0) {
             const filesToUpload = req.files.slice(0, 5);
             
-            // Upload images without transformation - use Cloudinary URL optimization instead
+            // Upload images to Cloudinary
             const uploadPromises = filesToUpload.map(file => {
                 return new Promise((resolve, reject) => {
                     const uploadStream = cloudinary.uploader.upload_stream(
                         {
                             folder: 'properties',
-                            // No transformation here - will be done via URL parameters on frontend
                             resource_type: 'auto'
                         },
                         (error, result) => {
                             if (error) reject(error);
-                            else resolve({
-                                url: result.secure_url,
-                                publicId: result.public_id
-                            });
+                            else {
+                                // Generate optimized URLs with different sizes
+                                const originalUrl = result.secure_url;
+                                resolve({
+                                    url: getOptimizedCloudinaryUrl(originalUrl, { width: 800 }), // Default optimized
+                                    originalUrl: originalUrl, // Keep original for reference
+                                    publicId: result.public_id,
+                                    // Pre-generate common sizes
+                                    sizes: {
+                                        thumb: getOptimizedCloudinaryUrl(originalUrl, { width: 200, quality: 'auto:low' }),
+                                        small: getOptimizedCloudinaryUrl(originalUrl, { width: 400 }),
+                                        medium: getOptimizedCloudinaryUrl(originalUrl, { width: 800 }),
+                                        large: getOptimizedCloudinaryUrl(originalUrl, { width: 1200 }),
+                                        card: getOptimizedCloudinaryUrl(originalUrl, { width: 500 })
+                                    }
+                                });
+                            }
                         }
                     );
                     streamifier.createReadStream(file.buffer).pipe(uploadStream);

@@ -42,7 +42,16 @@ const Browse = () => {
             try {
                 const params = {};
                 if (searchQuery) params.search = searchQuery;
-                if (selectedType !== 'all') params.roomType = selectedType.toLowerCase().replace(' pg', '');
+                if (selectedType !== 'all') {
+                    // Map UI labels to database gender field
+                    if (selectedType === 'Boys PG') {
+                        params.gender = 'male';
+                    } else if (selectedType === 'Girls PG') {
+                        params.gender = 'female';
+                    } else {
+                        params.gender = 'any';
+                    }
+                }
                 
                 const response = await propertyAPI.getAllProperties(params);
                 if (response.success) {
@@ -87,7 +96,16 @@ const Browse = () => {
             );
         }
         if (selectedType !== 'all') {
-            result = result.filter((p) => p.type === selectedType || p.roomType === selectedType.toLowerCase().replace(' pg', ''));
+            // Map UI labels to database gender field
+            let genderFilter;
+            if (selectedType === 'Boys PG') {
+                genderFilter = 'male';
+            } else if (selectedType === 'Girls PG') {
+                genderFilter = 'female';
+            } else {
+                genderFilter = 'any'; // Co-Living, Hostel, etc.
+            }
+            result = result.filter((p) => p.gender === genderFilter);
         }
         if (minRating > 0) {
             result = result.filter((p) => (p.rating || 0) >= minRating);
@@ -148,10 +166,7 @@ const Browse = () => {
                         </div>
                         {}
                         <div className="lg:w-96">
-                            <SearchBar
-                                onSearch={(query) => setSearchQuery(query)}
-                                variant="default"
-                            />
+                            <SearchBar variant="default" />
                         </div>
                     </div>
                 </motion.div>

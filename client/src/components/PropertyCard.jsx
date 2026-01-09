@@ -3,7 +3,10 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { savedPropertyAPI } from '../utils/api';
-import { getOptimizedImageUrl, getBlurPlaceholder } from '../utils/imageOptimizer';
+
+const getBlurPlaceholder = () => {
+    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PC9zdmc+';
+};
 const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [isSaved, setIsSaved] = useState(initialSaved);
@@ -11,8 +14,8 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
     const { isAuthenticated, user } = useAuth();
     const propertyId = property._id || property.id;
     const propertyTitle = property.title || property.name;
-    const propertyImageOriginal = property.images?.[0]?.url || property.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400';
-    const propertyImage = getOptimizedImageUrl(propertyImageOriginal, 'card');
+    // Use pre-optimized URLs from backend
+    const propertyImage = property.images?.[0]?.sizes?.card || property.images?.[0]?.url || property.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400';
     const propertyLocation = property.address 
         ? `${property.address.locality}, ${property.city}`
         : property.location || 'Location not specified';
