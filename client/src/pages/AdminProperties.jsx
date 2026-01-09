@@ -21,6 +21,9 @@ const AdminProperties = () => {
     const [filter, setFilter] = useState("pending");
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const [showDeclineModal, setShowDeclineModal] = useState(false);
+    const [declineReason, setDeclineReason] = useState("");
+    const [selectedPropertyId, setSelectedPropertyId] = useState(null);
     useEffect(() => {
         if (!user || user.email !== 'alkardorhd@gmail.com') {
             navigate('/', { replace: true });
@@ -45,6 +48,7 @@ const AdminProperties = () => {
                 }
             );
             setProperties(response.data.data.properties);
+            
         } catch (err) {
             setError(err.response?.data?.message || "Failed to fetch properties");
         } finally {
@@ -63,22 +67,35 @@ const AdminProperties = () => {
                     },
                 }
             );
+            
+            setProperties(prevProperties => prevProperties.filter(p => p._id !== propertyId));
+            
             setSuccessMessage("Property approved successfully!");
             setTimeout(() => setSuccessMessage(""), 3000);
-            fetchProperties();
         } catch (err) {
             setError(err.response?.data?.message || "Failed to approve property");
+            setTimeout(() => setError(""), 3000);
         }
     };
-    const handleDecline = async (propertyId) => {
-        if (!window.confirm("Are you sure you want to decline and delete this property?")) {
+    const handleDecline = (propertyId) => {
+        setSelectedPropertyId(propertyId);
+        setShowDeclineModal(true);
+        setDeclineReason("");
+    };
+
+    const submitDecline = async () => {
+        if (!declineReason.trim()) {
+            setError("Please provide a reason for declining");
+            setTimeout(() => setError(""), 3000);
             return;
         }
+
         try {
             setError("");
             const token = localStorage.getItem("accessToken");
-            await axios.delete(
-                `${import.meta.env.VITE_API_URL}/properties/admin/${propertyId}/decline`,
+            await axios.put(
+                `${import.meta.env.VITE_API_URL}/properties/admin/${selectedPropertyId}/decline`,
+                { reason: declineReason },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -86,10 +103,14 @@ const AdminProperties = () => {
                 }
             );
             
-            setProperties(prevProperties => prevProperties.filter(p => p._id !== propertyId));
+            setProperties(prevProperties => prevProperties.filter(p => p._id !== selectedPropertyId));
             
-            setSuccessMessage("Property declined and removed successfully!");
+            setSuccessMessage("Property declined! Email sent to landlord.");
             setTimeout(() => setSuccessMessage(""), 3000);
+            
+            setShowDeclineModal(false);
+            setDeclineReason("");
+            setSelectedPropertyId(null);
         } catch (err) {
             setError(err.response?.data?.message || "Failed to decline property");
             setTimeout(() => setError(""), 3000);
@@ -238,7 +259,7 @@ const AdminProperties = () => {
                                             <p className="flex items-center gap-2">
                                                 <FaPhone className="text-gray-400" />
                                                 <span className="font-medium">Phone:</span>
-                                                {property.contactNumber || "N/A"}
+                                                {property.phone || "N/A"}
                                             </p>
                                         </div>
                                     </div>
@@ -265,9 +286,7 @@ const AdminProperties = () => {
                                         <div className="bg-blue-50 p-3 rounded-lg">
                                             <p className="text-xs text-gray-600 mb-1">Near College</p>
                                             <p className="font-semibold text-gray-900">
-                                                {property.nearbyColleges?.[0]?.name ? 
-                                                    property.nearbyColleges[0].name.substring(0, 20) + '...' : 
-                                                    'N/A'}
+                                                {property.campusName || 'N/A'}
                                             </p>
                                         </div>
                                     </div>
@@ -286,7 +305,7 @@ const AdminProperties = () => {
                                                 className="flex-1 bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                                             >
                                                 <FaTimesCircle />
-                                                Decline & Delete
+                                                Decline Property
                                             </button>
                                         </div>
                                     )}
@@ -300,6 +319,53 @@ const AdminProperties = () => {
                                 </div>
                             </motion.div>
                         ))}
+                    </div>
+                )}
+
+                {/* Decline Reason Modal */}
+                {showDeclineModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl"
+                        >
+                            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                                Decline Property
+                            </h2>
+                            <p className="text-gray-600 mb-4">
+                                Please provide a reason for declining this property. An email will be sent to the landlord with your feedback.
+                            </p>
+                            <textarea
+                                value={declineReason}
+                                onChange={(e) => setDeclineReason(e.target.value)}
+                                placeholder="Enter reason for decline (e.g., incorrect information, missing documents, poor quality images...)" 
+                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all outline-none text-gray-800 min-h-[120px] resize-none"
+                                maxLength={500}
+                            />
+                            <div className="text-right text-sm text-gray-500 mt-1 mb-4">
+                                {declineReason.length}/500
+                            </div>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        setShowDeclineModal(false);
+                                        setDeclineReason("");
+                                        setSelectedPropertyId(null);
+                                    }}
+                                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-4 rounded-lg transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={submitDecline}
+                                    className="flex-1 bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <FaTimesCircle />
+                                    Decline & Send Email
+                                </button>
+                            </div>
+                        </motion.div>
                     </div>
                 )}
             </div>

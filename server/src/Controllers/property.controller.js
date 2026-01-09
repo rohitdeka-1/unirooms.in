@@ -3,7 +3,7 @@ import Payment from "../Models/payment.model.js";
 import User from "../Models/user.model.js";
 import { validationResult } from "express-validator";
 import { searchColleges, getCollegeByName, popularColleges } from "../Services/college.service.js";
-import { sendNewPropertyNotification } from "../Services/email.service.js";
+import { sendNewPropertyNotification, sendPropertyDeclineEmail } from "../Services/email.service.js";
 import cloudinary from "../Config/cloudinary.config.js";
 import streamifier from 'streamifier';
 
@@ -680,6 +680,15 @@ export const approveProperty = async (req, res) => {
 
 export const declineProperty = async (req, res) => {
     try {
+        const { reason } = req.body;
+
+        if (!reason || reason.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: "Decline reason is required",
+            });
+        }
+
         const property = await Property.findById(req.params.id).populate("landlordId", "name email");
 
         if (!property) {
@@ -689,11 +698,31 @@ export const declineProperty = async (req, res) => {
             });
         }
 
-        await Property.findByIdAndDelete(req.params.id);
+        // Update property status to declined and store the reason
+        property.isVerified = false;
+        property.isActive = false;
+        property.declineReason = reason;
+        property.declinedAt = new Date();
+        await property.save();
+
+        // Send decline notification email to landlord
+        if (property.landlordId && property.landlordId.email) {
+            try {
+                await sendPropertyDeclineEmail(
+                    property.landlordId.email,
+                    property.landlordId.name,
+                    property.title,
+                    reason
+                );
+            } catch (emailError) {
+                console.error("Error sending decline email:", emailError);
+                // Continue even if email fails
+            }
+        }
 
         res.status(200).json({
             success: true,
-            message: "Property declined and removed",
+            message: "Property declined and landlord notified via email",
         });
     } catch (error) {
         console.error("Decline Property Error:", error);

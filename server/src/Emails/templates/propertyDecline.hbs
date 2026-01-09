@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Property Listing Declined</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background-color: #ecf0f1; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 30px auto; background: #ffffff; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .header { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: #ffffff; padding: 35px 20px; text-align: center; }
+    .header h1 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: 0.5px; }
+    .content { padding: 40px 35px; }
+    .reason-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; margin: 25px 0; border-radius: 4px; }
+    .reason-box strong { color: #856404; display: block; margin-bottom: 10px; font-size: 15px; }
+    .reason-text { color: #664d03; line-height: 1.6; }
+    .action-box { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 20px; margin: 25px 0; border-radius: 4px; }
+    .action-box h3 { margin: 0 0 15px 0; color: #1565c0; font-size: 16px; }
+    .action-item { margin: 12px 0; padding-left: 25px; position: relative; color: #2c3e50; }
+    .action-item:before { content: "→"; position: absolute; left: 0; color: #2196f3; font-weight: bold; font-size: 16px; }
+    .button { display: inline-block; padding: 14px 35px; background: #3498db; color: #ffffff !important; text-decoration: none; border-radius: 3px; margin: 25px 0; font-weight: 600; letter-spacing: 0.3px; }
+    .button:hover { background: #2980b9; }
+    .footer { background: #f8f9fa; padding: 25px 20px; text-align: center; font-size: 13px; color: #7f8c8d; border-top: 1px solid #e0e0e0; }
+    .property-title { background: #f8f9fa; padding: 15px; border-radius: 4px; margin: 20px 0; font-size: 15px; color: #2c3e50; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Property Listing Declined</h1>
+    </div>
+    
+    <div class="content">
+      <p>Dear <strong>{{landlordName}}</strong>,</p>
+      
+      <p>Thank you for submitting your property listing on UniRooms. We have reviewed your submission for:</p>
+      
+      <div class="property-title">
+        <strong>{{propertyTitle}}</strong>
+      </div>
+      
+      <p>After careful review, we regret to inform you that your property listing has been declined for the following reason:</p>
+      
+      <div class="reason-box">
+        <strong>Decline Reason:</strong>
+        <div class="reason-text">{{declineReason}}</div>
+      </div>
+      
+      <div class="action-box">
+        <h3>What You Need to Do Next:</h3>
+        <div class="action-item">Review the decline reason carefully</div>
+        <div class="action-item">Make the necessary corrections to your property listing</div>
+        <div class="action-item">Update your property information in the dashboard</div>
+        <div class="action-item">Reactivate your listing for re-review</div>
+      </div>
+      
+      <p><strong>Don't worry!</strong> You can update your property listing to address the issues mentioned above and resubmit it for approval. Your property data has been preserved.</p>
+      
+      <div style="text-align: center;">
+        <a href="{{dashboardUrl}}" class="button">Go to Dashboard</a>
+      </div>
+      
+      <p style="margin-top: 30px;">If you have any questions or need assistance with updating your listing, please don't hesitate to contact our support team. We're here to help you get your property approved!</p>
+      
+      <p>Best regards,<br><strong>The UniRooms Team</strong></p>
+    </div>
+    
+    <div class="footer">
+      <p><strong>UniRooms</strong> - Student Accommodation Platform</p>
+      <p>© {{year}} UniRooms. All rights reserved.</p>
+      <p>Email: support@pgfinder.com</p>
+    </div>
+  </div>
+</body>
+</html>

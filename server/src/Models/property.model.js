@@ -179,6 +179,13 @@ const propertySchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    declineReason: {
+      type: String,
+      trim: true,
+    },
+    declinedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

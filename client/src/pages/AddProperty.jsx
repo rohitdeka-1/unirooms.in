@@ -644,8 +644,8 @@ const AddProperty = () => {
                                     <label className="block text-sm font-semibold text-neutral-700 mb-2.5">Total Rooms *</label>
                                     <input
                                         type="number"
-                                        name="totalRooms"
-                                        value={formData.totalRooms}
+                                        name="availableRooms"
+                                        value={formData.availableRooms}
                                         onChange={handleChange}
                                         onKeyDown={(e) => {
                                             if (e.key === 'e' || e.key === 'E' || e.key === '-' || e.key === '+' || e.key === '.') {
@@ -671,8 +671,8 @@ const AddProperty = () => {
                                 <label className="block text-sm font-semibold text-neutral-700 mb-2.5">Available Rooms *</label>
                                 <input
                                     type="number"
-                                    name="availableRooms"
-                                    value={formData.availableRooms}
+                                    name="totalRooms"
+                                    value={formData.totalRooms}
                                     onChange={handleChange}
                                     onKeyDown={(e) => {
                                         if (e.key === 'e' || e.key === 'E' || e.key === '-' || e.key === '+' || e.key === '.') {

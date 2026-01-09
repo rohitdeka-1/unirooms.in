@@ -69,8 +69,6 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
     };
     return (
         <motion.div
-            whileHover={{ y: -6 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             className="group card overflow-hidden w-full h-full max-w-sm mx-auto"
         >
             <Link to={`/property/${propertyId}`} className="block h-full">

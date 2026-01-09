@@ -100,7 +100,7 @@ router.get("/landlord/stats", protect, authorize("landlord"), getLandlordStats);
 
 router.get("/admin/all", protect, isAdmin, getAllPropertiesAdmin);
 router.put("/admin/:id/approve", protect, isAdmin, approveProperty);
-router.delete("/admin/:id/decline", protect, isAdmin, declineProperty);
+router.put("/admin/:id/decline", protect, isAdmin, declineProperty);
 
 router.post("/", protect, authorize("landlord"), upload.array('images', 5), parseFormData, propertyValidation, createProperty);
 router.put("/:id", protect, authorize("landlord"), upload.array('images', 5), parseFormData, updateProperty);

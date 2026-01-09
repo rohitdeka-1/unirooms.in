@@ -220,7 +220,7 @@ export const sendNewPropertyNotification = async (propertyDetails) => {
     const adminEmail = "alkardorhd@gmail.com";
     const { title, landlordName, landlordEmail, city, price, propertyId } = propertyDetails;
     
-    const reviewUrl = `${config.FRONTEND_URL}/admin/properties`;
+    const reviewUrl = `${config.CLIENT_URL || config.FRONTEND_URL}/admin/properties`;
 
     const mailOptions = {
       from: `"${config.EMAIL_FROM_NAME}" <${config.GMAIL_USER}>`,
@@ -301,6 +301,32 @@ export const sendNewPropertyNotification = async (propertyDetails) => {
   }
 };
 
+export const sendPropertyDeclineEmail = async (landlordEmail, landlordName, propertyTitle, declineReason) => {
+  try {
+    const html = compileTemplate("propertyDecline", {
+      landlordName,
+      propertyTitle,
+      declineReason,
+      dashboardUrl: `${config.CLIENT_URL}/landlord/dashboard`,
+      year: new Date().getFullYear(),
+    });
+
+    const mailOptions = {
+      from: `"UniRooms" <${config.GMAIL_USER}>`,
+      to: landlordEmail,
+      subject: "Property Listing Declined - Action Required",
+      html,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Property decline email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error sending property decline email:", error);
+    throw error;
+  }
+};
+
 export default {
   sendOTPEmail,
   sendVerificationEmail,
@@ -309,4 +335,5 @@ export default {
   sendPasswordResetOTP,
   sendPasswordResetEmail,
   sendNewPropertyNotification,
+  sendPropertyDeclineEmail,
 };
