@@ -186,6 +186,11 @@ const propertySchema = new mongoose.Schema(
     declinedAt: {
       type: Date,
     },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "declined"],
+      default: "pending",
+    },
   },
   {
     timestamps: true,

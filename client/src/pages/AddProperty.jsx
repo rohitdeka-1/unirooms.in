@@ -207,7 +207,7 @@ const AddProperty = () => {
     };
     const handleSubmitProperty = async (pId) => {
         if (loading) return; // Prevent double submission
-        
+
         try {
             setLoading(true);
             const formDataToSend = new FormData();
@@ -272,9 +272,9 @@ const AddProperty = () => {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (loading) return; // Prevent double submission
-        
+
         setErrors({});
         const newErrors = {};
         if (!formData.title || formData.title.trim().length < 10) {
@@ -493,7 +493,7 @@ const AddProperty = () => {
                             <div>
                                 <label className="block text-sm font-semibold text-neutral-700 mb-2.5">Property Title *</label>
                                 <input
-                                    type="text"
+                                    type="text" ixed
                                     name="title"
                                     value={formData.title}
                                     onChange={handleChange}

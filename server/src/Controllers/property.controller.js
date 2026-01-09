@@ -435,6 +435,14 @@ export const updateProperty = async (req, res) => {
             updateData.images = [...(property.images || []), ...newImages];
         }
 
+        // If property was declined, reset status to pending when landlord updates it
+        if (property.status === "declined") {
+            updateData.status = "pending";
+            updateData.isActive = true;
+            // Clear decline fields
+            updateData.$unset = { declineReason: "", declinedAt: "" };
+        }
+
         const updatedProperty = await Property.findByIdAndUpdate(
             req.params.id,
             updateData,
@@ -701,9 +709,18 @@ export const getAllPropertiesAdmin = async (req, res) => {
         
         let filter = {};
         if (status === 'pending') {
+            // Only show properties that are pending (not declined)
+            filter.$or = [
+                { status: 'pending' },
+                { status: { $exists: false } } // For backward compatibility with old properties
+            ];
             filter.isVerified = false;
         } else if (status === 'verified') {
             filter.isVerified = true;
+        }
+        // For 'all' status, we still exclude declined properties
+        else {
+            filter.status = { $ne: 'declined' };
         }
 
         const properties = await Property.find(filter)
@@ -730,7 +747,11 @@ export const approveProperty = async (req, res) => {
         // Use findByIdAndUpdate for faster operation
         const property = await Property.findByIdAndUpdate(
             req.params.id,
-            { isVerified: true },
+            { 
+                isVerified: true,
+                status: "approved",
+                $unset: { declineReason: "", declinedAt: "" } // Clear decline fields
+            },
             { new: true, runValidators: false } // Skip validation for faster update
         ).lean();
 
@@ -780,11 +801,12 @@ export const declineProperty = async (req, res) => {
             });
         }
 
-        // Update property status quickly using updateOne
+        // Mark property as declined (keep in database so landlord can fix it)
         await Property.updateOne(
             { _id: req.params.id },
             {
                 $set: {
+                    status: "declined",
                     isVerified: false,
                     isActive: false,
                     declineReason: reason,
