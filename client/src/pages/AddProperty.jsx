@@ -206,6 +206,8 @@ const AddProperty = () => {
         await handleSubmitProperty(pId);
     };
     const handleSubmitProperty = async (pId) => {
+        if (loading) return; // Prevent double submission
+        
         try {
             setLoading(true);
             const formDataToSend = new FormData();
@@ -243,13 +245,17 @@ const AddProperty = () => {
                 }
             });
             if (isEditMode) {
-                await propertyAPI.updateProperty(propertyId, formDataToSend);
-                toast.success('Property updated successfully!');
-                navigate('/landlord/dashboard');
+                const response = await propertyAPI.updateProperty(propertyId, formDataToSend);
+                if (response.success) {
+                    toast.success('Property updated successfully!');
+                    navigate('/landlord/dashboard');
+                }
             } else {
-                await propertyAPI.createProperty(formDataToSend);
-                toast.success('Property created successfully!');
-                navigate('/landlord/dashboard');
+                const response = await propertyAPI.createProperty(formDataToSend);
+                if (response.success) {
+                    toast.success('Property created successfully!');
+                    navigate('/landlord/dashboard');
+                }
             }
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} property:`, error);
@@ -266,6 +272,9 @@ const AddProperty = () => {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (loading) return; // Prevent double submission
+        
         setErrors({});
         const newErrors = {};
         if (!formData.title || formData.title.trim().length < 10) {

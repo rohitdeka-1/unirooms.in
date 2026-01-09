@@ -29,14 +29,7 @@ export const validateRegistration = [
     .isLength({ min: 4 })
     .withMessage("Password must be at least 4 characters long.")
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage("Password must contain: at least one uppercase letter (A-Z), one lowercase letter (a-z), and one number (0-9).")
-    .custom((value) => {
-      if (value.length < 8) {
-        throw new Error("For better security, we recommend using a password with at least 8 characters.");
-      }
-      return true;
-    })
-    .optional(),
+    .withMessage("Must be at least 4 characters with one uppercase, one lowercase, and one number"),
 ];
 
 export const validateLogin = [
