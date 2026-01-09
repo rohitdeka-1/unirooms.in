@@ -200,7 +200,8 @@ propertySchema.index({ city: 1, price: 1 });
 propertySchema.index({ landlordId: 1, isActive: 1 });
 propertySchema.index({ isActive: 1, isVerified: 1 });
 
-propertySchema.index({ title: "text", description: "text", city: "text" });
+// Text index for search functionality - includes campusName for college/campus searches
+propertySchema.index({ title: "text", description: "text", city: "text", campusName: "text" });
 
 propertySchema.virtual("hasAvailability").get(function () {
   return this.availableRooms > 0;
