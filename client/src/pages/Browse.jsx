@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
 import PropertyCard from '../components/PropertyCard';
 import SearchBar from '../components/SearchBar';
@@ -127,14 +126,11 @@ const Browse = () => {
         minRating > 0 ||
         searchQuery;
     return (
-        <div className="min-h-screen bg-neutral-50 pt-28 pb-24 md:pb-12">
+        <div className="min-h-screen bg-neutral-50 pt-28 pb-24">
             <div className="container mx-auto px-4">
                 {}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-8"
-                >
+                <div className="mb-8">
+
                     {}
                     <div className="flex items-center space-x-2 text-sm text-neutral-500 mb-4">
                         <Link to="/" className="hover:text-primary-600 transition-colors">
@@ -159,15 +155,10 @@ const Browse = () => {
                             <SearchBar variant="default" />
                         </div>
                     </div>
-                </motion.div>
+                </div>
                 <div className="flex flex-col lg:flex-row gap-8">
                     {}
-                    <motion.aside
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="hidden lg:block w-72 flex-shrink-0"
-                    >
+                    <aside className="hidden lg:block w-72 flex-shrink-0">
                         <div className="card p-6 sticky top-28">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-lg font-display font-bold text-neutral-800">
@@ -251,16 +242,11 @@ const Browse = () => {
                                 </div>
                             </div>
                         </div>
-                    </motion.aside>
+                    </aside>
                     {}
                     <div className="flex-1">
                         {}
-                        <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.15 }}
-                            className="flex items-center justify-between mb-6 bg-white rounded-2xl p-4 shadow-card"
-                        >
+                        <div className="flex items-center justify-between mb-6 bg-white rounded-2xl p-4 shadow-card">
                             <div className="flex items-center space-x-3">
                                 {}
                                 <button
@@ -294,7 +280,7 @@ const Browse = () => {
                                     ))}
                                 </select>
                             </div>
-                        </motion.div>
+                        </div>
                         {}
                         {loading ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -310,11 +296,7 @@ const Browse = () => {
                                 ))}
                             </div>
                         ) : error ? (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="card p-12 text-center"
-                            >
+                            <div className="card p-12 text-center">
                                 <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
                                     <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -332,26 +314,17 @@ const Browse = () => {
                                 >
                                     Try Again
                                 </button>
-                            </motion.div>
+                            </div>
                         ) : filteredProperties.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                                {filteredProperties.map((property, index) => (
-                                    <motion.div
-                                        key={property._id || property.id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: index * 0.05 }}
-                                    >
+                                {filteredProperties.map((property) => (
+                                    <div key={property._id || property.id}>
                                         <PropertyCard property={property} />
-                                    </motion.div>
+                                    </div>
                                 ))}
                             </div>
                         ) : (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="card p-12 text-center"
-                            >
+                            <div className="card p-12 text-center">
                                 <div className="w-20 h-20 mx-auto mb-6 bg-neutral-100 rounded-full flex items-center justify-center">
                                     <svg className="w-10 h-10 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -371,31 +344,21 @@ const Browse = () => {
                                         Clear All Filters
                                     </button>
                                 )}
-                            </motion.div>
+                            </div>
                         )}
                     </div>
                 </div>
             </div>
             {}
-            <AnimatePresence>
-                {showFilters && (
-                    <>
-                        {}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setShowFilters(false)}
-                            className="fixed inset-0 bg-black/50 z-50 lg:hidden"
-                        />
-                        {}
-                        <motion.div
-                            initial={{ y: '100%' }}
-                            animate={{ y: 0 }}
-                            exit={{ y: '100%' }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 lg:hidden max-h-[80vh] overflow-y-auto"
-                        >
+            {showFilters && (
+                <>
+                    {}
+                    <div
+                        onClick={() => setShowFilters(false)}
+                        className="fixed inset-0 bg-black/50 z-50 lg:hidden"
+                    />
+                    {}
+                    <div className="fixed bottom-20 left-0 right-0 bg-white rounded-t-3xl z-50 lg:hidden max-h-[70vh] overflow-y-auto transition-transform duration-300">
                             <div className="p-6">
                                 {}
                                 <div className="w-12 h-1.5 bg-neutral-200 rounded-full mx-auto mb-6" />
@@ -468,10 +431,9 @@ const Browse = () => {
                                     </button>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     </>
                 )}
-            </AnimatePresence>
         </div>
     );
 };

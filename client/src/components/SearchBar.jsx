@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { propertyAPI } from '../utils/api';
 const SearchBar = ({ onSearch, variant = 'default' }) => {
-    const [location, setLocation] = useState('');
+    const [location, setLocation] = useState('VIT Bhopal');
     const [collegeSuggestions, setCollegeSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [isSearchingCollege, setIsSearchingCollege] = useState(false);
@@ -98,6 +98,14 @@ const SearchBar = ({ onSearch, variant = 'default' }) => {
                             className={`w-full bg-transparent outline-none ${isHero ? 'text-neutral-700 placeholder-neutral-400 text-lg py-4' : 'text-neutral-700 placeholder-neutral-400 py-3'}`}
                         />
                     </div>
+                    <button
+                        type="submit"
+                        className={`${isHero ? 'w-14 h-14' : 'w-10 h-10'} bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors flex items-center justify-center mr-2 flex-shrink-0`}
+                    >
+                        <svg className={`${isHero ? 'w-6 h-6' : 'w-5 h-5'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
                 </div>
                 {}
                 {showSuggestions && collegeSuggestions.length > 0 && (

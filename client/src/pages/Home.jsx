@@ -73,13 +73,13 @@ const Home = () => {
     return (
         <div className="min-h-screen bg-neutral-50 overflow-x-hidden">
             {}
-            <section className="relative min-h-[90vh] flex items-center pt-24 pb-16 overflow-hidden bg-white">
+            <section className="relative min-h-[50vh] md:min-h-[90vh] flex items-center pt-20 pb-8 md:pt-24 md:pb-16 overflow-hidden bg-white">
                 {}
                 <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100/50 rounded-full blur-3xl" />
                     <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-100/30 rounded-full blur-3xl" />
                 </div>
-                <div className="relative z-10 container mx-auto px-4">
+                <div className="relative z-10 container mx-auto pt-5 px-4">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         {}
                         <motion.div
@@ -159,38 +159,11 @@ const Home = () => {
                                 </div>
                             </div>
                         </motion.div>
-                        {}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.3 }}
-                            className="lg:hidden mt-8 overflow-hidden"
-                        >
-                            <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-                                {[
-                                    { img: 'https://img.cofynd.com/images/latest_images_2024/990809bd3f06dba6b1e24bcd9799df4cd662e16f.webp', label: 'Boys PG', price: '₹4,500/mo' },
-                                    { img: 'https://is1-3.housingcdn.com/01c16c28/18454cf03cd329d0cd8f4d87e490679f/v0/medium/3_rk_-for-rent-sector_18_gurgaon-Gurgaon-bedroom.jpg', label: 'Girls PG', price: '₹4,500/mo' },
-                                    { img: 'https://img.cofynd.com/images/original/5d121352daa426393fc5581d5c307229d2f1f5ac.jpg', label: 'Co-Living', price: '₹7,000/mo' },
-                                ].map((item, index) => (
-                                    <div key={index} className="flex-shrink-0 w-56 snap-start first:ml-0 last:mr-0">
-                                        <div className="rounded-2xl overflow-hidden shadow-card h-36 relative">
-                                            <img src={item.img} alt={item.label} className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/70 to-transparent" />
-                                            <div className="absolute bottom-3 left-3 right-3 text-white">
-                                                <p className="font-semibold text-sm">{item.label}</p>
-                                                <p className="text-xs text-white/80">From {item.price}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <p className="text-center text-neutral-400 text-xs mt-1">← Swipe to explore →</p>
-                        </motion.div>
                     </div>
                 </div>
             </section>
             {}
-            <section className="py-20 bg-neutral-50">
+            <section className="pt-8 pb-20 bg-neutral-50">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
                         <div>
@@ -199,7 +172,7 @@ const Home = () => {
                                 PGs Near You
                             </h2>
                             <p className="text-neutral-500 mt-2 max-w-lg">
-                                Handpicked accommodations verified for quality and safety
+                                Accommodations verified for quality and safety
                             </p>
                         </div>
                         <Link

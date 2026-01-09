@@ -236,25 +236,38 @@ export const createProperty = async (req, res) => {
         let uploadedImages = [];
         if (req.files && req.files.length > 0) {
             const filesToUpload = req.files.slice(0, 5);
+            console.log(`Uploading ${filesToUpload.length} images to Cloudinary...`);
+            const uploadStart = Date.now();
             
-            // Upload images to Cloudinary
-            const uploadPromises = filesToUpload.map(file => {
+            // Upload images to Cloudinary with parallel processing and timeout protection
+            const uploadPromises = filesToUpload.map((file, index) => {
                 return new Promise((resolve, reject) => {
+                    // Set individual upload timeout (20 seconds per image)
+                    const uploadTimeout = setTimeout(() => {
+                        reject(new Error(`Upload timeout for image ${index + 1}`));
+                    }, 20000);
+
                     const uploadStream = cloudinary.uploader.upload_stream(
                         {
                             folder: 'properties',
-                            resource_type: 'auto'
+                            resource_type: 'auto',
+                            // Cloudinary transformations for optimization
+                            transformation: [
+                                { quality: 'auto:good', fetch_format: 'auto' }
+                            ]
                         },
                         (error, result) => {
-                            if (error) reject(error);
-                            else {
-                                // Generate optimized URLs with different sizes
+                            clearTimeout(uploadTimeout);
+                            if (error) {
+                                console.error(`Upload error for image ${index + 1}:`, error);
+                                reject(error);
+                            } else {
                                 const originalUrl = result.secure_url;
+                                console.log(`✓ Image ${index + 1} uploaded: ${result.public_id}`);
                                 resolve({
-                                    url: getOptimizedCloudinaryUrl(originalUrl, { width: 800 }), // Default optimized
-                                    originalUrl: originalUrl, // Keep original for reference
+                                    url: getOptimizedCloudinaryUrl(originalUrl, { width: 800 }),
+                                    originalUrl: originalUrl,
                                     publicId: result.public_id,
-                                    // Pre-generate common sizes
                                     sizes: {
                                         thumb: getOptimizedCloudinaryUrl(originalUrl, { width: 200, quality: 'auto:low' }),
                                         small: getOptimizedCloudinaryUrl(originalUrl, { width: 400 }),
@@ -271,12 +284,16 @@ export const createProperty = async (req, res) => {
             });
 
             try {
+                // Upload all images in parallel - much faster than sequential
                 uploadedImages = await Promise.all(uploadPromises);
+                const uploadTime = Date.now() - uploadStart;
+                console.log(`✓ All ${uploadedImages.length} images uploaded in ${uploadTime}ms`);
             } catch (uploadError) {
                 console.error("Image upload error:", uploadError);
                 return res.status(500).json({
                     success: false,
-                    message: "Error uploading images. Please try again.",
+                    message: "Error uploading images. Please try with smaller images or check your internet connection.",
+                    error: uploadError.message,
                 });
             }
         }

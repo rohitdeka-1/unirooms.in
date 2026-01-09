@@ -17,7 +17,7 @@ import {
 } from "../Controllers/property.controller.js";
 import { protect, authorize, optionalAuth } from "../Middlewares/auth.middleware.js";
 import { isAdmin } from "../Middlewares/admin.middleware.js";
-import upload from "../Middlewares/upload.middleware.js";
+import upload, { compressImages } from "../Middlewares/upload.middleware.js";
 import { body } from "express-validator";
 
 const router = express.Router();
@@ -102,7 +102,7 @@ router.get("/admin/all", protect, isAdmin, getAllPropertiesAdmin);
 router.put("/admin/:id/approve", protect, isAdmin, approveProperty);
 router.put("/admin/:id/decline", protect, isAdmin, declineProperty);
 
-router.post("/", protect, authorize("landlord"), upload.array('images', 5), parseFormData, propertyValidation, createProperty);
+router.post("/", protect, authorize("landlord"), upload.array('images', 5), compressImages, parseFormData, propertyValidation, createProperty);
 router.put("/:id", protect, authorize("landlord"), upload.array('images', 5), parseFormData, updateProperty);
 router.delete("/:id", protect, authorize("landlord"), deleteProperty);
 router.patch("/:id/toggle-active", protect, authorize("landlord"), togglePropertyStatus);
