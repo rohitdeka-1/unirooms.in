@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI, paymentAPI } from '../utils/api';
-import { getOptimizedImageUrl } from '../utils/imageOptimizer';
 const LandlordDashboard = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -196,7 +195,7 @@ const LandlordDashboard = () => {
                                             <div className="w-24 h-24 bg-neutral-200 rounded-xl overflow-hidden">
                                                 {property.images?.[0]?.url ? (
                                                     <img 
-                                                        src={getOptimizedImageUrl(property.images[0].url, 'thumb')} 
+                                                        src={property.images[0]?.sizes?.thumb || property.images[0].url} 
                                                         alt={property.title} 
                                                         loading="lazy"
                                                         decoding="async"
