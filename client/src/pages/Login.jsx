@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 const Login = () => {
     const navigate = useNavigate();
@@ -16,12 +17,14 @@ const Login = () => {
         setLoading(true);
         try {
             const response = await login(formData);
+            toast.success('Login successful! Welcome back.');
             if (response.data.user.role === 'landlord') {
                 navigate('/landlord/dashboard');
             } else {
                 navigate('/');
             }
         } catch (err) {
+            toast.error(err.message || 'Login failed. Please check your credentials.');
             setError(err.message || 'Login failed. Please check your credentials.');
         } finally {
             setLoading(false);
@@ -32,18 +35,21 @@ const Login = () => {
         setError('');
         try {
             const response = await googleLogin(credentialResponse.credential);
+            toast.success('Google login successful!');
             if (response.data.user.role === 'landlord') {
                 navigate('/landlord/dashboard');
             } else {
                 navigate('/');
             }
         } catch (err) {
+            toast.error(err.message || 'Google login failed. Please try again or sign up first.');
             setError(err.message || 'Google login failed. Please try again or sign up first.');
         } finally {
             setGoogleLoading(false);
         }
     };
     const handleGoogleError = () => {
+        toast.error('Google login failed. Please try again.');
         setError('Google login failed. Please try again.');
     };
     return (

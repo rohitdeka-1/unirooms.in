@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 const Signup = () => {
     const navigate = useNavigate();
@@ -25,10 +26,12 @@ const Signup = () => {
         try {
             const response = await register(formData);
             if (response.data.requiresEmailVerification) {
+                toast.success('Account created! Please verify your email.');
                 navigate('/verify-email-pending', {
                     state: { email: formData.email }
                 });
             } else {
+                toast.success('Account created successfully! Welcome.');
                 if (formData.role === 'landlord') {
                     navigate('/landlord/dashboard');
                 } else {
@@ -36,6 +39,7 @@ const Signup = () => {
                 }
             }
         } catch (err) {
+            toast.error(err.message || 'Registration failed. Please try again.');
             setError(err.message || 'Registration failed. Please try again.');
         } finally {
             setLoading(false);
@@ -46,6 +50,7 @@ const Signup = () => {
         setError('');
         try {
             const response = await googleSignup(credentialResponse.credential, formData.role);
+            toast.success('Account created with Google successfully!');
             if (formData.role === 'landlord') {
                 navigate('/landlord/dashboard');
             } else {
@@ -53,8 +58,10 @@ const Signup = () => {
             }
         } catch (err) {
             if (err.message?.includes('already registered')) {
+                toast.error('This email is already registered. Please log in instead.');
                 setError('This email is already registered. Please log in instead.');
             } else {
+                toast.error(err.message || 'Google sign up failed. Please try again.');
                 setError(err.message || 'Google sign up failed. Please try again.');
             }
         } finally {
@@ -62,6 +69,7 @@ const Signup = () => {
         }
     };
     const handleGoogleError = () => {
+        toast.error('Google sign up failed. Please try again.');
         setError('Google sign up failed. Please try again.');
     };
     return (
