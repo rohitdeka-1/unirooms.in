@@ -19,7 +19,7 @@ const VerifyEmail = () => {
             }
             hasVerified.current = true;
             try {
-                const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://unirooms-api-2026-be019c91a062.herokuapp.com/api/v1';
+                const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://unirooms-01cba0aba98a.herokuapp.com/api/v1';
                 const response = await fetch(`${API_BASE_URL}/auth/verify-email/${token}`);
                 const data = await response.json();
                 if (response.ok) {

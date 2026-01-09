@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://unirooms-api-2026-be019c91a062.herokuapp.com/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://unirooms-01cba0aba98a.herokuapp.com/api/v1';
 const getAuthToken = () => {
     return localStorage.getItem('accessToken');
 };
