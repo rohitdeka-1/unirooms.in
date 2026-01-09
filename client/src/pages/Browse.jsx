@@ -83,18 +83,8 @@ const Browse = () => {
     ];
     const filteredProperties = useMemo(() => {
         let result = [...properties];
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            result = result.filter(
-                (p) =>
-                    (p.name || p.title)?.toLowerCase().includes(query) ||
-                    p.city?.toLowerCase().includes(query) ||
-                    p.state?.toLowerCase().includes(query) ||
-                    p.address?.locality?.toLowerCase().includes(query) ||
-                    p.address?.street?.toLowerCase().includes(query) ||
-                    p.campusName?.toLowerCase().includes(query)
-            );
-        }
+        // Backend already handles search filtering, so we skip it here
+        // Only apply filters that aren't sent to backend
         if (selectedType !== 'all') {
             // Map UI labels to database gender field
             let genderFilter;
@@ -124,7 +114,7 @@ const Browse = () => {
                 break;
         }
         return result;
-    }, [properties, searchQuery, selectedType, minRating, sortBy]);
+    }, [properties, selectedType, minRating, sortBy]);
     const clearFilters = () => {
         setSelectedType('all');
         setMinRating(0);

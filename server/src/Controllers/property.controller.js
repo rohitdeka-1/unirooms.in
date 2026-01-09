@@ -59,7 +59,15 @@ export const getAllProperties = async (req, res) => {
             filter.amenities = { $all: amenitiesArray };
         }
         if (search) {
-            filter.$text = { $search: search };
+            // Use $or with regex for flexible search across multiple fields
+            filter.$or = [
+                { title: { $regex: search, $options: "i" } },
+                { description: { $regex: search, $options: "i" } },
+                { city: { $regex: search, $options: "i" } },
+                { campusName: { $regex: search, $options: "i" } },
+                { "address.locality": { $regex: search, $options: "i" } },
+                { "address.street": { $regex: search, $options: "i" } },
+            ];
         }
 
         const sortObj = {};
