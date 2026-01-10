@@ -52,6 +52,16 @@ const parseFormData = (req, res, next) => {
             : [req.body['amenities[]']];
         delete req.body['amenities[]'];
     }
+    
+    // Handle coverImageIndex - convert to number if it's a string or take first element if array
+    if (req.body.coverImageIndex) {
+        if (Array.isArray(req.body.coverImageIndex)) {
+            req.body.coverImageIndex = parseInt(req.body.coverImageIndex[0], 10) || 0;
+        } else if (typeof req.body.coverImageIndex === 'string') {
+            req.body.coverImageIndex = parseInt(req.body.coverImageIndex, 10) || 0;
+        }
+    }
+    
     next();
 };
 
