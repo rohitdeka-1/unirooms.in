@@ -14,8 +14,14 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
     const { isAuthenticated, user } = useAuth();
     const propertyId = property._id || property.id;
     const propertyTitle = property.title || property.name;
+    
+    // Get cover image based on coverImageIndex, fallback to first image
+    const coverIndex = property.coverImageIndex || 0;
+    const coverImage = property.images?.[coverIndex];
+    
     // Use pre-optimized URLs from backend
-    const propertyImage = property.images?.[0]?.sizes?.card || property.images?.[0]?.url || property.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400';
+    const propertyImage = coverImage?.sizes?.card || coverImage?.url || property.images?.[0]?.sizes?.card || property.images?.[0]?.url || property.image || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400';
+    
     const propertyLocation = property.address 
         ? `${property.address.locality}, ${property.city}`
         : property.location || 'Location not specified';

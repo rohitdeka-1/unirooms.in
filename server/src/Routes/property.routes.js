@@ -25,10 +25,26 @@ const router = express.Router();
 
 const parseFormData = (req, res, next) => {
     if (req.body.location && typeof req.body.location === 'string') {
-        req.body.location = JSON.parse(req.body.location);
+        try {
+            req.body.location = JSON.parse(req.body.location);
+        } catch (e) {
+            console.error('Error parsing location:', e);
+        }
     }
     if (req.body.address && typeof req.body.address === 'string') {
-        req.body.address = JSON.parse(req.body.address);
+        try {
+            req.body.address = JSON.parse(req.body.address);
+        } catch (e) {
+            console.error('Error parsing address:', e);
+        }
+    }
+    if (req.body.existingImages && typeof req.body.existingImages === 'string') {
+        try {
+            req.body.existingImages = JSON.parse(req.body.existingImages);
+        } catch (e) {
+            console.error('Error parsing existingImages:', e);
+            req.body.existingImages = null;
+        }
     }
     if (req.body['amenities[]']) {
         req.body.amenities = Array.isArray(req.body['amenities[]']) 

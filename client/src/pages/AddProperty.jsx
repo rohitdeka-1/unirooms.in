@@ -46,6 +46,7 @@ const AddProperty = () => {
         images: [],
         imageFiles: [],
         existingImages: [], // Track existing images (URLs from server) separately
+        coverImageIndex: 0, // Track which image is the cover
     });
     useEffect(() => {
         const fetchCampuses = async () => {
@@ -102,6 +103,7 @@ const AddProperty = () => {
                     images: property.images?.map(img => img.url) || [],
                     existingImages: property.images || [], // Store full image objects with publicId
                     imageFiles: [],
+                    coverImageIndex: property.coverImageIndex || 0,
                 });
                 setPaymentId(property.paymentId);
             } catch (error) {
@@ -206,6 +208,8 @@ const AddProperty = () => {
                 ...prev,
                 existingImages: prev.existingImages.filter((_, i) => i !== existingIndex),
                 images: prev.images.filter((_, i) => i !== index),
+                // Adjust coverImageIndex if needed
+                coverImageIndex: prev.coverImageIndex >= index ? Math.max(0, prev.coverImageIndex - 1) : prev.coverImageIndex,
             }));
         } else {
             // Removing a newly added image (not yet uploaded)
@@ -215,6 +219,8 @@ const AddProperty = () => {
                 ...prev,
                 imageFiles: prev.imageFiles.filter((_, i) => i !== fileIndex),
                 images: prev.images.filter((_, i) => i !== index),
+                // Adjust coverImageIndex if needed
+                coverImageIndex: prev.coverImageIndex >= index ? Math.max(0, prev.coverImageIndex - 1) : prev.coverImageIndex,
             }));
         }
         toast.success('Image removed');
@@ -244,6 +250,11 @@ const AddProperty = () => {
             // In edit mode, send which existing images to keep
             if (isEditMode && formData.existingImages) {
                 formDataToSend.append('existingImages', JSON.stringify(formData.existingImages));
+            }
+            
+            // Send coverImageIndex
+            if (formData.coverImageIndex !== undefined) {
+                formDataToSend.append('coverImageIndex', formData.coverImageIndex);
             }
             const propertyData = {
                 ...formData,
@@ -989,28 +1000,59 @@ const AddProperty = () => {
                             )}
                             { }
                             {formData.images.length > 0 && (
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                                    {formData.images.map((image, index) => (
-                                        <div key={index} className="relative group">
-                                            <img
-                                                src={image}
-                                                alt={`Preview ${index + 1}`}
-                                                className="w-full h-32 object-cover rounded-xl border-2 border-neutral-200"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveImage(index)}
-                                                className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                                            >
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                            <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
-                                                {index + 1}/5
+                                <div>
+                                    <div className="mb-2 flex items-center gap-2 text-sm text-neutral-600">
+                                        <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                        Click the star to set as cover image
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                                        {formData.images.map((image, index) => (
+                                            <div key={index} className="relative group">
+                                                <img
+                                                    src={image}
+                                                    alt={`Preview ${index + 1}`}
+                                                    className={`w-full h-32 object-cover rounded-xl border-2 transition-all ${
+                                                        formData.coverImageIndex === index 
+                                                            ? 'border-yellow-500 ring-2 ring-yellow-500' 
+                                                            : 'border-neutral-200'
+                                                    }`}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData(prev => ({ ...prev, coverImageIndex: index }))}
+                                                    className={`absolute top-2 left-2 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-lg ${
+                                                        formData.coverImageIndex === index
+                                                            ? 'bg-yellow-500 text-white'
+                                                            : 'bg-white/90 text-neutral-400 hover:bg-yellow-500 hover:text-white'
+                                                    }`}
+                                                    title="Set as cover image"
+                                                >
+                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveImage(index)}
+                                                    className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                                {formData.coverImageIndex === index && (
+                                                    <div className="absolute bottom-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded font-semibold">
+                                                        Cover
+                                                    </div>
+                                                )}
+                                                <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
+                                                    {index + 1}/{formData.images.length}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                             {formData.imageFiles.length === 0 && (

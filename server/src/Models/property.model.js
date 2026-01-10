@@ -149,6 +149,11 @@ const propertySchema = new mongoose.Schema(
         },
       },
     ],
+    coverImageIndex: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     availableFrom: {
       type: Date,
       default: Date.now,

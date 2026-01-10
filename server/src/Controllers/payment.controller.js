@@ -33,7 +33,7 @@ export const createPaymentOrder = async (req, res) => {
             });
         }
 
-        const amount = 99; 
+        const amount = 1; 
         const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
         
@@ -154,7 +154,7 @@ export const verifyPayment = async (req, res) => {
                     {
                         $set: {
                             status: "success",
-                            paymentMethod: paymentInfo.payment_group || "online",
+                            paymentMethod: normalizePaymentMethod(paymentInfo.payment_group),
                             paymentDate: new Date(),
                             cashfreePaymentId: paymentInfo.cf_payment_id,
                             transactionMessage: paymentInfo.payment_message || "Payment successful"
@@ -219,7 +219,7 @@ export const handleWebhook = async (req, res) => {
         switch (type) {
             case "PAYMENT_SUCCESS_WEBHOOK":
                 payment.status = "success";
-                payment.paymentMethod = data.payment.payment_group || "online";
+                payment.paymentMethod = normalizePaymentMethod(data.payment.payment_group);
                 payment.paymentDate = new Date();
                 payment.cashfreePaymentId = data.payment.cf_payment_id;
                 payment.transactionMessage = data.payment.payment_message || "Payment successful";
