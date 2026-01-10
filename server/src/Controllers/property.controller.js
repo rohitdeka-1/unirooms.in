@@ -500,11 +500,20 @@ export const updateProperty = async (req, res) => {
             updateData.coverImageIndex = property.coverImageIndex;
         }
 
-        // DIRECT UPDATE: Modify the property document directly instead of using $set
-        // This avoids mongoose casting issues with embedded arrays
+        // Store images separately to set it last
+        const imagesArray = updateData.images;
+        delete updateData.images; // Remove from updateData temporarily
+
+        // DIRECT UPDATE: Modify the property document directly (except images)
         Object.keys(updateData).forEach(key => {
             property[key] = updateData[key];
         });
+
+        // Set images directly - must be done separately to avoid stringification
+        if (imagesArray) {
+            property.images = imagesArray;
+            property.markModified('images');
+        }
 
         // If property was declined, reset status to pending when landlord updates it
         if (property.status === "declined") {
