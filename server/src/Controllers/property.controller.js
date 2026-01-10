@@ -431,7 +431,27 @@ export const updateProperty = async (req, res) => {
             ...req.body,
         };
         
-        if (newImages.length > 0) {
+        // Handle images update
+        if (req.body.existingImages) {
+            // Parse existing images that should be kept
+            try {
+                const existingImagesToKeep = JSON.parse(req.body.existingImages);
+                // Start with existing images that weren't removed
+                updateData.images = existingImagesToKeep;
+                // Append newly uploaded images
+                if (newImages.length > 0) {
+                    updateData.images = [...existingImagesToKeep, ...newImages];
+                }
+                delete updateData.existingImages; // Don't save this to DB
+            } catch (parseError) {
+                console.error("Error parsing existingImages:", parseError);
+                // Fallback: just append new images
+                if (newImages.length > 0) {
+                    updateData.images = [...(property.images || []), ...newImages];
+                }
+            }
+        } else if (newImages.length > 0) {
+            // No existing images data, just append new ones (backward compatible)
             updateData.images = [...(property.images || []), ...newImages];
         }
 
