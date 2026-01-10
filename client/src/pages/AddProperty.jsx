@@ -174,7 +174,9 @@ const AddProperty = () => {
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
         const maxImages = 5;
-        if (formData.imageFiles.length + files.length > maxImages) {
+        // Count both existing images and new files
+        const totalImages = formData.images.length + files.length;
+        if (totalImages > maxImages) {
             toast.error(`You can only upload up to ${maxImages} images`);
             return;
         }
@@ -184,6 +186,7 @@ const AddProperty = () => {
             images: [...prev.images, ...newImagePreviews],
             imageFiles: [...prev.imageFiles, ...files],
         }));
+        toast.success(`${files.length} image${files.length > 1 ? 's' : ''} added`);
     };
     const handleRemoveImage = (index) => {
         URL.revokeObjectURL(formData.images[index]);
@@ -324,7 +327,9 @@ const AddProperty = () => {
         if (formData.availableRooms > formData.totalRooms) {
             newErrors.availableRooms = 'Available rooms cannot exceed total rooms';
         }
-        if (formData.imageFiles.length === 0 && !isEditMode) {
+        // In edit mode, check total images (existing + new); in create mode, check new files only
+        const totalImages = isEditMode ? formData.images.length : formData.imageFiles.length;
+        if (totalImages === 0) {
             newErrors.images = 'Please upload at least 1 property image';
         }
         if (formData.amenities.length === 0) {

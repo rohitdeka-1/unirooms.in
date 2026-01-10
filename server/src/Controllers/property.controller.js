@@ -435,17 +435,19 @@ export const updateProperty = async (req, res) => {
             updateData.images = [...(property.images || []), ...newImages];
         }
 
+        // Build update query
+        const updateQuery = { $set: updateData };
+
         // If property was declined, reset status to pending when landlord updates it
         if (property.status === "declined") {
-            updateData.status = "pending";
-            updateData.isActive = true;
-            // Clear decline fields
-            updateData.$unset = { declineReason: "", declinedAt: "" };
+            updateQuery.$set.status = "pending";
+            updateQuery.$set.isActive = true;
+            updateQuery.$unset = { declineReason: "", declinedAt: "" };
         }
 
         const updatedProperty = await Property.findByIdAndUpdate(
             req.params.id,
-            updateData,
+            updateQuery,
             { new: true, runValidators: true }
         );
 
