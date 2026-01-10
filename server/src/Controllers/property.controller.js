@@ -426,6 +426,9 @@ export const updateProperty = async (req, res) => {
 
         delete req.body.landlordId;
         delete req.body.paymentId;
+        
+        // Store existingImages before deleting
+        const existingImagesToKeep = req.body.existingImages;
         delete req.body.existingImages; // Remove this before spreading
 
         const updateData = {
@@ -438,9 +441,8 @@ export const updateProperty = async (req, res) => {
         }
         
         // Handle images update
-        if (req.body.existingImages && Array.isArray(req.body.existingImages)) {
+        if (existingImagesToKeep && Array.isArray(existingImagesToKeep)) {
             // existingImages is already parsed by parseFormData middleware
-            const existingImagesToKeep = req.body.existingImages;
             // Start with existing images that weren't removed
             updateData.images = existingImagesToKeep;
             // Append newly uploaded images
@@ -454,6 +456,12 @@ export const updateProperty = async (req, res) => {
         // If no new images and no existing images update, keep original images
         else if (!updateData.images) {
             updateData.images = property.images;
+        }
+        
+        // Ensure coverImageIndex is in updateData (it comes from req.body after spreading)
+        // If it wasn't in req.body, keep the existing one
+        if (updateData.coverImageIndex === undefined && property.coverImageIndex !== undefined) {
+            updateData.coverImageIndex = property.coverImageIndex;
         }
 
         // Build update query
@@ -733,13 +741,19 @@ export const getAllPropertiesAdmin = async (req, res) => {
         let filter = {};
         if (status === 'pending') {
             // Only show properties that are pending (not declined)
-            filter.$or = [
-                { status: 'pending' },
-                { status: { $exists: false } } // For backward compatibility with old properties
+            filter.$and = [
+                {
+                    $or: [
+                        { status: 'pending' },
+                        { status: { $exists: false } } // For backward compatibility with old properties
+                    ]
+                },
+                { status: { $ne: 'declined' } } // Explicitly exclude declined
             ];
             filter.isVerified = false;
         } else if (status === 'verified') {
             filter.isVerified = true;
+            filter.status = { $ne: 'declined' }; // Exclude declined from verified too
         }
         // For 'all' status, we still exclude declined properties
         else {

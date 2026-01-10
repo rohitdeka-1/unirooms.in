@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { paymentAPI } from '../utils/api';
+import toast from 'react-hot-toast';
 const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState('confirm'); 
@@ -63,7 +64,35 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
     const handlePaymentSuccess = async (orderId, pId) => {
         try {
             await paymentAPI.verifyPayment({ orderId });
-            setStep('success');
+            
+            // Show custom blue success toast with check icon
+            toast.custom(
+                (t) => (
+                    <div
+                        className={`${
+                            t.visible ? 'animate-enter' : 'animate-leave'
+                        } max-w-md w-full bg-blue-500 shadow-lg rounded-lg pointer-events-auto flex items-center p-4`}
+                    >
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div className="ml-3 flex-1">
+                                <p className="text-sm font-medium text-white">
+                                    Payment completed successfully!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                ),
+                {
+                    duration: 3000,
+                    position: 'top-right',
+                }
+            );
+            
             setTimeout(() => {
                 onSuccess(pId);
             }, 1500);
@@ -146,21 +175,7 @@ const PaymentModal = ({ onClose, onSuccess, propertyPhone }) => {
                             </p>
                         </div>
                     )}
-                    {step === 'success' && (
-                        <div className="text-center py-8">
-                            <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-                                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-semibold text-neutral-800 mb-2">
-                                Payment Successful!
-                            </h3>
-                            <p className="text-neutral-600">
-                                Creating your property listing...
-                            </p>
-                        </div>
-                    )}
+
                     {step === 'error' && (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">

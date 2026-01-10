@@ -100,7 +100,7 @@ const AddProperty = () => {
                     totalRooms: property.totalRooms || '',
                     availableRooms: property.availableRooms || '',
                     amenities: property.amenities || [],
-                    images: property.images?.map(img => img.url) || [],
+                    images: property.images?.map(img => typeof img === 'string' ? img : img.url) || [],
                     existingImages: property.images || [], // Store full image objects with publicId
                     imageFiles: [],
                     coverImageIndex: property.coverImageIndex || 0,
@@ -195,32 +195,32 @@ const AddProperty = () => {
     const handleRemoveImage = (index) => {
         const imageToRemove = formData.images[index];
         
-        // Check if it's an existing image (URL string) or new image (blob URL)
-        const existingIndex = formData.existingImages.findIndex(img => img.url === imageToRemove);
-        const newImageIndex = formData.imageFiles.findIndex((_, i) => {
-            // Calculate the index in imageFiles by subtracting existing images count
-            return i === index - formData.existingImages.length;
-        });
+        // Determine if this is an existing image or a new file
+        // Existing images are in the first N positions where N = existingImages.length
+        const isExistingImage = index < formData.existingImages.length;
         
-        if (existingIndex !== -1) {
+        if (isExistingImage) {
             // Removing an existing image from server
             setFormData(prev => ({
                 ...prev,
-                existingImages: prev.existingImages.filter((_, i) => i !== existingIndex),
+                existingImages: prev.existingImages.filter((_, i) => i !== index),
                 images: prev.images.filter((_, i) => i !== index),
                 // Adjust coverImageIndex if needed
-                coverImageIndex: prev.coverImageIndex >= index ? Math.max(0, prev.coverImageIndex - 1) : prev.coverImageIndex,
+                coverImageIndex: prev.coverImageIndex > index ? prev.coverImageIndex - 1 : (prev.coverImageIndex === index ? 0 : prev.coverImageIndex),
             }));
         } else {
             // Removing a newly added image (not yet uploaded)
-            URL.revokeObjectURL(imageToRemove);
+            // The file index is the position in imageFiles array
             const fileIndex = index - formData.existingImages.length;
+            if (imageToRemove.startsWith('blob:')) {
+                URL.revokeObjectURL(imageToRemove);
+            }
             setFormData(prev => ({
                 ...prev,
                 imageFiles: prev.imageFiles.filter((_, i) => i !== fileIndex),
                 images: prev.images.filter((_, i) => i !== index),
                 // Adjust coverImageIndex if needed
-                coverImageIndex: prev.coverImageIndex >= index ? Math.max(0, prev.coverImageIndex - 1) : prev.coverImageIndex,
+                coverImageIndex: prev.coverImageIndex > index ? prev.coverImageIndex - 1 : (prev.coverImageIndex === index ? 0 : prev.coverImageIndex),
             }));
         }
         toast.success('Image removed');

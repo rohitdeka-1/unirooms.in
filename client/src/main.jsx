@@ -11,6 +11,9 @@ createRoot(document.getElementById('root')).render(
       <App />
       <Toaster 
           position="top-right"
+          containerStyle={{
+            top: 80,
+          }}
           toastOptions={{
             duration: 4000,
             style: {
@@ -34,6 +37,7 @@ createRoot(document.getElementById('root')).render(
               duration: 5000,
             },
           }}
+          limit={3}
         />
       </GoogleOAuthProvider>
     </ErrorBoundary>
