@@ -475,6 +475,11 @@ export const updateProperty = async (req, res) => {
         // NOW handle images - this is guaranteed to be set LAST
         if (existingImagesToKeep && Array.isArray(existingImagesToKeep)) {
             console.log('Using existingImages:', existingImagesToKeep.length, 'new images:', newImages.length);
+            // Debug: log first image to see structure
+            if (existingImagesToKeep.length > 0) {
+                console.log('First existingImage keys:', Object.keys(existingImagesToKeep[0]));
+                console.log('First existingImage url:', existingImagesToKeep[0].url);
+            }
             if (newImages.length > 0) {
                 updateData.images = [...existingImagesToKeep, ...newImages];
             } else {
@@ -510,13 +515,21 @@ export const updateProperty = async (req, res) => {
         });
 
         // Set images manually by clearing and pushing each item to avoid casting issues
-        if (imagesArray) {
+        if (imagesArray && imagesArray.length > 0) {
             property.images = []; // Clear the array first
             // Push each image object individually - this creates proper subdocuments
-            imagesArray.forEach(img => {
-                // Remove _id if it exists (let mongoose create new subdocument _id)
-                const { _id, ...imgData } = img;
-                property.images.push(imgData);
+            imagesArray.forEach((img, idx) => {
+                // Convert mongoose document to plain object if needed
+                const plainImg = img.toObject ? img.toObject() : img;
+                // Ensure we have the required url field
+                if (plainImg.url) {
+                    property.images.push({
+                        url: plainImg.url,
+                        publicId: plainImg.publicId
+                    });
+                } else {
+                    console.error(`Image at index ${idx} missing url:`, plainImg);
+                }
             });
         }
 
