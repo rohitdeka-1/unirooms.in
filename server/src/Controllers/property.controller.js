@@ -495,27 +495,27 @@ export const updateProperty = async (req, res) => {
             throw new Error('Images must be an array');
         }
         
-        // Ensure coverImageIndex is in updateData (it comes from req.body after spreading)
-        // If it wasn't in req.body, keep the existing one
+        // Ensure coverImageIndex is in updateData
         if (updateData.coverImageIndex === undefined && property.coverImageIndex !== undefined) {
             updateData.coverImageIndex = property.coverImageIndex;
         }
 
-        // Build update query
-        const updateQuery = { $set: updateData };
+        // DIRECT UPDATE: Modify the property document directly instead of using $set
+        // This avoids mongoose casting issues with embedded arrays
+        Object.keys(updateData).forEach(key => {
+            property[key] = updateData[key];
+        });
 
         // If property was declined, reset status to pending when landlord updates it
         if (property.status === "declined") {
-            updateQuery.$set.status = "pending";
-            updateQuery.$set.isActive = true;
-            updateQuery.$unset = { declineReason: "", declinedAt: "" };
+            property.status = "pending";
+            property.isActive = true;
+            property.declineReason = undefined;
+            property.declinedAt = undefined;
         }
 
-        const updatedProperty = await Property.findByIdAndUpdate(
-            req.params.id,
-            updateQuery,
-            { new: true, runValidators: true }
-        );
+        // Save the modified property
+        const updatedProperty = await property.save();
 
         res.status(200).json({
             success: true,
