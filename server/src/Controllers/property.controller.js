@@ -424,38 +424,60 @@ export const updateProperty = async (req, res) => {
             }
         }
 
+        // Store and validate existingImages FIRST before any deletions
+        let existingImagesToKeep = req.body.existingImages;
+        
+        // Double-check parsing (safety net)
+        if (existingImagesToKeep && typeof existingImagesToKeep === 'string') {
+            try {
+                existingImagesToKeep = JSON.parse(existingImagesToKeep);
+                console.log('Controller: Had to parse existingImages again');
+            } catch (e) {
+                console.error('Controller: Error parsing existingImages:', e);
+                existingImagesToKeep = null;
+            }
+        }
+        
+        // Delete all image-related and sensitive fields from req.body BEFORE spreading
         delete req.body.landlordId;
         delete req.body.paymentId;
-        
-        // Store existingImages before deleting
-        const existingImagesToKeep = req.body.existingImages;
-        delete req.body.existingImages; // Remove this before spreading
+        delete req.body.existingImages;
+        delete req.body.images; // Critical: prevent string pollution
+        delete req.body.imageFiles;
 
+        // Build updateData WITHOUT images field initially
         const updateData = {
             ...req.body,
         };
         
-        // Remove images field if it exists in req.body (it might be a string from FormData)
-        if (updateData.images) {
-            delete updateData.images;
-        }
-        
-        // Handle images update
+        // Explicitly set images AFTER spreading to ensure it's never a string
         if (existingImagesToKeep && Array.isArray(existingImagesToKeep)) {
-            // existingImages is already parsed by parseFormData middleware
+            console.log('Using existingImages:', existingImagesToKeep.length, 'new images:', newImages.length);
             // Start with existing images that weren't removed
-            updateData.images = existingImagesToKeep;
-            // Append newly uploaded images
             if (newImages.length > 0) {
                 updateData.images = [...existingImagesToKeep, ...newImages];
+            } else {
+                updateData.images = existingImagesToKeep;
             }
         } else if (newImages.length > 0) {
             // No existing images data, just append new ones (backward compatible)
+            console.log('No existingImages, appending', newImages.length, 'new images to existing', property.images?.length || 0);
             updateData.images = [...(property.images || []), ...newImages];
-        }
-        // If no new images and no existing images update, keep original images
-        else if (!updateData.images) {
+        } else {
+            // If no new images and no existing images update, keep original images
+            console.log('Keeping original images:', property.images?.length || 0);
             updateData.images = property.images;
+        }
+        
+        // Final safety check: ensure images is NEVER a string
+        if (typeof updateData.images === 'string') {
+            console.error('CRITICAL: updateData.images is still a string! Attempting emergency parse...');
+            try {
+                updateData.images = JSON.parse(updateData.images);
+            } catch (e) {
+                console.error('Emergency parse failed, using property images');
+                updateData.images = property.images || [];
+            }
         }
         
         // Ensure coverImageIndex is in updateData (it comes from req.body after spreading)

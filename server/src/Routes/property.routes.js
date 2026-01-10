@@ -41,10 +41,18 @@ const parseFormData = (req, res, next) => {
     if (req.body.existingImages && typeof req.body.existingImages === 'string') {
         try {
             req.body.existingImages = JSON.parse(req.body.existingImages);
+            console.log('Parsed existingImages:', Array.isArray(req.body.existingImages), req.body.existingImages?.length);
         } catch (e) {
             console.error('Error parsing existingImages:', e);
             req.body.existingImages = null;
         }
+    }
+    
+    // Remove images field from req.body if it's a string (FormData issue)
+    // This prevents it from overwriting the properly constructed images array
+    if (req.body.images && typeof req.body.images === 'string') {
+        console.log('Deleting string images field from req.body');
+        delete req.body.images;
     }
     if (req.body['amenities[]']) {
         req.body.amenities = Array.isArray(req.body['amenities[]']) 
