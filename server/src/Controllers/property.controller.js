@@ -438,46 +438,61 @@ export const updateProperty = async (req, res) => {
             }
         }
         
-        // Delete all image-related and sensitive fields from req.body BEFORE spreading
-        delete req.body.landlordId;
-        delete req.body.paymentId;
-        delete req.body.existingImages;
-        delete req.body.images; // Critical: prevent string pollution
-        delete req.body.imageFiles;
-
-        // Build updateData WITHOUT images field initially
-        const updateData = {
-            ...req.body,
-        };
+        // WHITELIST APPROACH: Only include allowed fields (NEVER spread req.body)
+        const updateData = {};
         
-        // Explicitly set images AFTER spreading to ensure it's never a string
+        // Text fields
+        if (req.body.title) updateData.title = req.body.title;
+        if (req.body.description) updateData.description = req.body.description;
+        if (req.body.phone) updateData.phone = req.body.phone;
+        if (req.body.campusName) updateData.campusName = req.body.campusName;
+        
+        // Number fields
+        if (req.body.price !== undefined) updateData.price = Number(req.body.price);
+        if (req.body.securityDeposit !== undefined) updateData.securityDeposit = Number(req.body.securityDeposit);
+        if (req.body.totalRooms !== undefined) updateData.totalRooms = Number(req.body.totalRooms);
+        if (req.body.availableRooms !== undefined) updateData.availableRooms = Number(req.body.availableRooms);
+        
+        // Enum fields
+        if (req.body.roomType) updateData.roomType = req.body.roomType;
+        if (req.body.gender) updateData.gender = req.body.gender;
+        
+        // Location fields
+        if (req.body.city) updateData.city = req.body.city;
+        if (req.body.state) updateData.state = req.body.state;
+        if (req.body.location) updateData.location = req.body.location;
+        if (req.body.address) updateData.address = req.body.address;
+        
+        // Array fields
+        if (req.body.amenities) updateData.amenities = req.body.amenities;
+        if (req.body.nearbyColleges) updateData.nearbyColleges = req.body.nearbyColleges;
+        
+        // Cover image index
+        if (req.body.coverImageIndex !== undefined) {
+            updateData.coverImageIndex = Number(req.body.coverImageIndex);
+        }
+        
+        // NOW handle images - this is guaranteed to be set LAST
         if (existingImagesToKeep && Array.isArray(existingImagesToKeep)) {
             console.log('Using existingImages:', existingImagesToKeep.length, 'new images:', newImages.length);
-            // Start with existing images that weren't removed
             if (newImages.length > 0) {
                 updateData.images = [...existingImagesToKeep, ...newImages];
             } else {
                 updateData.images = existingImagesToKeep;
             }
         } else if (newImages.length > 0) {
-            // No existing images data, just append new ones (backward compatible)
             console.log('No existingImages, appending', newImages.length, 'new images to existing', property.images?.length || 0);
             updateData.images = [...(property.images || []), ...newImages];
         } else {
-            // If no new images and no existing images update, keep original images
             console.log('Keeping original images:', property.images?.length || 0);
             updateData.images = property.images;
         }
         
-        // Final safety check: ensure images is NEVER a string
-        if (typeof updateData.images === 'string') {
-            console.error('CRITICAL: updateData.images is still a string! Attempting emergency parse...');
-            try {
-                updateData.images = JSON.parse(updateData.images);
-            } catch (e) {
-                console.error('Emergency parse failed, using property images');
-                updateData.images = property.images || [];
-            }
+        // Verify images is an array before proceeding
+        console.log('Final images type:', typeof updateData.images, 'isArray:', Array.isArray(updateData.images), 'length:', updateData.images?.length);
+        if (!Array.isArray(updateData.images)) {
+            console.error('CRITICAL ERROR: images is not an array!', typeof updateData.images);
+            throw new Error('Images must be an array');
         }
         
         // Ensure coverImageIndex is in updateData (it comes from req.body after spreading)
