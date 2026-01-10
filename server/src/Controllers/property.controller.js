@@ -427,14 +427,39 @@ export const updateProperty = async (req, res) => {
         // Store and validate existingImages FIRST before any deletions
         let existingImagesToKeep = req.body.existingImages;
         
-        // Double-check parsing (safety net)
-        if (existingImagesToKeep && typeof existingImagesToKeep === 'string') {
-            try {
-                existingImagesToKeep = JSON.parse(existingImagesToKeep);
-                console.log('Controller: Had to parse existingImages again');
-            } catch (e) {
-                console.error('Controller: Error parsing existingImages:', e);
-                existingImagesToKeep = null;
+        // Parse existingImages - may need multiple passes if double-stringified
+        if (existingImagesToKeep) {
+            // Keep parsing while it's still a string
+            while (typeof existingImagesToKeep === 'string') {
+                try {
+                    existingImagesToKeep = JSON.parse(existingImagesToKeep);
+                    console.log('Controller: Parsed existingImages, now type:', typeof existingImagesToKeep);
+                } catch (e) {
+                    console.error('Controller: Error parsing existingImages:', e);
+                    existingImagesToKeep = null;
+                    break;
+                }
+            }
+            
+            // Also check if array elements are strings and parse them
+            if (Array.isArray(existingImagesToKeep) && existingImagesToKeep.length > 0) {
+                if (typeof existingImagesToKeep[0] === 'string') {
+                    console.log('Controller: Array elements are strings, parsing first element');
+                    try {
+                        // The first element might be the entire JSON array as a string
+                        const parsed = JSON.parse(existingImagesToKeep[0]);
+                        if (Array.isArray(parsed)) {
+                            existingImagesToKeep = parsed;
+                        }
+                    } catch (e) {
+                        console.error('Controller: Error parsing array element:', e);
+                    }
+                }
+            }
+            
+            console.log('Controller: Final existingImages count:', existingImagesToKeep?.length);
+            if (existingImagesToKeep?.length > 0) {
+                console.log('Controller: First image url:', existingImagesToKeep[0]?.url);
             }
         }
         
