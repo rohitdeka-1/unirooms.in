@@ -194,6 +194,7 @@ const Home = () => {
                             ))}
                         </div>
                     ) : featuredProperties.length > 0 ? (
+                        <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {featuredProperties.map((property, index) => (
                                 <motion.div
@@ -221,6 +222,7 @@ const Home = () => {
                                 </svg>
                             </Link>
                         </div>
+                        </>
                     ) : (
                         <div className="text-center py-12">
                             <div className="w-16 h-16 mx-auto mb-4 bg-neutral-100 rounded-full flex items-center justify-center">
