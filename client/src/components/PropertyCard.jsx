@@ -7,6 +7,13 @@ import { savedPropertyAPI } from '../utils/api';
 const getBlurPlaceholder = () => {
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PC9zdmc+';
 };
+
+const formatViews = (views) => {
+    if (views < 1000) return views.toString();
+    const k = views / 1000;
+    if (k >= 10) return Math.floor(k) + 'k';
+    return k.toFixed(k % 1 === 0 ? 0 : 2).replace(/\.?0+$/, '') + 'k';
+};
 const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [isSaved, setIsSaved] = useState(initialSaved);
@@ -161,11 +168,12 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
                     {}
                     <div className="flex items-center justify-between pt-2 mt-2 sm:mt-0 border-t border-neutral-100">
                         {}
-                        <div className="flex items-center space-x-1.5 sm:space-x-2 px-2 py-1.5 sm:px-3 sm:py-2 bg-amber-50 rounded-lg">
-                            <svg className="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        <div className="flex items-center space-x-1.5 sm:space-x-2 px-2 py-1.5 sm:px-3 sm:py-2 bg-blue-50 rounded-lg">
+                            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
-                            <span className="font-bold text-neutral-700 text-sm">{property.rating || '4.5'}</span>
+                            <span className="font-bold text-neutral-700 text-sm">{formatViews(property.views || 0)} views</span>
                         </div>
                         {}
                         <div className="text-right">

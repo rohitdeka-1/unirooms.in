@@ -4,6 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { propertyAPI } from '../utils/api';
 import { updateMetaTags, generatePropertyStructuredData, addStructuredData } from '../utils/seo';
+
+const formatViews = (views) => {
+    if (views < 1000) return views.toString();
+    const k = views / 1000;
+    if (k >= 10) return Math.floor(k) + 'k';
+    return k.toFixed(k % 1 === 0 ? 0 : 2).replace(/\.?0+$/, '') + 'k';
+};
+
 const PropertyDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -249,13 +257,14 @@ const PropertyDetail = () => {
                                         </div>
                                     )}
                                     {}
-                                    <div className="px-2 py-1 sm:px-4 sm:py-2 bg-amber-50 rounded-xl">
+                                    <div className="px-2 py-1 sm:px-4 sm:py-2 bg-blue-50 rounded-xl">
                                         <div className="flex items-center space-x-1 sm:space-x-1 sm:space-x-2">
-                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                        <span className="font-bold text-dark-800 text-sm sm:text-base">{property.averageRating || 0}</span>
-                                        <span className="text-dark-500 text-[10px] sm:text-sm">({property.totalReviews || 0})</span>
+                                        <span className="font-bold text-dark-800 text-sm sm:text-base">{formatViews(property.views || 0)}</span>
+                                        <span className="text-dark-500 text-[10px] sm:text-sm">views</span>
                                         </div>
                                     </div>
                                 </div>
