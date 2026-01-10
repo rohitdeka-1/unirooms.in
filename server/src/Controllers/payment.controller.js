@@ -76,7 +76,7 @@ export const createPaymentOrder = async (req, res) => {
             setTimeout(() => reject(new Error('Payment gateway timeout')), 10000) // 10 second timeout
         );
         
-        const cashfreePromise = cashfree.PGCreateOrder("2023-08-01", request);
+        const cashfreePromise = cashfree.PGCreateOrder(request);
         
         const response = await Promise.race([cashfreePromise, timeoutPromise]);
         
@@ -154,7 +154,7 @@ export const verifyPayment = async (req, res) => {
             setTimeout(() => reject(new Error('Payment verification timeout')), 8000) // 8 second timeout
         );
         
-        const cashfreePromise = cashfree.PGOrderFetchPayments("2023-08-01", orderId);
+        const cashfreePromise = cashfree.PGOrderFetchPayments(orderId);
         
         const response = await Promise.race([cashfreePromise, timeoutPromise]);
 
