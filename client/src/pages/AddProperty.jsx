@@ -302,7 +302,20 @@ const AddProperty = () => {
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} property:`, error);
             if (!isEditMode && (error.message.includes('listing limit') || error.message.includes('listing credit'))) {
-                toast.error('Complete payment to proceed');
+                toast.custom((t) => (
+                    <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-blue-500 shadow-lg rounded-lg pointer-events-auto flex items-center p-4`}>
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div className="ml-3">
+                                <p className="text-sm font-medium text-white">Complete payment to proceed</p>
+                            </div>
+                        </div>
+                    </div>
+                ), { duration: 3000 });
                 setShowPaymentModal(true);
                 return;
             } else {

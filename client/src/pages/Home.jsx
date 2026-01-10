@@ -208,6 +208,19 @@ const Home = () => {
                                 </motion.div>
                             ))}
                         </div>
+                        
+                        {/* Browse More Link */}
+                        <div className="text-center mt-10">
+                            <Link
+                                to="/browse"
+                                className="inline-flex items-center space-x-2 px-6 py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25"
+                            >
+                                <span>Browse More PGs</span>
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
+                            </Link>
+                        </div>
                     ) : (
                         <div className="text-center py-12">
                             <div className="w-16 h-16 mx-auto mb-4 bg-neutral-100 rounded-full flex items-center justify-center">
