@@ -509,10 +509,15 @@ export const updateProperty = async (req, res) => {
             property[key] = updateData[key];
         });
 
-        // Set images directly - must be done separately to avoid stringification
+        // Set images manually by clearing and pushing each item to avoid casting issues
         if (imagesArray) {
-            property.images = imagesArray;
-            property.markModified('images');
+            property.images = []; // Clear the array first
+            // Push each image object individually - this creates proper subdocuments
+            imagesArray.forEach(img => {
+                // Remove _id if it exists (let mongoose create new subdocument _id)
+                const { _id, ...imgData } = img;
+                property.images.push(imgData);
+            });
         }
 
         // If property was declined, reset status to pending when landlord updates it
