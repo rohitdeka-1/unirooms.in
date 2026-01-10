@@ -50,7 +50,7 @@ export const createPaymentOrder = async (req, res) => {
             });
         }
 
-        const amount = 1; 
+        const amount = 99; 
         const orderId = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
         
