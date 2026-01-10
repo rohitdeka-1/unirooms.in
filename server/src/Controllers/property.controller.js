@@ -426,10 +426,16 @@ export const updateProperty = async (req, res) => {
 
         delete req.body.landlordId;
         delete req.body.paymentId;
+        delete req.body.existingImages; // Remove this before spreading
 
         const updateData = {
             ...req.body,
         };
+        
+        // Remove images field if it exists in req.body (it might be a string from FormData)
+        if (updateData.images) {
+            delete updateData.images;
+        }
         
         // Handle images update
         if (req.body.existingImages && Array.isArray(req.body.existingImages)) {
@@ -441,10 +447,13 @@ export const updateProperty = async (req, res) => {
             if (newImages.length > 0) {
                 updateData.images = [...existingImagesToKeep, ...newImages];
             }
-            delete updateData.existingImages; // Don't save this to DB
         } else if (newImages.length > 0) {
             // No existing images data, just append new ones (backward compatible)
             updateData.images = [...(property.images || []), ...newImages];
+        }
+        // If no new images and no existing images update, keep original images
+        else if (!updateData.images) {
+            updateData.images = property.images;
         }
 
         // Build update query

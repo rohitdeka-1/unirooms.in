@@ -13,6 +13,23 @@ const cashfree = new Cashfree(
     config.CASHFREE_SECRET_KEY
 );
 
+// Normalize Cashfree payment_group to our enum values
+const normalizePaymentMethod = (paymentGroup) => {
+    if (!paymentGroup) return "online";
+    
+    const normalized = paymentGroup.toLowerCase();
+    
+    // Map Cashfree payment_group values to our enum
+    if (normalized.includes('upi')) return 'upi';
+    if (normalized.includes('card') || normalized.includes('credit') || normalized.includes('debit')) return 'card';
+    if (normalized.includes('net') || normalized.includes('bank')) return 'netbanking';
+    if (normalized.includes('wallet')) return 'wallet';
+    
+    // Return original if it matches our enum, otherwise default
+    const validMethods = ["upi", "card", "netbanking", "wallet", "credit_card", "debit_card", "net_banking", "online"];
+    return validMethods.includes(normalized) ? normalized : "online";
+};
+
 export const createPaymentOrder = async (req, res) => {
     try {
         
@@ -49,12 +66,9 @@ export const createPaymentOrder = async (req, res) => {
             },
             order_meta: {
                 return_url: `${config.FRONTEND_URL}/landlord/payment-callback?order_id={order_id}`,
-                notify_url: `${process.env.BACKEND_URL}/api/v1/payments/webhook`,
+                notify_url: `${process.env.BACKEND_URL || config.BACKEND_URL}/api/v1/payments/webhook`,
             },
             order_note: "Property Listing Credit Purchase",
-            order_tags: {
-                payment_methods: "upi,cc,dc,nb,wallet"
-            }
         };
 
         // Set a timeout for the Cashfree API call
@@ -62,7 +76,7 @@ export const createPaymentOrder = async (req, res) => {
             setTimeout(() => reject(new Error('Payment gateway timeout')), 10000) // 10 second timeout
         );
         
-        const cashfreePromise = cashfree.PGCreateOrder(request);
+        const cashfreePromise = cashfree.PGCreateOrder("2023-08-01", request);
         
         const response = await Promise.race([cashfreePromise, timeoutPromise]);
         
@@ -140,7 +154,7 @@ export const verifyPayment = async (req, res) => {
             setTimeout(() => reject(new Error('Payment verification timeout')), 8000) // 8 second timeout
         );
         
-        const cashfreePromise = cashfree.PGOrderFetchPayments(orderId);
+        const cashfreePromise = cashfree.PGOrderFetchPayments("2023-08-01", orderId);
         
         const response = await Promise.race([cashfreePromise, timeoutPromise]);
 
@@ -170,12 +184,33 @@ export const verifyPayment = async (req, res) => {
                         status: "success",
                     },
                 });
+            } else if (paymentInfo.payment_status === "PENDING" || paymentInfo.payment_status === "ACTIVE") {
+                return res.status(200).json({
+                    success: false,
+                    message: "Payment is still pending",
+                    data: {
+                        status: paymentInfo.payment_status,
+                        paymentId: payment._id,
+                    },
+                });
             } else {
+                // Payment failed or other status
+                await Payment.updateOne(
+                    { cashfreeOrderId: orderId },
+                    {
+                        $set: {
+                            status: "failed",
+                            failureReason: paymentInfo.payment_message || "Payment failed"
+                        }
+                    }
+                );
+                
                 return res.status(400).json({
                     success: false,
                     message: "Payment not completed",
                     data: {
                         status: paymentInfo.payment_status,
+                        reason: paymentInfo.payment_message
                     },
                 });
             }
@@ -204,6 +239,20 @@ export const handleWebhook = async (req, res) => {
         const signature = req.headers["x-webhook-signature"];
         const timestamp = req.headers["x-webhook-timestamp"];
         
+        // Verify webhook signature for security
+        if (signature && timestamp && config.CASHFREE_SECRET_KEY) {
+            const signatureData = `${timestamp}${JSON.stringify(req.body)}`;
+            const expectedSignature = crypto
+                .createHmac('sha256', config.CASHFREE_SECRET_KEY)
+                .update(signatureData)
+                .digest('base64');
+            
+            if (signature !== expectedSignature) {
+                console.error('Webhook signature verification failed');
+                return res.status(400).json({ success: false, message: "Invalid signature" });
+            }
+        }
+        
         if (!data || !data.order || !data.order.order_id) {
             console.log("Webhook test or invalid payload received");
             return res.status(200).json({ success: true, message: "Webhook endpoint is active" });
@@ -228,6 +277,11 @@ export const handleWebhook = async (req, res) => {
             case "PAYMENT_FAILED_WEBHOOK":
                 payment.status = "failed";
                 payment.failureReason = data.payment.payment_message || "Payment failed";
+                break;
+                
+            case "PAYMENT_USER_DROPPED_WEBHOOK":
+                payment.status = "failed";
+                payment.failureReason = "User dropped the payment";
                 break;
 
             default:
