@@ -18,6 +18,10 @@ const Browse = () => {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalProperties, setTotalProperties] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const PROPERTIES_PER_PAGE = 20;
 
     useEffect(() => {
         updateMetaTags(pageSEO.browse);
@@ -39,7 +43,10 @@ const Browse = () => {
             setLoading(true);
             setError(null);
             try {
-                const params = {};
+                const params = {
+                    page: currentPage,
+                    limit: PROPERTIES_PER_PAGE
+                };
                 if (searchQuery) params.search = searchQuery;
                 if (selectedType !== 'all') {
                     // Map UI labels to database gender field
@@ -55,6 +62,8 @@ const Browse = () => {
                 const response = await propertyAPI.getAllProperties(params);
                 if (response.success) {
                     setProperties(response.data.properties || []);
+                    setTotalProperties(response.data.pagination?.total || 0);
+                    setTotalPages(response.data.pagination?.pages || 1);
                 }
             } catch (err) {
                 console.error('Error fetching properties:', err);
@@ -66,6 +75,11 @@ const Browse = () => {
         };
 
         fetchProperties();
+    }, [selectedType, searchQuery, currentPage]);
+
+    // Reset to page 1 when filters change
+    useEffect(() => {
+        setCurrentPage(1);
     }, [selectedType, searchQuery]);
     const propertyTypes = [
         { value: 'all', label: 'All Types' },
@@ -147,7 +161,7 @@ const Browse = () => {
                                 Browse Properties
                             </h1>
                             <p className="text-neutral-500 mt-1">
-                                {loading ? 'Loading...' : `${filteredProperties.length} properties available`}
+                                {loading ? 'Loading...' : `${totalProperties} properties available`}
                             </p>
                         </div>
                         {}
@@ -262,7 +276,7 @@ const Browse = () => {
                                     )}
                                 </button>
                                 <span className="hidden md:inline text-neutral-500 text-sm">
-                                    Showing {filteredProperties.length} results
+                                    Showing {filteredProperties.length} of {totalProperties} results
                                 </span>
                             </div>
                             {}
@@ -316,13 +330,98 @@ const Browse = () => {
                                 </button>
                             </div>
                         ) : filteredProperties.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                                {filteredProperties.map((property) => (
-                                    <div key={property._id || property.id}>
-                                        <PropertyCard property={property} />
+                            <>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {filteredProperties.map((property) => (
+                                        <div key={property._id || property.id}>
+                                            <PropertyCard property={property} />
+                                        </div>
+                                    ))}
+                                </div>
+                                
+                                {/* Pagination */}
+                                {totalPages > 1 && (
+                                    <div className="mt-8 flex items-center justify-center gap-2">
+                                        <button
+                                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                            disabled={currentPage === 1}
+                                            className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                                                currentPage === 1
+                                                    ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+                                                    : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                                            }`}
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+                                        
+                                        {/* Page numbers */}
+                                        <div className="flex items-center gap-1">
+                                            {(() => {
+                                                const pages = [];
+                                                const showEllipsisStart = currentPage > 3;
+                                                const showEllipsisEnd = currentPage < totalPages - 2;
+                                                
+                                                // Always show first page
+                                                pages.push(1);
+                                                
+                                                if (showEllipsisStart) {
+                                                    pages.push('...');
+                                                }
+                                                
+                                                // Show pages around current page
+                                                for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+                                                    if (!pages.includes(i)) {
+                                                        pages.push(i);
+                                                    }
+                                                }
+                                                
+                                                if (showEllipsisEnd) {
+                                                    pages.push('...');
+                                                }
+                                                
+                                                // Always show last page if more than 1 page
+                                                if (totalPages > 1 && !pages.includes(totalPages)) {
+                                                    pages.push(totalPages);
+                                                }
+                                                
+                                                return pages.map((page, idx) => (
+                                                    page === '...' ? (
+                                                        <span key={`ellipsis-${idx}`} className="px-2 text-neutral-400">...</span>
+                                                    ) : (
+                                                        <button
+                                                            key={page}
+                                                            onClick={() => setCurrentPage(page)}
+                                                            className={`w-10 h-10 rounded-xl font-medium transition-all ${
+                                                                currentPage === page
+                                                                    ? 'bg-primary-600 text-white shadow-button'
+                                                                    : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                                                            }`}
+                                                        >
+                                                            {page}
+                                                        </button>
+                                                    )
+                                                ));
+                                            })()}
+                                        </div>
+                                        
+                                        <button
+                                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                            disabled={currentPage === totalPages}
+                                            className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                                                currentPage === totalPages
+                                                    ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+                                                    : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                                            }`}
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
                                     </div>
-                                ))}
-                            </div>
+                                )}
+                            </>
                         ) : (
                             <div className="card p-12 text-center">
                                 <div className="w-20 h-20 mx-auto mb-6 bg-neutral-100 rounded-full flex items-center justify-center">
@@ -427,7 +526,7 @@ const Browse = () => {
                                         onClick={() => setShowFilters(false)}
                                         className="flex-1 btn-primary"
                                     >
-                                        Show {filteredProperties.length} Results
+                                        Show Results
                                     </button>
                                 </div>
                             </div>
