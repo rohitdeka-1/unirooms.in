@@ -168,12 +168,20 @@ const PropertyCard = ({ property, onUnsave, isSaved: initialSaved = false }) => 
                     {}
                     <div className="flex items-center justify-between pt-2 mt-2 sm:mt-0 border-t border-neutral-100">
                         {}
-                        <div className="flex items-center space-x-1.5 sm:space-x-2 px-2 py-1.5 sm:px-3 sm:py-2 bg-amber-50 rounded-lg">
-                            <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            <span className="font-bold text-neutral-700 text-sm">{formatViews(property.views || 0)} views</span>
+                        <div className={`flex items-center space-x-1.5 sm:space-x-2 px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg ${property.views >= 100 ? 'bg-gradient-to-br from-orange-300 to-red-400' : 'bg-amber-50'}`}>
+                            {property.views >= 100 ? (
+                                <img 
+                                    src="/Fire.gif" 
+                                    alt="Trending" 
+                                    className="w-4 h-4"
+                                />
+                            ) : (
+                                <svg className="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            )}
+                            <span className={`font-bold text-sm ${property.views >= 100 ? 'text-white drop-shadow-lg' : 'text-neutral-700'}`}>{formatViews(property.views || 0)} views</span>
                         </div>
                         {}
                         <div className="text-right">
