@@ -257,18 +257,93 @@ const PropertyDetail = () => {
                                         </div>
                                     )}
                                     {}
-                                    <div className="px-2 py-1 sm:px-4 sm:py-2 bg-amber-50 rounded-xl">
-                                        <div className="flex items-center space-x-1 sm:space-x-1 sm:space-x-2">
-                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                        <span className="font-bold text-dark-800 text-sm sm:text-base">{formatViews(property.views || 0)}</span>
-                                        <span className="text-dark-500 text-[10px] sm:text-sm">views</span>
+                                    <div className={`px-2 py-1 sm:px-4 sm:py-2 rounded-xl ${property.views >= 100 ? 'bg-gradient-to-br from-orange-300 to-red-400' : 'bg-amber-50'}`}>
+                                        <div className="flex items-center space-x-1 sm:space-x-1">
+                                            {property.views >= 100 ? (
+                                                <img 
+                                                    src="/Fire.gif" 
+                                                    alt="Trending" 
+                                                    className="w-4 h-4 sm:w-5 sm:h-5"
+                                                />
+                                            ) : (
+                                                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            )}
+                                        <span className={`font-bold text-sm sm:text-base ${property.views >= 100 ? 'text-white drop-shadow-lg' : 'text-dark-800'}`}>{formatViews(property.views || 0)}</span>
+                                        <span className={`text-[10px] sm:text-sm ${property.views >= 100 ? 'text-orange-100' : 'text-dark-500'}`}>views</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        {/* Mobile only: Price and Contact at top */}
+                        <div className="lg:hidden card p-3 sm:p-6">
+                            <h2 className="text-base sm:text-xl font-display font-bold text-dark-900 mb-3 sm:mb-4">Monthly Rent</h2>
+                            <div className="flex items-baseline mb-2">
+                                <span className="text-2xl sm:text-4xl font-display font-bold gradient-text">₹{property.price?.toLocaleString()}</span>
+                                <span className="text-dark-400 ml-2 text-xs sm:text-base">/month</span>
+                            </div>
+                            {property.securityDeposit > 0 && (
+                                <p className="text-xs sm:text-sm text-dark-500">Security Deposit: ₹{property.securityDeposit.toLocaleString()}</p>
+                            )}
+                        </div>
+                        {}
+                        <div className="lg:hidden card p-3 sm:p-6">
+                            <h3 className="font-display font-bold text-dark-900 mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
+                                Contact & Location
+                                {landlord.verified && (
+                                    <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">Verified</span>
+                                )}
+                            </h3>
+                            {isAuthenticated ? (
+                                <div className="space-y-2 sm:space-y-3">
+                                    <div className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-dark-50 rounded-xl">
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                        </div>
+                                        <span className="text-dark-700 font-medium text-sm sm:text-base truncate">{landlord.name}</span>
+                                    </div>
+                                    <a href={`tel:${landlord.phone}`} className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-200 hover:shadow-md">
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                            </svg>
+                                        </div>
+                                        <span className="text-blue-700 font-semibold text-sm sm:text-base">{landlord.phone}</span>
+                                    </a>
+                                    {property.location?.coordinates && (
+                                        <a 
+                                            href={`https://www.google.com/maps?q=${property.location.coordinates[1]},${property.location.coordinates[0]}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full btn-primary py-2.5 sm:py-3.5 flex items-center justify-center gap-2 text-sm sm:text-base"
+                                        >
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            Visit on Maps
+                                        </a>
+                                    )}
+                                </div>
+                            ) : (
+                                <div
+                                    onClick={handleContactClick}
+                                    className="p-4 sm:p-6 bg-gradient-to-br from-dark-50 to-dark-100 rounded-xl cursor-pointer hover:shadow-card transition-all text-center border-2 border-dashed border-dark-200"
+                                >
+                                    <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-2 sm:mb-3 bg-primary-100 rounded-full flex items-center justify-center">
+                                        <svg className="w-6 h-6 sm:w-7 sm:h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <p className="font-semibold text-dark-700 mb-1 text-sm sm:text-base">Login to View Contact & Location</p>
+                                    <p className="text-xs sm:text-sm text-dark-500">Sign in to get landlord details and property location</p>
+                                </div>
+                            )}
                         </div>
                         {}
                         <div className="card p-3 sm:p-6">
@@ -276,7 +351,7 @@ const PropertyDetail = () => {
                             <p className="text-dark-600 leading-relaxed text-sm sm:text-base">{property.description || 'No description available.'}</p>
                         </div>
                         {}
-                        <div className="card p-3 sm:p-3 sm:p-6">
+                        <div className="card p-3 sm:p-3  ">
                             <h2 className="text-base sm:text-xl font-display font-bold text-dark-900 mb-3 sm:mb-6">Amenities & Facilities</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4">
                                 {facilities.map((facility, index) => (
@@ -293,7 +368,7 @@ const PropertyDetail = () => {
                         </div>
                     </div>
                     {}
-                    <div className="lg:col-span-1">
+                    <div className="hidden lg:block lg:col-span-1">
                         <div className="card p-4 sm:p-6 lg:sticky lg:top-28">
                             {}
                             <div className="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b border-dark-100">
@@ -324,13 +399,13 @@ const PropertyDetail = () => {
                                             </div>
                                             <span className="text-dark-700 font-medium text-sm sm:text-base truncate">{landlord.name}</span>
                                         </div>
-                                        <a href={`tel:${landlord.phone}`} className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-green-50 rounded-xl hover:bg-green-100 transition">
-                                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        <a href={`tel:${landlord.phone}`} className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-200 hover:shadow-md">
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                                 </svg>
                                             </div>
-                                            <span className="text-green-700 font-semibold text-sm sm:text-base">{landlord.phone}</span>
+                                            <span className="text-blue-700 font-semibold text-sm sm:text-base">{landlord.phone}</span>
                                         </a>
                                     </div>
                                 ) : (
