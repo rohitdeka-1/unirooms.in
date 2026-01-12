@@ -101,11 +101,12 @@ const Navbar = () => {
                                 {isAuthenticated ? (
                                     <div className="flex items-center space-x-4">
                                         <Link to="/profile" className="flex items-center space-x-3 px-3 py-2 rounded-xl hover:bg-neutral-100 transition-colors">
-                                            {user?.profileImage ? (
+                                            {user?.profileImage && !user.profileImage.includes('default-avatar') ? (
                                                 <img
                                                     src={user.profileImage}
                                                     alt={user?.name || 'User'}
                                                     className="w-9 h-9 rounded-xl object-cover"
+                                                    referrerPolicy="no-referrer"
                                                     onError={(e) => {
                                                         e.target.onerror = null;
                                                         e.target.style.display = 'none';
@@ -115,7 +116,7 @@ const Navbar = () => {
                                             ) : null}
                                             <div
                                                 className="w-9 h-9 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center"
-                                                style={{ display: user?.profileImage ? 'none' : 'flex' }}
+                                                style={{ display: user?.profileImage && !user.profileImage.includes('default-avatar') ? 'none' : 'flex' }}
                                             >
                                                 <span className="text-white font-semibold text-sm">
                                                     {user?.name?.charAt(0).toUpperCase() || 'U'}
@@ -153,11 +154,12 @@ const Navbar = () => {
                                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                                         className="flex items-center space-x-2 p-1.5 rounded-xl hover:bg-neutral-100 transition-colors"
                                     >
-                                        {user?.profileImage ? (
+                                        {user?.profileImage && !user.profileImage.includes('default-avatar') ? (
                                             <img
                                                 src={user.profileImage}
                                                 alt={user?.name || 'User'}
                                                 className="w-9 h-9 rounded-xl object-cover ring-2 ring-primary-200"
+                                                referrerPolicy="no-referrer"
                                                 onError={(e) => {
                                                     e.target.onerror = null;
                                                     e.target.style.display = 'none';
@@ -167,7 +169,7 @@ const Navbar = () => {
                                         ) : null}
                                         <div
                                             className="w-9 h-9 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center ring-2 ring-primary-200"
-                                            style={{ display: user?.profileImage ? 'none' : 'flex' }}
+                                            style={{ display: user?.profileImage && !user.profileImage.includes('default-avatar') ? 'none' : 'flex' }}
                                         >
                                             <span className="text-white font-semibold text-sm">
                                                 {user?.name?.charAt(0).toUpperCase() || 'U'}

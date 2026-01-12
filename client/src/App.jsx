@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
@@ -45,6 +46,7 @@ const Layout = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
+      <SocketProvider>
       <Router>
         <Toaster 
           position="top-right" 
@@ -105,6 +107,7 @@ function App() {
           </Routes>
         </Layout>
       </Router>
+      </SocketProvider>
     </AuthProvider>
   );
 }

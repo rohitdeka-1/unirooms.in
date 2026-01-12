@@ -9,12 +9,16 @@ import {
     FaUser,
     FaEnvelope,
     FaPhone,
-    FaFilter
+    FaFilter,
+    FaUsers
 } from "react-icons/fa";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { useSocket } from "../context/SocketContext";
+
 const AdminProperties = () => {
     const { user } = useAuth();
+    const { onlineUsers } = useSocket();
     const navigate = useNavigate();
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -24,6 +28,7 @@ const AdminProperties = () => {
     const [showDeclineModal, setShowDeclineModal] = useState(false);
     const [declineReason, setDeclineReason] = useState("");
     const [selectedPropertyId, setSelectedPropertyId] = useState(null);
+
     useEffect(() => {
         if (!user || user.email !== 'alkardorhd@gmail.com') {
             navigate('/', { replace: true });
@@ -119,6 +124,22 @@ const AdminProperties = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 pt-20 mt-10 pb-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Real-time Users Counter */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mb-6 flex justify-end"
+                >
+                    <div className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-full shadow-lg">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-200"></span>
+                        </span>
+                        <FaUsers className="text-lg" />
+                        <span className="font-bold text-lg">{onlineUsers}</span>
+                        <span className="text-sm">online</span>
+                    </div>
+                </motion.div>
                 {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
