@@ -31,14 +31,11 @@ io.on('connection', (socket) => {
         peakUsers = connectedUsers;
     }
     
-    console.log(chalk.green(`User connected. Total: ${connectedUsers} | Peak: ${peakUsers}`));
-    
     // Emit both current and peak count
     io.emit('userStats', { current: connectedUsers, peak: peakUsers });
     
     socket.on('disconnect', () => {
         connectedUsers--;
-        console.log(chalk.yellow(`User disconnected. Total: ${connectedUsers} | Peak: ${peakUsers}`));
         io.emit('userStats', { current: connectedUsers, peak: peakUsers });
     });
 });
