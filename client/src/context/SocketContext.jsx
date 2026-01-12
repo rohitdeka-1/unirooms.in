@@ -13,6 +13,7 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
     const [onlineUsers, setOnlineUsers] = useState(0);
+    const [peakUsers, setPeakUsers] = useState(0);
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
@@ -25,6 +26,12 @@ export const SocketProvider = ({ children }) => {
             console.log('Connected to socket server');
         });
 
+        newSocket.on('userStats', ({ current, peak }) => {
+            setOnlineUsers(current);
+            setPeakUsers(peak);
+        });
+
+        // Backwards compatibility for old event
         newSocket.on('userCount', (count) => {
             setOnlineUsers(count);
         });
@@ -38,7 +45,8 @@ export const SocketProvider = ({ children }) => {
 
     const value = {
         socket,
-        onlineUsers
+        onlineUsers,
+        peakUsers
     };
 
     return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>;

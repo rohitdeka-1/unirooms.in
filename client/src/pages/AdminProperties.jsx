@@ -18,7 +18,7 @@ import { useSocket } from "../context/SocketContext";
 
 const AdminProperties = () => {
     const { user } = useAuth();
-    const { onlineUsers } = useSocket();
+    const { onlineUsers, peakUsers } = useSocket();
     const navigate = useNavigate();
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -124,26 +124,82 @@ const AdminProperties = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 pt-20 mt-10 pb-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Real-time Users Counter */}
+                {/* Real-time Analytics Section */}
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mb-6 flex justify-end"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-8 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4"
                 >
-                    <div className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-full shadow-lg">
-                        <span className="relative flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-200"></span>
-                        </span>
-                        <FaUsers className="text-lg" />
-                        <span className="font-bold text-lg">{onlineUsers}</span>
-                        <span className="text-sm">online</span>
+                    {/* Live Users Card */}
+                    <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl sm:rounded-2xl p-3 sm:p-6 text-white shadow-xl">
+                        <div className="flex items-center justify-between mb-2 sm:mb-4">
+                            <div className="p-2 sm:p-3 bg-white/20 rounded-lg sm:rounded-xl">
+                                <FaUsers className="text-lg sm:text-2xl" />
+                            </div>
+                            <span className="relative flex h-2 w-2 sm:h-3 sm:w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 sm:h-3 sm:w-3 bg-white"></span>
+                            </span>
+                        </div>
+                        <p className="text-green-100 text-[10px] sm:text-sm font-medium mb-0.5 sm:mb-1">Live Users</p>
+                        <div className="flex items-baseline gap-1 sm:gap-2">
+                            <span className="text-2xl sm:text-4xl font-bold">{onlineUsers}</span>
+                            <span className="text-green-200 text-[10px] sm:text-sm hidden sm:inline">online now</span>
+                        </div>
+                    </div>
+
+                    {/* Peak Users Card (High Score) */}
+                    <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl sm:rounded-2xl p-3 sm:p-6 text-white shadow-xl relative overflow-hidden">
+                        <div className="absolute top-1 right-1 sm:top-2 sm:right-2">
+                            <span className="text-[8px] sm:text-xs bg-white/20 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">🏆</span>
+                        </div>
+                        <div className="flex items-center justify-between mb-2 sm:mb-4">
+                            <div className="p-2 sm:p-3 bg-white/20 rounded-lg sm:rounded-xl">
+                                <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p className="text-orange-100 text-[10px] sm:text-sm font-medium mb-0.5 sm:mb-1">Peak</p>
+                        <div className="flex items-baseline gap-1 sm:gap-2">
+                            <span className="text-2xl sm:text-4xl font-bold">{peakUsers}</span>
+                            <span className="text-orange-200 text-[10px] sm:text-sm hidden sm:inline">all-time</span>
+                        </div>
+                    </div>
+
+                    {/* Properties Count Card */}
+                    <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl sm:rounded-2xl p-3 sm:p-6 text-white shadow-xl">
+                        <div className="flex items-center justify-between mb-2 sm:mb-4">
+                            <div className="p-2 sm:p-3 bg-white/20 rounded-lg sm:rounded-xl">
+                                <FaMapMarkerAlt className="text-lg sm:text-2xl" />
+                            </div>
+                        </div>
+                        <p className="text-blue-100 text-[10px] sm:text-sm font-medium mb-0.5 sm:mb-1">Properties</p>
+                        <div className="flex items-baseline gap-1 sm:gap-2">
+                            <span className="text-2xl sm:text-4xl font-bold">{properties.length}</span>
+                            <span className="text-blue-200 text-[10px] sm:text-sm hidden sm:inline">listings</span>
+                        </div>
+                    </div>
+
+                    {/* Quick Stats Card */}
+                    <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl sm:rounded-2xl p-3 sm:p-6 text-white shadow-xl">
+                        <div className="flex items-center justify-between mb-2 sm:mb-4">
+                            <div className="p-2 sm:p-3 bg-white/20 rounded-lg sm:rounded-xl">
+                                <FaCheckCircle className="text-lg sm:text-2xl" />
+                            </div>
+                        </div>
+                        <p className="text-purple-100 text-[10px] sm:text-sm font-medium mb-0.5 sm:mb-1">Filter</p>
+                        <div className="flex items-baseline gap-1 sm:gap-2">
+                            <span className="text-xl sm:text-4xl font-bold capitalize">{filter}</span>
+                        </div>
                     </div>
                 </motion.div>
+
                 {}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
                     className="mb-8"
                 >
                     <h1 className="text-4xl font-bold text-gray-900 mb-2">

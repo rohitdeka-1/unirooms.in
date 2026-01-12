@@ -19,18 +19,27 @@ const io = new Server(httpServer, {
     }
 });
 
- let connectedUsers = 0;
+// Track connected users and peak (high score)
+let connectedUsers = 0;
+let peakUsers = 0;
 
 io.on('connection', (socket) => {
     connectedUsers++;
-    console.log(chalk.green(`User connected. Total users: ${connectedUsers}`));
     
-     io.emit('userCount', connectedUsers);
+    // Update peak if current exceeds it
+    if (connectedUsers > peakUsers) {
+        peakUsers = connectedUsers;
+    }
+    
+    console.log(chalk.green(`User connected. Total: ${connectedUsers} | Peak: ${peakUsers}`));
+    
+    // Emit both current and peak count
+    io.emit('userStats', { current: connectedUsers, peak: peakUsers });
     
     socket.on('disconnect', () => {
         connectedUsers--;
-        console.log(chalk.yellow(`User disconnected. Total users: ${connectedUsers}`));
-        io.emit('userCount', connectedUsers);
+        console.log(chalk.yellow(`User disconnected. Total: ${connectedUsers} | Peak: ${peakUsers}`));
+        io.emit('userStats', { current: connectedUsers, peak: peakUsers });
     });
 });
 
