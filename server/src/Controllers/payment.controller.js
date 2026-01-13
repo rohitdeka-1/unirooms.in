@@ -334,3 +334,129 @@ export const getPaymentById = async (req, res) => {
         });
     }
 };
+
+// Create donation order
+export const createDonation = async (req, res) => {
+    try {
+        const { amount, donorName, message } = req.body;
+
+        if (!amount || amount < 5) {
+            return res.status(400).json({
+                success: false,
+                message: "Minimum donation amount is ₹5",
+            });
+        }
+
+        const orderId = `DONATE_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+        // For local development, use production URL for Cashfree (they require HTTPS)
+        const returnUrl = config.FRONTEND_URL.startsWith('https') 
+            ? `${config.FRONTEND_URL}?donation=success`
+            : `https://unirooms.in?donation=success`;
+
+        // Build order request - notify_url is optional
+        const request = {
+            order_amount: amount,
+            order_currency: "INR",
+            order_id: orderId,
+            customer_details: {
+                customer_id: `donor_${Date.now()}`,
+                customer_name: donorName || "Anonymous",
+                customer_email: "donor@unirooms.in",
+                customer_phone: "9999999999",
+            },
+            order_meta: {
+                return_url: returnUrl,
+            },
+            order_note: message || "Donation to Unirooms",
+        };
+
+        const response = await cashfree.PGCreateOrder(request);
+
+        // Create donation record
+        const payment = await Payment.create({
+            amount,
+            currency: "INR",
+            status: "pending",
+            purpose: "donation",
+            cashfreeOrderId: orderId,
+            donorName: donorName || "Anonymous",
+            donorMessage: message || "",
+        });
+
+        res.status(201).json({
+            success: true,
+            message: "Donation order created successfully",
+            data: {
+                orderId: payment.cashfreeOrderId,
+                amount: payment.amount,
+                payment_session_id: response.data.payment_session_id,
+                order_id: response.data.order_id,
+            },
+        });
+    } catch (error) {
+        console.error("Create Donation Error:", error.response?.data || error.message);
+        res.status(500).json({
+            success: false,
+            message: "Error creating donation order",
+            error: error.response?.data?.message || error.message,
+        });
+    }
+};
+
+// Verify donation
+export const verifyDonation = async (req, res) => {
+    try {
+        const { orderId } = req.body;
+
+        if (!orderId) {
+            return res.status(400).json({
+                success: false,
+                message: "Order ID is required",
+            });
+        }
+
+        const payment = await Payment.findOne({ cashfreeOrderId: orderId });
+
+        if (!payment) {
+            return res.status(404).json({
+                success: false,
+                message: "Donation not found",
+            });
+        }
+
+        // Get payment status from Cashfree
+        const response = await cashfree.PGOrderFetchPayments(orderId);
+        const payments = response.data;
+
+        if (payments && payments.length > 0) {
+            const latestPayment = payments[0];
+
+            if (latestPayment.payment_status === "SUCCESS") {
+                payment.status = "completed";
+                payment.cashfreePaymentId = latestPayment.cf_payment_id;
+                payment.paymentMethod = normalizePaymentMethod(latestPayment.payment_group);
+                payment.paidAt = new Date();
+                await payment.save();
+
+                return res.status(200).json({
+                    success: true,
+                    message: "Thank you for your donation!",
+                    data: { payment },
+                });
+            }
+        }
+
+        res.status(400).json({
+            success: false,
+            message: "Donation payment not completed",
+        });
+    } catch (error) {
+        console.error("Verify Donation Error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error verifying donation",
+            error: error.message,
+        });
+    }
+};

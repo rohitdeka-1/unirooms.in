@@ -122,6 +122,14 @@ export const paymentAPI = {
     }),
     getMyPayments: () => apiCall('/payments/my-payments'),
     getPaymentById: (id) => apiCall(`/payments/${id}`),
+    createDonation: (data) => apiCall('/payments/donate', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    verifyDonation: (data) => apiCall('/payments/donate/verify', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
 };
 export const savedPropertyAPI = {
     getSavedProperties: () => apiCall('/saved'),

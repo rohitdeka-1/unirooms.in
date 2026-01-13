@@ -29,6 +29,7 @@ import ListPropertyRedirect from './pages/ListPropertyRedirect';
 import AdminProperties from './pages/AdminProperties';
 import Developer from './pages/Developer';
 import NotFound from './pages/NotFound';
+import FloatingDonateButton from './components/FloatingDonateButton';
 const Layout = ({ children }) => {
   const location = useLocation();
   const hideNavRoutes = ['/login', '/signup', '/forgot-password', '/verify-email', '/verify-email-pending'];
@@ -40,6 +41,7 @@ const Layout = ({ children }) => {
       {children}
       {!shouldHideNav && <Footer />}
       {!shouldHideNav && <BottomNav />}
+      {!shouldHideNav && <FloatingDonateButton />}
     </>
   );
 };

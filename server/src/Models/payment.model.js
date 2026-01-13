@@ -5,8 +5,9 @@ const paymentSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: [true, "User ID is required"],
-      
+      required: function() {
+        return this.purpose !== "donation";
+      },
     },
     amount: {
       type: Number,
@@ -30,8 +31,18 @@ const paymentSchema = new mongoose.Schema(
     },
     purpose: {
       type: String,
-      enum: ["registration", "subscription_renewal", "property_listing"],
+      enum: ["registration", "subscription_renewal", "property_listing", "donation"],
       required: [true, "Payment purpose is required"],
+    },
+    donorName: {
+      type: String,
+      default: "Anonymous",
+    },
+    donorMessage: {
+      type: String,
+    },
+    paidAt: {
+      type: Date,
     },
     propertiesCount: {
       type: Number,

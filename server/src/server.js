@@ -7,11 +7,9 @@ import config from "./Config/env.config.js";
 
 const PORT = config.PORT;
 
-// Create HTTP server
 const httpServer = createServer(app);
 
-// Initialize Socket.IO
-const io = new Server(httpServer, {
+ const io = new Server(httpServer, {
     cors: {
         origin: ['https://unirooms-in.vercel.app', 'http://localhost:5173', 'https://unirooms.in'],
         methods: ['GET', 'POST'],
@@ -19,20 +17,17 @@ const io = new Server(httpServer, {
     }
 });
 
-// Track connected users and peak (high score)
 let connectedUsers = 0;
 let peakUsers = 0;
 
 io.on('connection', (socket) => {
     connectedUsers++;
     
-    // Update peak if current exceeds it
-    if (connectedUsers > peakUsers) {
+     if (connectedUsers > peakUsers) {
         peakUsers = connectedUsers;
     }
     
-    // Emit both current and peak count
-    io.emit('userStats', { current: connectedUsers, peak: peakUsers });
+     io.emit('userStats', { current: connectedUsers, peak: peakUsers });
     
     socket.on('disconnect', () => {
         connectedUsers--;
