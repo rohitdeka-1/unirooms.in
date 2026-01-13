@@ -238,7 +238,7 @@ const DonationModal = ({ onClose }) => {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={handleDonate}
-                                    disabled={selectedAmount < 10}
+                                    disabled={selectedAmount < 5}
                                     className={`w-full py-4 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
                                         selectedAmount >= 5
                                             ? 'bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/40 hover:shadow-xl hover:shadow-purple-500/50'
