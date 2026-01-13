@@ -31,6 +31,7 @@ const Pricing = lazy(() => import('./pages/Pricing'));
 const ListPropertyRedirect = lazy(() => import('./pages/ListPropertyRedirect'));
 const AdminProperties = lazy(() => import('./pages/AdminProperties'));
 const Developer = lazy(() => import('./pages/Developer'));
+const CollegeLanding = lazy(() => import('./pages/CollegeLanding'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 const LoadingFallback = () => (
@@ -114,6 +115,7 @@ function App() {
                 <Route path="/list-property" element={<ListPropertyRedirect />} />
                 <Route path="/admin/properties" element={<AdminProperties />} />
                 <Route path="/developer" element={<Developer />} />
+                <Route path="/college/:collegeSlug" element={<CollegeLanding />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

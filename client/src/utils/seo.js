@@ -193,7 +193,13 @@ export const pageSEO = {
     description: 'Your safety is our priority. Learn about Unirooms\' verification process, safety guidelines, and how we ensure secure PG accommodations for students.',
     keywords: 'PG safety, verified accommodations, safe student housing, secure PG',
     url: 'https://unirooms.in/safety'
-  }
+  },
+  // College-specific SEO templates
+  collegeTemplate: (collegeName, city, fullName) => ({
+    title: `PG Near ${collegeName} | Best Accommodation Near ${fullName} | Unirooms`,
+    description: `Find verified PG accommodations near ${collegeName} in ${city}. Boys PG, Girls PG, and hostels with WiFi, meals, and security. Safe and affordable student housing near ${fullName}.`,
+    keywords: `pg near ${collegeName.toLowerCase()}, ${collegeName.toLowerCase()} pg, boys pg near ${collegeName.toLowerCase()}, girls pg near ${collegeName.toLowerCase()}, hostel near ${collegeName.toLowerCase()}, accommodation ${city.toLowerCase()}, paying guest ${collegeName.toLowerCase()}, student accommodation ${collegeName.toLowerCase()}`
+  })
 };
 export default {
   updateMetaTags,
@@ -203,4 +209,5 @@ export default {
   addStructuredData,
   generateSlug,
   pageSEO
+
 };

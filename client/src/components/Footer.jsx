@@ -19,8 +19,10 @@ const Footer = () => {
         explore: [
             { name: 'Browse', path: '/browse' },
             { name: 'Pricing', path: '/pricing' },
-            { name: 'Near VIT Bhopal', path: '/browse?location=vit-bhopal' },
-            { name: 'Near VIT Chennai', path: '/browse?location=vit-chennai' },
+            { name: 'Near VIT Bhopal', path: '/college/vit-bhopal' },
+            { name: 'Near VIT Vellore', path: '/college/vit-vellore' },
+            { name: 'Near VIT Chennai', path: '/college/vit-chennai' },
+            { name: 'Near SRM University', path: '/college/srm-university' },
         ],
         landlords: [
             { name: 'List Your Property', path: '/list-property' },
