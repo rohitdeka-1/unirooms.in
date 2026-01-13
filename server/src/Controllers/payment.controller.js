@@ -433,7 +433,7 @@ export const verifyDonation = async (req, res) => {
             const latestPayment = payments[0];
 
             if (latestPayment.payment_status === "SUCCESS") {
-                payment.status = "completed";
+                payment.status = "success";
                 payment.cashfreePaymentId = latestPayment.cf_payment_id;
                 payment.paymentMethod = normalizePaymentMethod(latestPayment.payment_group);
                 payment.paidAt = new Date();
