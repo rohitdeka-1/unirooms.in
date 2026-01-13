@@ -438,26 +438,6 @@ const Browse = () => {
                                     </div>
                                 </div>
                                 {}
-                                <div className="mb-8">
-                                    <h3 className="text-sm font-semibold text-neutral-700 mb-3">
-                                        Minimum Rating
-                                    </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                        {[0, 3, 3.5, 4, 4.5].map((rating) => (
-                                            <button
-                                                key={rating}
-                                                onClick={() => setMinRating(rating)}
-                                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${minRating === rating
-                                                    ? 'bg-primary-600 text-white'
-                                                    : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-                                                    }`}
-                                            >
-                                                {rating === 0 ? 'Any' : `${rating}+ ⭐`}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                                {}
                                 <div className="flex space-x-3">
                                     <button
                                         onClick={clearFilters}
