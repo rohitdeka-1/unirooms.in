@@ -1,4 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://unirooms-01cba0aba98a.herokuapp.com/api/v1';
+// Use relative path for API calls to hide backend URL
+// Development: Vite proxy will route /api to localhost:5000
+// Production: Vercel rewrites will route /api to Heroku backend
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 const getAuthToken = () => {
     return localStorage.getItem('accessToken');
 };
