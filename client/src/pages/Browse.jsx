@@ -189,14 +189,14 @@ const Browse = () => {
             </div>
 
             {/* Main Content */}
-            <div className="container mx-auto px-4 pb-24">
+            <div className="container mx-auto px-4 pb-24 mt-10">
                 <div className="flex flex-col lg:flex-row gap-4">
                     {/* Sidebar Filter - Desktop */}
                     <aside className="hidden lg:block w-80 flex-shrink-0">
                         <div className="sticky top-28 space-y-6">
                             {/* Filter Card */}
                             <div className="bg-white rounded-3xl shadow-xl shadow-neutral-200/50 border border-neutral-100 overflow-hidden">
-                                <div className="bg-gradient-to-r from-primary-500 to-blue-500 p-5">
+                                <div className="bg-gradient-to-r from-primary-500 to-blue-500 p-2">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3 text-white">
                                             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
@@ -220,7 +220,7 @@ const Browse = () => {
                                     </div>
                                 </div>
                                 
-                                <div className="p-6">
+                                <div className="px-6 py-3">
                                     <h3 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-4">
                                         Property Type
                                     </h3>
@@ -229,9 +229,9 @@ const Browse = () => {
                                             <label
                                                 key={type.value}
                                                 onClick={() => setSelectedType(type.value)}
-                                                className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer transition-all duration-200 ${
+                                                className={`flex items-center gap-4 p-1 rounded-xl cursor-pointer transition-all duration-200 ${
                                                     selectedType === type.value
-                                                        ? 'bg-primary-50 border-2 border-primary-500'
+                                                        ? 'bg-primary-50 border-2 '
                                                         : 'border-2 border-transparent hover:bg-neutral-50'
                                                 }`}
                                             >
@@ -251,7 +251,7 @@ const Browse = () => {
                                                 </div>
                                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                                                     selectedType === type.value
-                                                        ? 'bg-primary-500 border-primary-500'
+                                                        ? 'bg-primary-500 '
                                                         : 'border-neutral-300'
                                                 }`}>
                                                     {selectedType === type.value && (
