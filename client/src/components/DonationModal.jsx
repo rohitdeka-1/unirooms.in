@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { paymentAPI } from '../utils/api';
 import toast from 'react-hot-toast';
 
 const DonationModal = ({ onClose }) => {
-    const [amount, setAmount] = useState('');
+    const navigate = useNavigate();
+    const [amount, setAmount] = useState('custom');
     const [customAmount, setCustomAmount] = useState('');
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState('select'); // select, processing, success, error
@@ -273,25 +275,55 @@ const DonationModal = ({ onClose }) => {
                     )}
 
                     {step === 'success' && (
-                        <div className="p-8 text-center">
+                        <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-8 text-center">
                             <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ type: "spring", duration: 0.5 }}
-                                className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center"
+                                initial={{ scale: 0, rotate: -180 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{ type: "spring", duration: 0.7 }}
+                                className="w-24 h-24 mx-auto mb-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
                             >
-                                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                 </svg>
                             </motion.div>
-                            <h3 className="text-2xl font-bold text-neutral-800 mb-2">Thank you! 💜</h3>
-                            <p className="text-neutral-500 mb-6">Your support means the world to us!</p>
-                            <button
-                                onClick={onClose}
-                                className="px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                            <motion.h3 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                                className="text-3xl font-bold text-white mb-3"
                             >
-                                Done
-                            </button>
+                                Thank You! 💜
+                            </motion.h3>
+                            <motion.p 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 }}
+                                className="text-white/80 mb-2 text-lg"
+                            >
+                                Your support means the world to us!
+                            </motion.p>
+                            <motion.p 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 }}
+                                className="text-white/60 mb-8 text-sm"
+                            >
+                                Together we're making student housing better ✨
+                            </motion.p>
+                            <motion.button
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => {
+                                    onClose();
+                                    navigate('/');
+                                }}
+                                className="px-8 py-3 bg-white text-purple-600 rounded-xl font-bold hover:shadow-lg transition-all"
+                            >
+                                Back to Home
+                            </motion.button>
                         </div>
                     )}
 
