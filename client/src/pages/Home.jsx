@@ -71,13 +71,18 @@ const Home = () => {
         { value: '4.8', label: 'Avg Rating' },
     ];
     return (
-        <div className="min-h-screen bg-neutral-50 overflow-x-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50/30 overflow-x-hidden">
             {}
-            <section className="relative min-h-[50vh] md:min-h-[90vh] flex items-center pt-20 pb-8 md:pt-24 md:pb-16 overflow-hidden bg-white">
+            <section className="relative min-h-[50vh] md:min-h-[90vh] flex items-center pt-24 pb-12 md:pt-28 md:pb-16 overflow-hidden bg-gradient-to-br from-primary-600 via-primary-500 to-blue-500">
                 {}
                 <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100/50 rounded-full blur-3xl" />
-                    <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-100/30 rounded-full blur-3xl" />
+                    <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
+                    <div className="absolute top-20 -left-20 w-60 h-60 bg-blue-400/20 rounded-full blur-3xl" />
+                    <div className="absolute bottom-20 right-1/4 w-40 h-40 bg-white/5 rounded-full blur-2xl" />
+                    {/* Grid pattern */}
+                    <div className="absolute inset-0 opacity-10" style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                    }} />
                 </div>
                 <div className="relative z-10 container mx-auto pt-5 px-4">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -87,26 +92,26 @@ const Home = () => {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.6 }}
                         >
-                            <span className="inline-flex items-center px-4 py-2 bg-primary-50 text-primary-700 rounded-full text-sm font-medium mb-6 border border-primary-100">
-                                <span className="w-2 h-2 bg-primary-500 rounded-full mr-2 animate-pulse" />
+                            <span className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full text-sm font-medium mb-6 border border-white/30 shadow-lg">
+                                <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse" />
                                 Trusted by Students
                             </span>
-                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-neutral-900 mb-4 md:mb-6 leading-tight">
+                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 md:mb-6 leading-tight drop-shadow-lg">
                                 Find Your Perfect
-                                <span className="text-primary-600"> PG </span>
+                                <span className="text-blue-100"> PG </span>
                                 <span className="block sm:inline">Near University</span>
                             </h1>
-                            <p className="text-base md:text-lg text-neutral-600 mb-6 md:mb-8">
+                            <p className="text-base md:text-lg text-white/90 mb-6 md:mb-8">
                                 Discover verified, affordable PG accommodations within walking distance of your university. Your comfort, our priority.
                             </p>
                             {}
                             <SearchBar variant="hero" />
                             {}
-                            <div className="grid grid-cols-4 gap-4 md:gap-8 mt-8 md:mt-10">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 mt-8 md:mt-10">
                                 {stats.map((stat, index) => (
-                                    <div key={index} className="text-left">
-                                        <p className="text-xl md:text-3xl font-display font-bold text-neutral-900">{stat.value}</p>
-                                        <p className="text-neutral-500 text-xs md:text-sm">{stat.label}</p>
+                                    <div key={index} className="bg-white/10 backdrop-blur-sm rounded-xl p-3 md:p-4 border border-white/20 hover:bg-white/20 transition-all">
+                                        <p className="text-2xl md:text-3xl font-display font-bold text-white">{stat.value}</p>
+                                        <p className="text-white/80 text-xs md:text-sm mt-1">{stat.label}</p>
                                     </div>
                                 ))}
                             </div>
@@ -163,21 +168,23 @@ const Home = () => {
                 </div>
             </section>
             {}
-            <section className="pt-8 pb-20 bg-neutral-50">
+            <section className="pt-16 pb-20 bg-gradient-to-br from-neutral-50 via-white to-blue-50/20">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
                         <div>
-                            <span className="text-primary-600 font-semibold text-sm uppercase tracking-wider">Featured</span>
-                            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-800 mt-2">
+                            <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-primary-100 to-blue-100 text-primary-700 rounded-full text-sm font-semibold uppercase tracking-wider">
+                                ⭐ Featured
+                            </span>
+                            <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-800 mt-4">
                                 PGs Near You
                             </h2>
-                            <p className="text-neutral-500 mt-2 max-w-lg">
+                            <p className="text-neutral-600 mt-2 max-w-lg">
                                 Accommodations verified for quality and safety
                             </p>
                         </div>
                         <Link
                             to="/browse"
-                            className="mt-4 md:mt-0 inline-flex items-center space-x-2 text-primary-600 font-semibold hover:text-primary-700 group"
+                            className="mt-6 md:mt-0 inline-flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-blue-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-primary-500/30 transition-all group"
                         >
                             <span>View All Properties</span>
                             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,10 +218,10 @@ const Home = () => {
                         </div>
                         
                         {/* Browse More Link */}
-                        <div className="text-center mt-10">
+                        <div className="text-center mt-12">
                             <Link
                                 to="/browse"
-                                className="inline-flex items-center space-x-2 px-6 py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/25"
+                                className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-blue-500 text-white font-semibold rounded-xl hover:shadow-xl hover:shadow-primary-500/30 transition-all transform hover:scale-105"
                             >
                                 <span>Browse More PGs</span>
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -240,11 +247,18 @@ const Home = () => {
                 </div>
             </section>
             {}
-            <section className="py-20 bg-white">
-                <div className="container mx-auto px-4">
+            <section className="py-20 bg-white relative overflow-hidden">
+                {/* Decorative Elements */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-20 right-10 w-72 h-72 bg-primary-100/30 rounded-full blur-3xl" />
+                    <div className="absolute bottom-20 left-10 w-72 h-72 bg-blue-100/30 rounded-full blur-3xl" />
+                </div>
+                <div className="container mx-auto px-4 relative z-10">
                     <div className="text-center mb-16">
-                        <span className="text-primary-600 font-semibold text-sm uppercase tracking-wider">Why Us</span>
-                        <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-800 mt-2">
+                        <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-primary-100 to-blue-100 text-primary-700 rounded-full text-sm font-semibold uppercase tracking-wider">
+                            ✨ Why Us
+                        </span>
+                        <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-800 mt-4">
                             Why Choose Unirooms?
                         </h2>
                     </div>
@@ -281,50 +295,57 @@ const Home = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
-                                className="card p-8 text-center group hover:shadow-card-hover"
+                                className="bg-white rounded-3xl p-8 text-center group hover:shadow-2xl hover:shadow-primary-500/10 transition-all duration-300 border border-neutral-100 hover:border-primary-200 hover:-translate-y-2"
                             >
-                                <div className={`w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center ${feature.color === 'primary' ? 'bg-primary-100 text-primary-600' :
-                                    feature.color === 'accent' ? 'bg-accent-100 text-accent-600' :
-                                        'bg-green-100 text-green-600'
-                                    } group-hover:scale-110 transition-transform duration-300`}>
+                                <div className={`w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center ${
+                                    feature.color === 'primary' ? 'bg-gradient-to-br from-primary-500 to-blue-500 shadow-lg shadow-primary-500/30' :
+                                    feature.color === 'accent' ? 'bg-gradient-to-br from-orange-500 to-red-500 shadow-lg shadow-orange-500/30' :
+                                    'bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg shadow-green-500/30'
+                                } text-white group-hover:scale-110 transition-transform duration-300`}>
                                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         {feature.icon}
                                     </svg>
                                 </div>
-                                <h3 className="text-xl font-display font-bold text-neutral-800 mb-3">{feature.title}</h3>
-                                <p className="text-neutral-500">{feature.description}</p>
+                                <h3 className="text-xl font-display font-bold text-neutral-800 mb-3 group-hover:text-primary-600 transition-colors">{feature.title}</h3>
+                                <p className="text-neutral-600">{feature.description}</p>
                             </motion.div>
                         ))}
                     </div>
                 </div>
             </section>
             {}
-            <section className="py-20 bg-gradient-to-r from-primary-600 to-primary-700 relative overflow-hidden">
+            <section className="py-24 bg-gradient-to-br from-primary-600 via-primary-500 to-blue-500 relative overflow-hidden">
                 <div className="absolute inset-0">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl" />
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl" />
+                    <div className="absolute inset-0 opacity-10" style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                    }} />
                 </div>
                 <div className="container mx-auto px-4 relative z-10 text-center">
-                    <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-6">
+                    <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-6 drop-shadow-lg">
                         Ready to Find Your<br />Perfect PG?
                     </h2>
-                    <p className="text-white/80 text-lg mb-8 max-w-xl mx-auto">
+                    <p className="text-white/90 text-lg mb-10 max-w-xl mx-auto">
                         Join thousands of students who found their ideal accommodation through Unirooms.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link to="/browse" className="btn-accent">
+                        <Link to="/browse" className="px-8 py-4 bg-white text-primary-600 font-semibold rounded-xl hover:bg-white/90 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105">
                             Browse Properties
                         </Link>
-                        <Link to="/signup" className="btn-secondary !bg-white/10 !text-white !border-white/20 hover:!bg-white/20">
+                        <Link to="/signup" className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border-2 border-white/30 hover:bg-white/20 transition-all">
                             Create Account
                         </Link>
                     </div>
                 </div>
             </section>
             {}
-            <section className="py-20 bg-neutral-50">
+            <section className="py-20 bg-gradient-to-br from-neutral-50 via-white to-blue-50/20">
                 <div className="container mx-auto px-4 max-w-4xl">
                     <div className="text-center mb-12">
+                        <span className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-primary-100 to-blue-100 text-primary-700 rounded-full text-sm font-semibold uppercase tracking-wider mb-4">
+                            ❓ FAQ
+                        </span>
                         <h2 className="text-3xl md:text-4xl font-display font-bold text-neutral-800 mb-4">
                             Frequently Asked Questions
                         </h2>
@@ -339,7 +360,7 @@ const Home = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                className="card p-6 cursor-pointer group"
+                                className="bg-white rounded-2xl p-6 cursor-pointer group hover:shadow-xl hover:shadow-primary-500/5 transition-all border border-neutral-100"
                             >
                                 <summary className="font-semibold text-neutral-800 flex items-center justify-between group-hover:text-primary-600 transition-colors">
                                     {faq.question}
