@@ -86,10 +86,16 @@ export const getAllProperties = async (req, res) => {
             Property.countDocuments(filter)
         ]);
 
+        // Hide sensitive information (phone and exact coordinates) from list view
+        const sanitizedProperties = properties.map(property => {
+            const { phone, location, ...rest } = property;
+            return rest;
+        });
+
         res.status(200).json({
             success: true,
             data: {
-                properties,
+                properties: sanitizedProperties,
                 pagination: {
                     page: Number(page),
                     limit: Number(limit),
@@ -132,15 +138,24 @@ export const getPropertyById = async (req, res) => {
         // Convert to plain object to manipulate
         const propertyData = property.toObject();
 
-        // Hide sensitive owner details if user is not authenticated
-        if (!req.user && propertyData.landlordId) {
-            // Only expose name and profileImage for unauthenticated users
-            // Remove sensitive fields: email and phone
-            propertyData.landlordId = {
-                _id: propertyData.landlordId._id,
-                name: propertyData.landlordId.name,
-                profileImage: propertyData.landlordId.profileImage
-            };
+        // Hide sensitive details if user is not authenticated
+        if (!req.user) {
+            // Hide landlord's email and phone
+            if (propertyData.landlordId) {
+                propertyData.landlordId = {
+                    _id: propertyData.landlordId._id,
+                    name: propertyData.landlordId.name,
+                    profileImage: propertyData.landlordId.profileImage
+                };
+            }
+            
+            // Hide property's phone number
+            delete propertyData.phone;
+            
+            // Hide exact location coordinates - keep general location info only
+            if (propertyData.location && propertyData.location.coordinates) {
+                delete propertyData.location;
+            }
         }
 
         res.status(200).json({
@@ -782,10 +797,13 @@ export const getPropertiesNearCollege = async (req, res) => {
             .limit(Number(limit))
             .lean();
 
-        const formattedProperties = properties.map((property) => ({
-            ...property,
-            landlord: property.landlordId,
-        }));
+        const formattedProperties = properties.map((property) => {
+            const { phone, location, ...rest } = property;
+            return {
+                ...rest,
+                landlord: rest.landlordId,
+            };
+        });
 
         res.status(200).json({
             success: true,
