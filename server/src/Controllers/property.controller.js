@@ -78,7 +78,7 @@ export const getAllProperties = async (req, res) => {
         // Execute queries in parallel for faster response
         const [properties, total] = await Promise.all([
             Property.find(filter)
-                .populate("landlordId", "name email phone profileImage")
+                .populate("landlordId", "name profileImage")  // Only expose name and profileImage
                 .sort(sortObj)
                 .skip(skip)
                 .limit(Number(limit))
@@ -129,9 +129,23 @@ export const getPropertyById = async (req, res) => {
 
         await property.incrementViews();
 
+        // Convert to plain object to manipulate
+        const propertyData = property.toObject();
+
+        // Hide sensitive owner details if user is not authenticated
+        if (!req.user && propertyData.landlordId) {
+            // Only expose name and profileImage for unauthenticated users
+            // Remove sensitive fields: email and phone
+            propertyData.landlordId = {
+                _id: propertyData.landlordId._id,
+                name: propertyData.landlordId.name,
+                profileImage: propertyData.landlordId.profileImage
+            };
+        }
+
         res.status(200).json({
             success: true,
-            data: { property },
+            data: { property: propertyData },
         });
     } catch (error) {
         console.error("Get Property Error:", error);
@@ -762,7 +776,7 @@ export const getPropertiesNearCollege = async (req, res) => {
 
         const skip = (Number(page) - 1) * Number(limit);
         const properties = await Property.find(filter)
-            .populate("landlordId", "name email phone profileImage")
+            .populate("landlordId", "name profileImage")  // Only expose name and profileImage
             .sort({ [sortBy]: order === "asc" ? 1 : -1 })
             .skip(skip)
             .limit(Number(limit))
