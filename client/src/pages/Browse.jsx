@@ -12,7 +12,6 @@ const Browse = () => {
     // Use campus parameter if available, otherwise use search parameter
     const [searchQuery, setSearchQuery] = useState(campusParam || initialSearch);
     const [selectedType, setSelectedType] = useState('all');
-    const [minRating, setMinRating] = useState(0);
     const [sortBy, setSortBy] = useState('recommended');
     const [showFilters, setShowFilters] = useState(false);
     const [properties, setProperties] = useState([]);
@@ -49,14 +48,7 @@ const Browse = () => {
                 };
                 if (searchQuery) params.search = searchQuery;
                 if (selectedType !== 'all') {
-                    // Map UI labels to database gender field
-                    if (selectedType === 'Boys PG') {
-                        params.gender = 'male';
-                    } else if (selectedType === 'Girls PG') {
-                        params.gender = 'female';
-                    } else {
-                        params.gender = 'any';
-                    }
+                    params.gender = selectedType;
                 }
                 
                 const response = await propertyAPI.getAllProperties(params);
@@ -83,36 +75,21 @@ const Browse = () => {
     }, [selectedType, searchQuery]);
     const propertyTypes = [
         { value: 'all', label: 'All Types' },
-        { value: 'Boys PG', label: 'Boys PG' },
-        { value: 'Girls PG', label: 'Girls PG' },
-        { value: 'Co-Living', label: 'Co-Living' },
-        { value: 'Hostel', label: 'Hostel' },
+        { value: 'male', label: 'Boys PG' },
+        { value: 'female', label: 'Girls PG' },
+        { value: 'any', label: 'Co-ed (Any Gender)' },
     ];
     const sortOptions = [
         { value: 'recommended', label: 'Recommended' },
         { value: 'price-low', label: 'Price: Low to High' },
         { value: 'price-high', label: 'Price: High to Low' },
-        { value: 'rating', label: 'Highest Rated' },
     ];
     const filteredProperties = useMemo(() => {
         let result = [...properties];
-        // Backend already handles search filtering, so we skip it here
-        // Only apply filters that aren't sent to backend
-        if (selectedType !== 'all') {
-            // Map UI labels to database gender field
-            let genderFilter;
-            if (selectedType === 'Boys PG') {
-                genderFilter = 'male';
-            } else if (selectedType === 'Girls PG') {
-                genderFilter = 'female';
-            } else {
-                genderFilter = 'any'; // Co-Living, Hostel, etc.
-            }
-            result = result.filter((p) => p.gender === genderFilter);
-        }
-        if (minRating > 0) {
-            result = result.filter((p) => (p.rating || 0) >= minRating);
-        }
+        // Backend already handles search and gender filtering
+        // Gender filter: backend returns gender-specific + "any" gender PGs
+        // So Boys PG filter shows male + any, Girls PG shows female + any
+        
         switch (sortBy) {
             case 'price-low':
                 result.sort((a, b) => a.price - b.price);
@@ -120,24 +97,19 @@ const Browse = () => {
             case 'price-high':
                 result.sort((a, b) => b.price - a.price);
                 break;
-            case 'rating':
-                result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-                break;
             default:
                 break;
         }
         return result;
-    }, [properties, selectedType, minRating, sortBy]);
+    }, [properties, sortBy]);
     const clearFilters = () => {
         setSelectedType('all');
-        setMinRating(0);
         setSortBy('recommended');
         setSearchQuery('');
         window.history.pushState({}, '', '/browse');
     };
     const hasActiveFilters =
         selectedType !== 'all' ||
-        minRating > 0 ||
         searchQuery;
     return (
         <div className="min-h-screen bg-neutral-50 pt-28 pb-24">
@@ -223,35 +195,6 @@ const Browse = () => {
                                                 className="sr-only"
                                             />
                                         </label>
-                                    ))}
-                                </div>
-                            </div>
-                            {}
-                            <div className="mb-6">
-                                <h3 className="text-sm font-semibold text-neutral-700 mb-3">
-                                    Minimum Rating
-                                </h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {[0, 3, 3.5, 4, 4.5].map((rating) => (
-                                        <button
-                                            key={rating}
-                                            onClick={() => setMinRating(rating)}
-                                            className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${minRating === rating
-                                                ? 'bg-primary-600 text-white shadow-button'
-                                                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                                                }`}
-                                        >
-                                            {rating === 0 ? 'Any' : `${rating}+`}
-                                            {rating > 0 && (
-                                                <svg
-                                                    className="w-3.5 h-3.5 inline ml-1 text-amber-400"
-                                                    fill="currentColor"
-                                                    viewBox="0 0 20 20"
-                                                >
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            )}
-                                        </button>
                                     ))}
                                 </div>
                             </div>
