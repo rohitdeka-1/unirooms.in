@@ -1,15 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-leaflet', 'leaflet'],
   },
   build: {
-    // Code splitting for better performance
-    rollupOptions: {
+     rollupOptions: {
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
@@ -18,8 +16,7 @@ export default defineConfig({
         }
       }
     },
-    // Minify and compress
-    minify: 'terser',
+     minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true,

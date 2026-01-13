@@ -166,7 +166,7 @@ const Browse = () => {
             </div>
 
             {/* Quick Filter Pills */}
-            <div className="container mx-auto px-4 -mt-6 relative z-100 mb-4">
+            <div className="container mx-auto px-4 -mt-8 relative z-100 mb-2">
                 <div className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start">
                     {propertyTypes.map((type) => (
                         <button
@@ -297,7 +297,7 @@ const Browse = () => {
                     {/* Main Content Area */}
                     <div className="flex-1">
                         {/* Results Bar */}
-                        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-white rounded-2xl p-4 shadow-lg shadow-neutral-100 border border-neutral-100">
+                        <div className="flex flex-wrap items-center justify-between gap-4 mb-6  bg-white rounded-2xl p-2 shadow-lg shadow-neutral-100 border border-neutral-100">
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => setShowFilters(true)}
