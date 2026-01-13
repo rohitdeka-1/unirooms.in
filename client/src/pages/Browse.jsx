@@ -166,7 +166,7 @@ const Browse = () => {
             </div>
 
             {/* Quick Filter Pills */}
-            <div className="container mx-auto px-4 -mt-6 relative z-10 mb-4">
+            <div className="container mx-auto px-4 -mt-6 relative z-100 mb-4">
                 <div className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start">
                     {propertyTypes.map((type) => (
                         <button
