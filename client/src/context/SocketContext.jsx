@@ -17,13 +17,38 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        const socketUrl = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:5000';
+        // Get base URL correctly - production Heroku URL or localhost
+        let socketUrl;
+        if (import.meta.env.VITE_API_URL) {
+            // Extract base URL from API URL (remove /api/v1)
+            socketUrl = import.meta.env.VITE_API_URL.replace('/api/v1', '');
+        } else {
+            socketUrl = 'http://localhost:5000';
+        }
+        
         const newSocket = io(socketUrl, {
-            transports: ['websocket', 'polling']
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            reconnectionAttempts: 5,
+            withCredentials: true
         });
 
         newSocket.on('connect', () => {
-            console.log('Connected to socket server');
+            console.log('✅ Connected to socket server:', socketUrl);
+        });
+
+        newSocket.on('connect_error', (error) => {
+            console.error('❌ Socket connection error:', error.message);
+        });
+
+        newSocket.on('reconnect', (attemptNumber) => {
+            console.log('🔄 Reconnected after', attemptNumber, 'attempts');
+        });
+
+        newSocket.on('disconnect', (reason) => {
+            console.log('🔌 Socket disconnected:', reason);
         });
 
         newSocket.on('userStats', ({ current, peak }) => {

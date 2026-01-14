@@ -14,11 +14,17 @@ const httpServer = createServer(app);
         origin: ['https://unirooms-in.vercel.app', 'http://localhost:5173', 'https://unirooms.in'],
         methods: ['GET', 'POST'],
         credentials: true
-    }
+    },
+    transports: ['websocket', 'polling'],
+    allowEIO3: true,
+    pingTimeout: 60000,
+    pingInterval: 25000
 });
 
 let connectedUsers = 0;
 let peakUsers = 0;
+ 
+
 
 io.on('connection', (socket) => {
     connectedUsers++;
@@ -34,6 +40,8 @@ io.on('connection', (socket) => {
         io.emit('userStats', { current: connectedUsers, peak: peakUsers });
     });
 });
+
+
 
 connectDb().then(() => {
     httpServer.listen(PORT, () => {
