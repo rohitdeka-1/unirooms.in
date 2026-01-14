@@ -17,23 +17,19 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        // Determine socket URL based on environment
-        let socketUrl;
-        if (import.meta.env.VITE_API_URL) {
-            // If env var is set, use it
-            socketUrl = import.meta.env.VITE_API_URL.replace('/api/v1', '');
-        } else if (window.location.hostname === 'localhost') {
-            // Local development
-            socketUrl = 'http://localhost:5000';
-        } else {
-            // Production fallback - use your Heroku URL
-            socketUrl = 'https://unirooms-01cba0aba98a.herokuapp.com';
-        }
+        // Socket.IO must connect directly to Heroku backend, not through Vercel proxy
+        const isDevelopment = window.location.hostname === 'localhost' || 
+                             window.location.hostname === '127.0.0.1';
         
-        console.log('🔌 Attempting to connect to:', socketUrl);
+        const socketUrl = isDevelopment 
+            ? 'http://localhost:5000'
+            : 'https://unirooms-01cba0aba98a.herokuapp.com';
+        
+        console.log('🔌 Socket.IO connecting to:', socketUrl);
         
         const newSocket = io(socketUrl, {
-            transports: ['websocket', 'polling']
+            transports: ['websocket', 'polling'],
+            withCredentials: true
         });
 
         newSocket.on('connect', () => {
