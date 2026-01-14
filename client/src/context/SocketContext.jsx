@@ -17,7 +17,18 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        const socketUrl = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:5000';
+        // Determine socket URL based on environment
+        let socketUrl;
+        if (import.meta.env.VITE_API_URL) {
+            // If env var is set, use it
+            socketUrl = import.meta.env.VITE_API_URL.replace('/api/v1', '');
+        } else if (window.location.hostname === 'localhost') {
+            // Local development
+            socketUrl = 'http://localhost:5000';
+        } else {
+            // Production fallback - use your Heroku URL
+            socketUrl = 'https://unirooms-01cba0aba98a.herokuapp.com';
+        }
         
         console.log('🔌 Attempting to connect to:', socketUrl);
         
