@@ -5,6 +5,7 @@ import helmet from "helmet";
 import hpp from "hpp";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 import apiRoutes from "./Routes/index.js";
 import { apiLimiter } from "./Middlewares/security.middleware.js";
 import Property from "./Models/property.model.js";
@@ -101,7 +102,17 @@ app.use("/api/v1", apiRoutes);
 
 // Serve static files from React build (if available in production)
 const clientBuildPath = path.join(__dirname, '../../client/dist');
-app.use(express.static(clientBuildPath));
+const indexHtmlPath = path.join(clientBuildPath, 'index.html');
+
+// Check if build directory exists
+const buildExists = fs.existsSync(clientBuildPath) && fs.existsSync(indexHtmlPath);
+
+if (buildExists) {
+    app.use(express.static(clientBuildPath));
+    console.log('✓ Serving static files from:', clientBuildPath);
+} else {
+    console.log('⚠ Client build not found. API-only mode. Build path:', clientBuildPath);
+}
 
 // API root endpoint - must come before catch-all
 app.get('/api', (req, res) => {
@@ -133,7 +144,15 @@ app.get('/property/:id', async (req, res, next) => {
                 .lean();
 
             if (!property || !property.isVerified) {
-                return res.status(404).sendFile(path.join(clientBuildPath, 'index.html'));
+                // If build exists, serve index.html, otherwise send 404 JSON
+                if (buildExists) {
+                    return res.status(404).sendFile(indexHtmlPath);
+                } else {
+                    return res.status(404).json({
+                        success: false,
+                        message: "Property not found"
+                    });
+                }
             }
 
             const html = generatePropertyHTML(property);
@@ -141,8 +160,15 @@ app.get('/property/:id', async (req, res, next) => {
             res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
             return res.send(html);
         } else {
-            // For regular users, serve the React app
-            return res.sendFile(path.join(clientBuildPath, 'index.html'));
+            // For regular users, serve the React app if build exists
+            if (buildExists) {
+                return res.sendFile(indexHtmlPath);
+            } else {
+                return res.status(503).json({
+                    success: false,
+                    message: "Frontend not available. API is running."
+                });
+            }
         }
     } catch (error) {
         console.error('Error serving property page:', error);
@@ -157,12 +183,17 @@ app.use((req, res, next) => {
         return next();
     }
     
-    // Serve index.html for all other routes (SPA routing)
-    res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
-        if (err) {
-            next();
-        }
-    });
+    // Serve index.html for all other routes (SPA routing) only if build exists
+    if (buildExists) {
+        res.sendFile(indexHtmlPath, (err) => {
+            if (err) {
+                next();
+            }
+        });
+    } else {
+        // If no build, let it fall through to error handler
+        next();
+    }
 });
 
 app.use((err, req, res, next) => {
