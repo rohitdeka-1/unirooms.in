@@ -144,15 +144,12 @@ app.get('/property/:id', async (req, res, next) => {
                 .lean();
 
             if (!property || !property.isVerified) {
-                // If build exists, serve index.html, otherwise send 404 JSON
-                if (buildExists) {
-                    return res.status(404).sendFile(indexHtmlPath);
-                } else {
-                    return res.status(404).json({
-                        success: false,
-                        message: "Property not found"
-                    });
-                }
+                // Return simple 404 HTML for bots
+                return res.status(404).send(`
+                    <!DOCTYPE html>
+                    <html><head><title>Property Not Found</title></head>
+                    <body><h1>Property Not Found</h1></body></html>
+                `);
             }
 
             const html = generatePropertyHTML(property);
@@ -160,19 +157,18 @@ app.get('/property/:id', async (req, res, next) => {
             res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
             return res.send(html);
         } else {
-            // For regular users, serve the React app if build exists
-            if (buildExists) {
-                return res.sendFile(indexHtmlPath);
-            } else {
-                return res.status(503).json({
-                    success: false,
-                    message: "Frontend not available. API is running."
-                });
-            }
+            // For regular users, redirect to the frontend (Vercel)
+            // This handles cases where someone directly hits the server URL
+            const frontendUrl = process.env.FRONTEND_URL || 'https://unirooms.in';
+            return res.redirect(301, `${frontendUrl}/property/${req.params.id}`);
         }
     } catch (error) {
         console.error('Error serving property page:', error);
-        next();
+        // For errors, return JSON
+        res.status(500).json({
+            success: false,
+            message: "Error loading property"
+        });
     }
 });
 
