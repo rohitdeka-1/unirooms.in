@@ -6,6 +6,7 @@ import { searchColleges, getCollegeByName, popularColleges } from "../Services/c
 import { sendNewPropertyNotification, sendPropertyDeclineEmail } from "../Services/email.service.js";
 import cloudinary from "../Config/cloudinary.config.js";
 import streamifier from 'streamifier';
+import { generatePropertyHTML } from "../Utils/htmlTemplate.js";
 
 // Helper function to generate optimized Cloudinary URLs
 const getOptimizedCloudinaryUrl = (url, options = {}) => {
@@ -1001,6 +1002,26 @@ export const declineProperty = async (req, res) => {
             message: "Error declining property",
             error: error.message,
         });
+    }
+};
+
+// Get property metadata for social sharing
+export const getPropertyMetadata = async (req, res) => {
+    try {
+        const property = await Property.findById(req.params.id)
+            .select('title description images rent price city nearbyCollege roomType gender address location totalRooms state')
+            .lean();
+
+        if (!property || !property.isVerified) {
+            return res.status(404).send('Property not found');
+        }
+
+        const html = generatePropertyHTML(property);
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.send(html);
+    } catch (error) {
+        console.error("Get Property Metadata Error:", error);
+        res.status(500).send('Error loading property');
     }
 };
 

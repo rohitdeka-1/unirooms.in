@@ -5,6 +5,10 @@
       "destination": "https://unirooms-01cba0aba98a.herokuapp.com/api/:path*"
     },
     {
+      "source": "/property/:id",
+      "destination": "https://unirooms-01cba0aba98a.herokuapp.com/property/:id"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

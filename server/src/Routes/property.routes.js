@@ -14,6 +14,7 @@ import {
     getAllPropertiesAdmin,
     approveProperty,
     declineProperty,
+    getPropertyMetadata,
 } from "../Controllers/property.controller.js";
 import { protect, authorize, optionalAuth } from "../Middlewares/auth.middleware.js";
 import { isAdmin } from "../Middlewares/admin.middleware.js";
