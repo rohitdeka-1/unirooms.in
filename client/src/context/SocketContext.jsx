@@ -23,7 +23,7 @@ export const SocketProvider = ({ children }) => {
 
         const socketUrl = isDevelopment 
             ? 'http://localhost:5000'
-            : 'http://139.59.43.165:5000';
+            : window.location.origin;
 
         console.log('🔌 Socket.IO connecting to:', socketUrl);
 
