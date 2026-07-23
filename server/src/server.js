@@ -23,13 +23,13 @@ let peakUsers = 0;
 io.on('connection', (socket) => {
     connectedUsers++;
     console.log('✅ User connected. Total:', connectedUsers);
-    
+
     if (connectedUsers > peakUsers) {
         peakUsers = connectedUsers;
     }
-    
+
     io.emit('userStats', { current: connectedUsers, peak: peakUsers });
-    
+
     socket.on('disconnect', () => {
         connectedUsers--;
         console.log('❌ User disconnected. Total:', connectedUsers);
