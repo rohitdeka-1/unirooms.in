@@ -21,7 +21,9 @@ export const SocketProvider = ({ children }) => {
         const isDevelopment = window.location.hostname === 'localhost' ||
             window.location.hostname === '127.0.0.1';
 
-        const socketUrl = 'https://api.unirooms.in';
+        const socketUrl = isDevelopment 
+            ? 'http://localhost:5000'
+            : 'http://139.59.43.165:5000';
 
         console.log('🔌 Socket.IO connecting to:', socketUrl);
 
