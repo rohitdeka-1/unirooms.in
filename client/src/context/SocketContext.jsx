@@ -28,7 +28,7 @@ export const SocketProvider = ({ children }) => {
         console.log('🔌 Socket.IO connecting to:', socketUrl);
 
         const newSocket = io(socketUrl, {
-            transports: ['websocket', 'polling'],
+            transports: ['polling'],
             withCredentials: true
         });
 
