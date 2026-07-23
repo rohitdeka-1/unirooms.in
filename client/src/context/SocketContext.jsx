@@ -18,15 +18,13 @@ export const SocketProvider = ({ children }) => {
 
     useEffect(() => {
         // Socket.IO must connect directly to Heroku backend, not through Vercel proxy
-        const isDevelopment = window.location.hostname === 'localhost' || 
-                             window.location.hostname === '127.0.0.1';
-        
-        const socketUrl = isDevelopment 
-            ? 'http://localhost:5000'
-            : 'https://unirooms-01cba0aba98a.herokuapp.com';
-        
+        const isDevelopment = window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1';
+
+        const socketUrl = 'https://api.unirooms.in';
+
         console.log('🔌 Socket.IO connecting to:', socketUrl);
-        
+
         const newSocket = io(socketUrl, {
             transports: ['websocket', 'polling'],
             withCredentials: true
