@@ -11,7 +11,7 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
     cors: {
-        origin: ['https://unirooms-in.vercel.app', 'http://localhost:5173', 'https://unirooms.in'],
+        origin: ['https://unirooms-in.vercel.app', 'http://localhost:5173', 'https://unirooms.in', 'https://www.unirooms.in'],
         methods: ['GET', 'POST'],
         credentials: true
     }

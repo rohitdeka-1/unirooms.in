@@ -46,7 +46,7 @@ app.use(cookieParser());
 
 
 const corsOptions = {
-    origin: ['https://unirooms-in.vercel.app', 'http://localhost:5173', 'https://unirooms.in'],
+    origin: ['https://unirooms-in.vercel.app', 'http://localhost:5173', 'https://unirooms.in', 'https://www.unirooms.in'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
